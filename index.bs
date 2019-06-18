@@ -41,7 +41,7 @@ Abstract:
 </pre>
 
 <pre class="anchors">
-urlPrefix: https://tc39.es/ecma262/; spec: ECMASCRIPT
+urlPrefix: https://tc39.es/ecma262/; spec: ECMAScript
     text: SharedArrayBuffer; type: interface; url: sec-sharedarraybuffer-objects
 urlPrefix: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure; spec: I-D.ietf-httpbis-header-structure
     type: dfn
@@ -51,6 +51,8 @@ urlPrefix: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure; spec
             text: dictionary; url: #section-3.1
             text: token; url: #section-3.9
             text: boolean; url: #section-3.11
+    type: grammar
+        text: sh-token; url: #section-3.9
     type: abstract-op
         text: serialize Structured Header; url: #section-4.1
         text: Structured Header parsing algorithm; url: #section-4.2.7
@@ -60,6 +62,7 @@ urlPrefix: https://html.spec.whatwg.org/
     type: abstract-op
         text: initialize the Document object; url: multipage/browsing-the-web.html#initialise-the-document-object
         text: create a new browsing context; url: multipage/browsers.html#creating-a-new-browsing-context
+        text: run a worker; url: multipage/workers.html#run-a-worker
 </pre>
 
 <pre class="link-defaults">
@@ -70,6 +73,8 @@ spec:html; type:dfn; for:/; text:browsing context
 spec:html; type:dfn; text:environment
 spec:html; type:dfn; text: browsing context group
 spec:fetch; type:dfn; for:/; text:response
+spec:fetch; type:dfn; for:/; text:cross-origin resource policy check
+spec:html; type:dfn; for:/; text:global object
 </pre>
 
 Introduction {#intro}
@@ -120,8 +125,8 @@ the bits and pieces discussed above.
 Framework {#framework}
 ======================
 
-`Cross-Origin-Embedding-Policy` HTTP Response Header {#COEP}
-------------------------------------------------------------
+The `Cross-Origin-Embedding-Policy` HTTP Response Header {#COEP}
+----------------------------------------------------------------
 
 The <dfn http-header>`Cross-Origin-Embedding-Policy`</dfn> HTTP response header field allows a
 server to declare an embedding policy for a given document. It is a [=Structured Header=] whose
@@ -134,9 +139,85 @@ Cross-Origin-Embedding-Policy = sh-token
 The only currently valid `Cross-Origin-Embedding-Policy` value is "`require-corp`".
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
-this header if it contains an invalid value.
+this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
+value cannot be parsed as a <a grammar>`sh-token`</a>.
 
+ISSUE: Anne suggested that we ought to fail closed instead in
+[a comment on the relevant PR](https://github.com/whatwg/fetch/pull/893#discussion_r274867414). I'm
+writing it down this way, as it still seems to me to be correct, but we should discuss more until we
+agree on the behavior.
 
+Parsing {#parsing}
+------------------
+
+<div algorithm="parsing the header">
+To <dfn abstract-op local-lt="parse header">obtain a response's embedding policy</dfn> given a
+[=response=] (|response|):
+
+1.  Let |policy| be "`none`".
+
+2.  Let |header| be the result of [=extracting header values=] given `Cross-Origin-Embedding-Policy`
+    and |response|'s [=response/header list=].
+
+3.  If |header| matches the <a grammar>`sh-token`</a> grammar:
+
+    1.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
+        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
+        to "`item`".
+
+        ISSUE: Not sure if this is the right integration between Fetch's understanding of header
+        values and Structured Headers.
+
+    2.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
+
+4.  Return |policy|.
+
+<div class="note">
+Note: This fails open (by defaulting to "`none`") in the presence of a header that cannot be
+parsed as a [=structured header/token=]. This includes inadvertant lists created by combining
+multiple instances of the `Cross-Origin-Embedding-Policy` header present in a given response:
+
+<table class="data">
+  <thead>
+    <tr>
+      <th>`Cross-Origin-Embedding-Policy`</th>
+      <th>Final Policy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>No header delivered</em></td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp`</td>
+      <td>`require-corp`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp, unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value, unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value, require-corp`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp, require-corp`</td>
+      <td>`none`</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</div>
 
 
 Integrations {#integrations}
@@ -145,93 +226,282 @@ Integrations {#integrations}
 Integration with HTML {#integration-html}
 -----------------------------------------
 
-When creating a document, user agents MUST process any
-<a http-header>`Cross-Origin-Embedding-Policy`</a> header delivered by the server, imposing any
+When creating a document, user agents will process
+<a http-header>`Cross-Origin-Embedding-Policy`</a> headers delivered by the server, imposing any
 restrictions it asserts. Likewise, user agents MUST also take into account the embedding policy
 asserted by the document's opener or embedder, ensuring that they're properly imposed as well. To do
 so, HTML is patched as follows:
 
-1.  {{Document}} objects are given an <dfn for="document">embedding policy</dfn>, whose value is
-    either "`none`", or "`require-corp`". By default, its value is "`none`".
+1.  An <dfn>embedding policy</dfn> is a string with one of the following values: "`none`",
+    "`require-corp`".
 
-2.  [=Browsing context=] objects are given an associated <dfn for="browsing context">creator
-    embedding policy</dfn>, wose value is either "`none`", or "`require-corp`". By default, its
-    value is "`none`".
+2.  The [=/embedding policy=] is persisted on a number of objects:
 
-3.  The [$create a new browsing context$] algorithm sets the [=document/embedding policy=] for
+    1.  {{Document}} objects are given an <dfn for="document">embedding policy</dfn> property, whose
+        value is an [=/embedding policy=] defaulting to "`none`".
+
+    2.  {{WorkerGlobalScope}} objects are given a <dfn for="WorkerGlobalScope">embedding
+        policy</dfn> property, whose value is an [=/embedding policy=] defaulting to "`none`".
+
+    3.  [=Environment settings objects=] are given a <dfn for="environment settings object">embedding
+        policy</dfn> accessor, which has the following implementations:
+
+        :   For {{Window}} objects:
+        ::  Return the [=document/embedding policy=] of <var ignore>window</var>'s
+            [=associated Document=].
+        :   For {{WorkerGlobalScope}} objects:
+        ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedding policy=].
+
+3.  [=Browsing context=] objects are given an associated <dfn for="browsing context">creator
+    embedding policy</dfn>, whose value is an [=/embedding policy=] defaulting to "`none`".
+
+4.  The [$create a new browsing context$] algorithm sets the [=document/embedding policy=] for
     a browsing context's initial `about:blank` document by:
 
-    1.  Persisting the |creator| {{Document}}'s [=document/embedding policy=] on the newly created
-        [=browsing context=]'s [=browsing context/creator embedding policy=] in step 2 of the
-        existing algorithm.
+    1.  Persisting the <var ignore>creator</var> {{Document}}'s [=document/embedding policy=] on the
+        newly created [=browsing context=]'s [=browsing context/creator embedding policy=] in step 2
+        of the existing algorithm.
 
     2.  Adding a new step directly after Referrer Policy is initialized in step 11 of the existing
-        algorithm  which will copy any creator document's policy:
+        algorithm  which will copy any <var ignore>creator</var> document's policy:
 
-        > 12.  Set |document|'s [=document/embedding policy=] to <var ignore>browsingContext</var>'s
-        >      [=browsing context/creator embedding policy=].
+        > 12.  Set <var ignore>document</var>'s [=document/embedding policy=] to
+        >      <var ignore>browsingContext</var>'s [=browsing context/creator embedding policy=].
 
-4.  The [$initialize the Document object$] algorithm sets the [=document/embedding policy=] for
+5.  The [$initialize the Document object$] algorithm sets the [=document/embedding policy=] for
     {{Document}}s to which a [=browsing context=] is navigated by adding a new step directly after
     Referrer Policy is initialized in step 6:
 
-    > 7.  [$Initialize a Document's embedding policy from a response$] given
+    > 7.  Call [$initialize a Document's embedding policy from a response$] given
     >     <var ignore>document</var> and <var ignore>response</var>.
 
-Each document's [=document/embedding policy=] will be set to "`require-corp`" if it's embedded
-in a document whose [=document/embedding policy=] is "`require-corp`"
+6.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedding policy=] for
+    {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
+    in step 12.5:
 
-Initializing a `Document`'s Embedding Policy {#initialize-embedding-policy}
----------------------------------------------------------------------------
+    > 6.  Call [$initialize a global object's embedding policy from a response$] given
+    >     <var ignore>worker global scope</var> and <var ignore>response</var>.
+
+### Initializing a `Document`'s Embedding Policy ### {#initialize-embedding-policy-for-document}
 
 <div algorithm="to initialize a Document's embedding policy from a response">
 To <dfn abstract-op>initialize a Document's embedding policy from a response</dfn>, given a
 {{Document}} object (|document|) and a [=response=] (|response|):
 
+1.  Let |policy| be the result of [$parse header|obtaining an embedding policy$] from |response|.
 
-1.  Let |policy| be "`none`".
+2.  Let |inherit from| be `null`.
 
-2.  Let |parsed-policy| be the result of executing the [$Structured Header parsing algorithm$] with
-    <var ignore>input_string</var> set to the result of [=extracting header values=] given
-    `Cross-Origin-Embedding-Policy` and |response|'s [=response/header list=], and
-    <var ignore>header_type</var> set to "`item`".
+3.  If |document|'s [=browsing context=] is a [=nested browsing context=], then set |inherit from|
+    to the {{Document}} [=nested through|through which=] |context| is nested.
 
-    Issue: If we get a malformed header (as opposed to a header that contains an unknown token),
-    should we fail closed (e.g. "`require-corp`") or open (e.g. "`none`")?
+4.  If |document|'s [=browsing context=] is an [=auxiliary browsing context=], then set
+    |inherit from| to the [=active document=] of |context|'s [=opener browsing context=].
 
-3.  If |parsed-policy| is "`require-corp`", set |policy| to "`require-corp`".
+5.  If |inherit from| is not `null`, and |inherit from|'s [=document/embedding policy=] is
+    "`require-corp`", set |policy| to "`require-corp`".
 
-4.  Let |context| be |document|'s [=browsing context=].
-
-5.  If |context| is a [=nested browsing context=]:
-
-    1.  Let |parent| be the {{Document}} [=nested through|through which=] |context| is nested.
-
-    2.  If |parent|'s [=document/embedding policy=] is "`require-corp`", set |policy| to
-        "`require-corp`".
-
-6.  If |context| is an [=auxiliary browsing context=]:
-
-    1.  Let.
+6.  Set |document|'s [=document/embedding policy=] to |policy|.
 
 </div>
 
-ISSUE: Not sure if this is the right integration between Fetch's understanding of header values
-and Structured Headers. Perhaps Fetch should be doing more work here?
+<div class="example">
+If `https://example.com/` is loaded as a non-auxiliary top-level document, its
+[=document/embedding policy=] will depend soley upon the `Cross-Origin-Embedding-Policy` header
+it includes. That is:
 
-The <a http-header>`Cross-Origin-Resource-Policy`</a> HTTP response header aims to give servers
-the ability to mitigate this risk by explicitly declaring the scope in which a given resource is
-expected to be available to "`no-cors`" requests. Servers can prevent cross-origin/-site
-embeddings by asserting `Cross-Origin-Resource-Policy: same-origin` or
-`Cross-Origin-Resource-Policy: same-site` respectively, which provides the user agent with enough
-context to ensure that the resource never enters a process which might be controlled by another
-party. 
+<table class="data">
+  <thead>
+    <tr>
+      <th>`Cross-Origin-Embedding-Policy`</th>
+      <th>Final Policy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>No header delivered</em></td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp`</td>
+      <td>`require-corp`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp, unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value, unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value, require-corp`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp, require-corp`</td>
+      <td>`none`</td>
+    </tr>
+  </tbody>
+</table>
 
-As currently defined, this mechanism is a purely opt-in hardening mechanism. 
+If `https://example.com/` is loaded as a nested or auxiliary document, its
+[=document/embedding policy=] will depend both upon the `Cross-Origin-Embedding-Policy` header it
+includes, as well as its parent's or opener's [=document/embedding policy=], respectively. That is:
 
-This document proposes an extension to this opt-in mechanism that would give an embedding context
-the ability to assert 
+<table class="data">
+  <thead>
+    <tr>
+      <th>`Cross-Origin-Embedding-Policy`</th>
+      <th>Parent / Opener Policy</th>
+      <th>Final Policy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>No header delivered</em></td>
+      <td>`none`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td><em>No header delivered</em></td>
+      <td>`require-corp`</td>
+      <td>`require-corp`</td>
+    </tr>
+    <tr>
+      <td>`require-corp`</td>
+      <td>`none`</td>
+      <td>`require-corp`</td>
+    </tr>
+    <tr>
+      <td>`require-corp`</td>
+      <td>`require-corp`</td>
+      <td>`require-corp`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value`</td>
+      <td>`none`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value`</td>
+      <td>`require-corp`</td>
+      <td>`require-corp`</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
+### Initializing a global object's Embedding Policy ### {#initialize-embedding-policy-for-global}
+
+<div algorithm="to initialize a global object's embedding policy from a response">
+To <dfn abstract-op>initialize a global object's embedding policy from a response</dfn>, given a
+[=global object=] (|global|) and a [=response=] (|response|):
+
+1.  Let |policy| be "`none`".
+
+2.  Let |response policy| be the result of [$parse header|obtaining an embedding policy$] from
+    |response|.
+
+3.  Run the steps corresponding to the first matching statement:
+
+    :   |response|'s [=response/url=]'s [=url/scheme=] is a [=local scheme=]
+    :   |global| is a {{DedicatedWorkerGlobalScope}}:
+    ::  1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
+    
+            1.  If the item's [=/embedding policy=] is "`require-corp`", set |policy| to
+                "`require-corp`".
+
+    :   |global| is a {{SharedWorkerGlobalScope}}:
+    ::  1.   Set |policy| to |response policy|.
+
+        2.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
+    
+            1.  If the item's [=/embedding policy=] is "`require-corp`", set |policy| to
+                "`require-corp`".
+
+        ISSUE: Is this the right model for {{SharedWorker}}?
+
+    :   |global| is a {{ServiceWorkerGlobalScope}}:
+    ::  1.   Set |policy| to |response policy|.
+
+4.  Set |global|'s [=WorkerGlobalScope/embedding policy=] to |policy|.
+
+</div>
+
+
+Integration with Fetch {#integration-fetch}
+-------------------------------------------
+
+When fetching resources, user agents should examine both the [=request=]'s [=request/client=] and
+[=request/reserved client=] to determine the applicable [=/embedding policy=], and apply any constraints that policy expresses
+to incoming responses. To do so, Fetch is patched as follows:
+
+1.  The `Cross-Origin-Resource-Policy` grammar is extended to include a "`cross-site`" value.
+
+2.  The [$cross-origin resource policy check$] is rewritten to take the [=/embedding policy=] into
+    account, and to cover some [=navigation requests=] in addition to `no-cors` requests.
+
+### Cross-Origin Resource Policy Checks ### {#corp-check}
+
+To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [=request=]
+(|request|) and a [=response=] (|response|), run these steps:
+
+1.  Let |embedding policy| be "`require-corp`".
+
+2.  Set |embedding policy| to "`none`" if both of the following statements are true:
+
+    *    |request|'s [=request/client=]'s [=environment settings object/embedding policy=] is
+         "`none`".
+    *    |request|'s [=request/reserved client=] is not `null`, and its
+         [=environment settings object/embedding policy=] is "`none`".
+
+
+3.  Return `allowed` if any of the following statements are true:
+
+    *    |request|'s [=request/mode=] is "`same-origin`", "`cors`", or "`websocket`".
+    *    |request|'s [=request/mode=] is "`navigate`", and |embedding policy| is "`none`".
+
+4.  ASSERT: |request|'s [=request/mode=] is "`no-cors`" or "`navigate`". If |request|'s
+    [=request/mode=] is "`navigate`", |embedding policy| is "`require-corp`".
+
+5.  Let |policy| be the result of [=header list/getting=] `Cross-Origin-Resource-Policy` from
+    |response|'s [=response/header list=].
+
+6.  If |policy| is `null` ,and |embedding policy| is "`require-corp`", set |policy| to
+    "`same-origin`".
+
+7.  Switch on |policy| and run the associated steps:
+
+    :   `null`
+    :   `cross-origin`
+    ::  Return `allowed`.
+
+    :   `same-origin`
+    ::  If |request|'s [=request/origin=] is [=same origin=] with |request|'s
+        [=request/current URL=]'s [=url/origin=], then return `allowed`.
+
+    :   `same-site`
+    ::  If both of the following statements are true, then return `allowed`:
+    
+        *   |request|'s [=request/origin=]'s [=origin/host=] is [=same site=] with |request|'s
+            [=request/current URL=]'s [=url/origin=]'s [=origin/host=].
+        *   |request|'s [=request/origin=]'s [=origin/scheme=] is "`https`", or |response|'s
+            [=response/HTTPS state=] is "`none`".
+
+        Otherwise, return `blocked`.
+
+        Note: `Cross-Origin-Resource-Policy: same-site` does not consider a response delivered
+        via a secure transport to match a non-secure requesting origin, even if their hosts are
+        otherwise [=same site=]. Securely-transported responses will only match a
+        securely-transported initiator.
+
+    :   Otherwise
+    ::  Return `allowed`.
 
 Implementation Considerations {#impl-considerations}
 ====================================================
