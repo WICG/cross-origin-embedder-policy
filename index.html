@@ -1212,8 +1212,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 9c9e00cfdaddb9b81439182b02ae23e5d5b65b2d" name="generator">
-  <meta content="c18931e0f6e923183738eeafc646a646dbb5af46" name="document-revision">
+  <meta content="Bikeshed version 872cce6d3026423d677f3bd5837f1a1a46299a04" name="generator">
+  <meta content="cf5e4cdf51044a359a31e7b1f83511b0fc0bde7e" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1413,14 +1413,16 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedding Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-06-18">18 June 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-06-19">19 June 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
-     <dd><a href="https://github.com/mikewest/corpp/issues/">GitHub</a>
+     <dd><a href="https://github.com/whatwg/html/labels/topic%3A%20cross-origin-embedding-policy">whatwg/html topic: cross-origin-embedding-policy</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editor:
      <dd class="editor p-author h-card vcard" data-editor-id="56384"><a class="p-name fn u-email email" href="mailto:mkwst@google.com">Mike West</a> (<span class="p-org org">Google Inc.</span>)
+     <dt>Version History:
+     <dd><a href="https://github.com/mikewest/corpp">mikewest/corpp</a>
     </dl>
    </div>
    <div data-fill-with="warning"></div>
@@ -1679,6 +1681,13 @@ in step 12.5:</p>
       <p>Set <var>document</var>’s <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy⑥">embedding policy</a> to <var>policy</var>.</p>
     </ol>
    </div>
+   <p class="issue" id="issue-cc9e3c3a"><a class="self-link" href="#issue-cc9e3c3a"></a> We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
+to do the right thing with regard to process isolation for top-level windows.</p>
+   <p class="issue" id="issue-e939c637"><a class="self-link" href="#issue-e939c637"></a> Inheriting into frames might be the wrong model. Instead, we could require the frame itself
+to assert <code>Cross-Origin-Embedding-Policy: require-corp</code>, and block the load if it doesn’t. That
+would likely be safer, insofar as it would give the embedder less control over the embedee’s state,
+and the embedee’s developer would always see consistent behavior in the given document no matter how
+it’s loaded.</p>
    <div class="example" id="example-6bcecd8c">
     <a class="self-link" href="#example-6bcecd8c"></a> If <code>https://example.com/</code> is loaded as a non-auxiliary top-level document, its <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy⑦">embedding policy</a> will depend soley upon the <code>Cross-Origin-Embedding-Policy</code> header
 it includes. That is: 
@@ -1781,13 +1790,17 @@ includes, as well as its parent’s or opener’s <a data-link-type="dfn" href="
 "<code>require-corp</code>".</p>
           </ol>
         </ol>
-        <p class="issue" id="issue-a368064f"><a class="self-link" href="#issue-a368064f"></a> Is this the right model for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworker" id="ref-for-sharedworker">SharedWorker</a></code>?</p>
+        <p class="issue" id="issue-1f0fe121"><a class="self-link" href="#issue-1f0fe121"></a> Is this the right model for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworker" id="ref-for-sharedworker">SharedWorker</a></code>? See also the questions around <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker" id="ref-for-serviceworker">ServiceWorker</a></code> below.</p>
        <dt data-md><var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope" id="ref-for-serviceworkerglobalscope">ServiceWorkerGlobalScope</a></code>:
        <dd data-md>
         <ol>
          <li data-md>
           <p>Set <var>policy</var> to <var>response policy</var>.</p>
         </ol>
+        <p class="issue" id="issue-13500964"><a class="self-link" href="#issue-13500964"></a> Do we need to ensure that <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker" id="ref-for-serviceworker①">ServiceWorker</a></code> can’t have a distinct COEP from pages
+it controls? Do we need to inherit the <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker" id="ref-for-serviceworker②">ServiceWorker</a></code>'s policy into documents it
+controls? Would it be enough to ensure that we perform a CORP check when delivering a
+resource from the service worker to a document?</p>
       </dl>
      <li data-md>
       <p>Set <var>global</var>’s <a data-link-type="dfn" href="#workerglobalscope-embedding-policy" id="ref-for-workerglobalscope-embedding-policy②">embedding policy</a> to <var>policy</var>.</p>
@@ -2324,6 +2337,12 @@ strategy to consider.</p>
     <li><a href="#ref-for-section-3.9②">2.2. Parsing</a> <a href="#ref-for-section-3.9③">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-serviceworker">
+   <a href="https://w3c.github.io/ServiceWorker/#serviceworker">https://w3c.github.io/ServiceWorker/#serviceworker</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-serviceworker">3.1.2. Initializing a global object’s Embedding Policy</a> <a href="#ref-for-serviceworker①">(2)</a> <a href="#ref-for-serviceworker②">(3)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-serviceworkerglobalscope">
    <a href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope">https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope</a><b>Referenced in:</b>
    <ul>
@@ -2416,6 +2435,7 @@ strategy to consider.</p>
    <li>
     <a data-link-type="biblio">[service-workers-1]</a> defines the following terms:
     <ul>
+     <li><span class="dfn-paneled" id="term-for-serviceworker" style="color:initial">ServiceWorker</span>
      <li><span class="dfn-paneled" id="term-for-serviceworkerglobalscope" style="color:initial">ServiceWorkerGlobalScope</span>
     </ul>
    <li>
@@ -2462,7 +2482,18 @@ writing it down this way, as it still seems to me to be correct, but we should d
 agree on the behavior.<a href="#issue-d7719780"> ↵ </a></div>
    <div class="issue"> Not sure if this is the right integration between Fetch’s understanding of header
 values and Structured Headers.<a href="#issue-f02fbd56"> ↵ </a></div>
-   <div class="issue"> Is this the right model for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworker">SharedWorker</a></code>?<a href="#issue-a368064f"> ↵ </a></div>
+   <div class="issue"> We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
+to do the right thing with regard to process isolation for top-level windows.<a href="#issue-cc9e3c3a"> ↵ </a></div>
+   <div class="issue"> Inheriting into frames might be the wrong model. Instead, we could require the frame itself
+to assert <code>Cross-Origin-Embedding-Policy: require-corp</code>, and block the load if it doesn’t. That
+would likely be safer, insofar as it would give the embedder less control over the embedee’s state,
+and the embedee’s developer would always see consistent behavior in the given document no matter how
+it’s loaded.<a href="#issue-e939c637"> ↵ </a></div>
+   <div class="issue"> Is this the right model for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworker">SharedWorker</a></code>? See also the questions around <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker">ServiceWorker</a></code> below.<a href="#issue-1f0fe121"> ↵ </a></div>
+   <div class="issue"> Do we need to ensure that <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker">ServiceWorker</a></code> can’t have a distinct COEP from pages
+it controls? Do we need to inherit the <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker">ServiceWorker</a></code>'s policy into documents it
+controls? Would it be enough to ensure that we perform a CORP check when delivering a
+resource from the service worker to a document?<a href="#issue-13500964"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="http-headerdef-cross-origin-embedding-policy">
    <b><a href="#http-headerdef-cross-origin-embedding-policy">#http-headerdef-cross-origin-embedding-policy</a></b><b>Referenced in:</b>

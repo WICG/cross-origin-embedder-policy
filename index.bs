@@ -5,6 +5,9 @@ Level: 1
 Status: DREAM
 Editor: Mike West 56384, Google Inc., mkwst@google.com
 Markup Shorthands: markdown yes
+!Version History: <a href="[REPOSITORYURL]">[REPOSITORY]</a>
+Issue Tracking: whatwg/html topic: cross-origin-embedding-policy https://github.com/whatwg/html/labels/topic%3A%20cross-origin-embedding-policy
+Boilerplate: repository-issue-tracking off
 Abstract:
     In order to support interesting and powerful APIs in a post-Spectre world, it seems necessary
     to ensure that resoures are only voluntarily embedded into a potentially-dangerous context.
