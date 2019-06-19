@@ -1,12 +1,12 @@
 <pre class='metadata'>
-Title: Cross-Origin Embedding Policy
+Title: Cross-Origin Embedder Policy
 Shortname: coep
 Level: 1
 Status: DREAM
 Editor: Mike West 56384, Google Inc., mkwst@google.com
 Markup Shorthands: markdown yes
 !Version History: <a href="[REPOSITORYURL]">[REPOSITORY]</a>
-Issue Tracking: whatwg/html topic: cross-origin-embedding-policy https://github.com/whatwg/html/labels/topic%3A%20cross-origin-embedding-policy
+Issue Tracking: whatwg/html topic: cross-origin-embedder-policy https://github.com/whatwg/html/labels/topic%3A%20cross-origin-embedder-policy
 Boilerplate: repository-issue-tracking off
 Abstract:
     In order to support interesting and powerful APIs in a post-Spectre world, it seems necessary
@@ -107,7 +107,7 @@ To that end, this proposal does three things:
     HTTP response header, which constitutes an explicit declaration that a given resource may be
     embedded in cross-site contexts.
 
-2.  It introduces a new `Cross-Origin-Embedding-Policy` header which shifts the default behavior for
+2.  It introduces a new `Cross-Origin-Embedder-Policy` header which shifts the default behavior for
     resources loaded in a given context to an opt-in model, in which cross-origin responses must
     either assert a <a http-header>`Cross-Origin-Resource-Policy`</a> header which allows the
     embedding, or pass a [=CORS check=].
@@ -117,7 +117,7 @@ To that end, this proposal does three things:
     {{Window/open|window.open()}}.
 
 Together, these would allow a user agent to gate access to interesting APIs (like the aforementioned
-{{SharedArrayBuffer}}) on a top-level context opting-into `Cross-Origin-Embedding-Policy`, which in
+{{SharedArrayBuffer}}) on a top-level context opting-into `Cross-Origin-Embedder-Policy`, which in
 turn gives servers the ability to inspect incoming requests and make reasonable decisions about
 when to allow an embedding.
 
@@ -128,18 +128,18 @@ the bits and pieces discussed above.
 Framework {#framework}
 ======================
 
-The `Cross-Origin-Embedding-Policy` HTTP Response Header {#COEP}
+The `Cross-Origin-Embedder-Policy` HTTP Response Header {#COEP}
 ----------------------------------------------------------------
 
-The <dfn http-header>`Cross-Origin-Embedding-Policy`</dfn> HTTP response header field allows a
-server to declare an embedding policy for a given document. It is a [=Structured Header=] whose
+The <dfn http-header>`Cross-Origin-Embedder-Policy`</dfn> HTTP response header field allows a
+server to declare an embedder policy for a given document. It is a [=Structured Header=] whose
 value MUST be a [=structured header/token=]. [[!I-D.ietf-httpbis-header-structure]] Its ABNF is:
 
 ```
-Cross-Origin-Embedding-Policy = sh-token
+Cross-Origin-Embedder-Policy = sh-token
 ```
 
-The only currently valid `Cross-Origin-Embedding-Policy` value is "`require-corp`".
+The only currently valid `Cross-Origin-Embedder-Policy` value is "`require-corp`".
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
@@ -154,12 +154,12 @@ Parsing {#parsing}
 ------------------
 
 <div algorithm="parsing the header">
-To <dfn abstract-op local-lt="parse header">obtain a response's embedding policy</dfn> given a
+To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy</dfn> given a
 [=response=] (|response|):
 
 1.  Let |policy| be "`none`".
 
-2.  Let |header| be the result of [=extracting header values=] given `Cross-Origin-Embedding-Policy`
+2.  Let |header| be the result of [=extracting header values=] given `Cross-Origin-Embedder-Policy`
     and |response|'s [=response/header list=].
 
 3.  If |header| matches the <a grammar>`sh-token`</a> grammar:
@@ -178,12 +178,12 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedding policy
 <div class="note">
 Note: This fails open (by defaulting to "`none`") in the presence of a header that cannot be
 parsed as a [=structured header/token=]. This includes inadvertant lists created by combining
-multiple instances of the `Cross-Origin-Embedding-Policy` header present in a given response:
+multiple instances of the `Cross-Origin-Embedder-Policy` header present in a given response:
 
 <table class="data">
   <thead>
     <tr>
-      <th>`Cross-Origin-Embedding-Policy`</th>
+      <th>`Cross-Origin-Embedder-Policy`</th>
       <th>Final Policy</th>
     </tr>
   </thead>
@@ -230,68 +230,68 @@ Integration with HTML {#integration-html}
 -----------------------------------------
 
 When creating a document, user agents will process
-<a http-header>`Cross-Origin-Embedding-Policy`</a> headers delivered by the server, imposing any
-restrictions it asserts. Likewise, user agents MUST also take into account the embedding policy
+<a http-header>`Cross-Origin-Embedder-Policy`</a> headers delivered by the server, imposing any
+restrictions it asserts. Likewise, user agents MUST also take into account the embedder policy
 asserted by the document's opener or embedder, ensuring that they're properly imposed as well. To do
 so, HTML is patched as follows:
 
-1.  An <dfn>embedding policy</dfn> is a string with one of the following values: "`none`",
+1.  An <dfn>embedder policy</dfn> is a string with one of the following values: "`none`",
     "`require-corp`".
 
-2.  The [=/embedding policy=] is persisted on a number of objects:
+2.  The [=/embedder policy=] is persisted on a number of objects:
 
-    1.  {{Document}} objects are given an <dfn for="document">embedding policy</dfn> property, whose
-        value is an [=/embedding policy=] defaulting to "`none`".
+    1.  {{Document}} objects are given an <dfn for="document">embedder policy</dfn> property, whose
+        value is an [=/embedder policy=] defaulting to "`none`".
 
-    2.  {{WorkerGlobalScope}} objects are given a <dfn for="WorkerGlobalScope">embedding
-        policy</dfn> property, whose value is an [=/embedding policy=] defaulting to "`none`".
+    2.  {{WorkerGlobalScope}} objects are given a <dfn for="WorkerGlobalScope">embedder
+        policy</dfn> property, whose value is an [=/embedder policy=] defaulting to "`none`".
 
-    3.  [=Environment settings objects=] are given a <dfn for="environment settings object">embedding
+    3.  [=Environment settings objects=] are given a <dfn for="environment settings object">embedder
         policy</dfn> accessor, which has the following implementations:
 
         :   For {{Window}} objects:
-        ::  Return the [=document/embedding policy=] of <var ignore>window</var>'s
+        ::  Return the [=document/embedder policy=] of <var ignore>window</var>'s
             [=associated Document=].
         :   For {{WorkerGlobalScope}} objects:
-        ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedding policy=].
+        ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedder policy=].
 
 3.  [=Browsing context=] objects are given an associated <dfn for="browsing context">creator
-    embedding policy</dfn>, whose value is an [=/embedding policy=] defaulting to "`none`".
+    embedder policy</dfn>, whose value is an [=/embedder policy=] defaulting to "`none`".
 
-4.  The [$create a new browsing context$] algorithm sets the [=document/embedding policy=] for
+4.  The [$create a new browsing context$] algorithm sets the [=document/embedder policy=] for
     a browsing context's initial `about:blank` document by:
 
-    1.  Persisting the <var ignore>creator</var> {{Document}}'s [=document/embedding policy=] on the
-        newly created [=browsing context=]'s [=browsing context/creator embedding policy=] in step 2
+    1.  Persisting the <var ignore>creator</var> {{Document}}'s [=document/embedder policy=] on the
+        newly created [=browsing context=]'s [=browsing context/creator embedder policy=] in step 2
         of the existing algorithm.
 
     2.  Adding a new step directly after Referrer Policy is initialized in step 11 of the existing
         algorithm  which will copy any <var ignore>creator</var> document's policy:
 
-        > 12.  Set <var ignore>document</var>'s [=document/embedding policy=] to
-        >      <var ignore>browsingContext</var>'s [=browsing context/creator embedding policy=].
+        > 12.  Set <var ignore>document</var>'s [=document/embedder policy=] to
+        >      <var ignore>browsingContext</var>'s [=browsing context/creator embedder policy=].
 
-5.  The [$initialize the Document object$] algorithm sets the [=document/embedding policy=] for
+5.  The [$initialize the Document object$] algorithm sets the [=document/embedder policy=] for
     {{Document}}s to which a [=browsing context=] is navigated by adding a new step directly after
     Referrer Policy is initialized in step 6:
 
-    > 7.  Call [$initialize a Document's embedding policy from a response$] given
+    > 7.  Call [$initialize a Document's embedder policy from a response$] given
     >     <var ignore>document</var> and <var ignore>response</var>.
 
-6.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedding policy=] for
+6.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
     {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
     in step 12.5:
 
-    > 6.  Call [$initialize a global object's embedding policy from a response$] given
+    > 6.  Call [$initialize a global object's embedder policy from a response$] given
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
 
-### Initializing a `Document`'s Embedding Policy ### {#initialize-embedding-policy-for-document}
+### Initializing a `Document`'s Embedder policy ### {#initialize-embedder-policy-for-document}
 
-<div algorithm="to initialize a Document's embedding policy from a response">
-To <dfn abstract-op>initialize a Document's embedding policy from a response</dfn>, given a
+<div algorithm="to initialize a Document's embedder policy from a response">
+To <dfn abstract-op>initialize a Document's embedder policy from a response</dfn>, given a
 {{Document}} object (|document|) and a [=response=] (|response|):
 
-1.  Let |policy| be the result of [$parse header|obtaining an embedding policy$] from |response|.
+1.  Let |policy| be the result of [$parse header|obtaining an embedder policy$] from |response|.
 
 2.  Let |inherit from| be `null`.
 
@@ -301,10 +301,10 @@ To <dfn abstract-op>initialize a Document's embedding policy from a response</df
 4.  If |document|'s [=browsing context=] is an [=auxiliary browsing context=], then set
     |inherit from| to the [=active document=] of |context|'s [=opener browsing context=].
 
-5.  If |inherit from| is not `null`, and |inherit from|'s [=document/embedding policy=] is
+5.  If |inherit from| is not `null`, and |inherit from|'s [=document/embedder policy=] is
     "`require-corp`", set |policy| to "`require-corp`".
 
-6.  Set |document|'s [=document/embedding policy=] to |policy|.
+6.  Set |document|'s [=document/embedder policy=] to |policy|.
 
 </div>
 
@@ -312,20 +312,20 @@ ISSUE: We might not need to inhert the COEP state into auxiliary frames, if we c
 to do the right thing with regard to process isolation for top-level windows.
 
 ISSUE: Inheriting into frames might be the wrong model. Instead, we could require the frame itself
-to assert `Cross-Origin-Embedding-Policy: require-corp`, and block the load if it doesn't. That
+to assert `Cross-Origin-Embedder-Policy: require-corp`, and block the load if it doesn't. That
 would likely be safer, insofar as it would give the embedder less control over the embedee's state,
 and the embedee's developer would always see consistent behavior in the given document no matter how
 it's loaded.
 
 <div class="example">
 If `https://example.com/` is loaded as a non-auxiliary top-level document, its
-[=document/embedding policy=] will depend soley upon the `Cross-Origin-Embedding-Policy` header
+[=document/embedder policy=] will depend soley upon the `Cross-Origin-Embedder-Policy` header
 it includes. That is:
 
 <table class="data">
   <thead>
     <tr>
-      <th>`Cross-Origin-Embedding-Policy`</th>
+      <th>`Cross-Origin-Embedder-Policy`</th>
       <th>Final Policy</th>
     </tr>
   </thead>
@@ -362,13 +362,13 @@ it includes. That is:
 </table>
 
 If `https://example.com/` is loaded as a nested or auxiliary document, its
-[=document/embedding policy=] will depend both upon the `Cross-Origin-Embedding-Policy` header it
-includes, as well as its parent's or opener's [=document/embedding policy=], respectively. That is:
+[=document/embedder policy=] will depend both upon the `Cross-Origin-Embedder-Policy` header it
+includes, as well as its parent's or opener's [=document/embedder policy=], respectively. That is:
 
 <table class="data">
   <thead>
     <tr>
-      <th>`Cross-Origin-Embedding-Policy`</th>
+      <th>`Cross-Origin-Embedder-Policy`</th>
       <th>Parent / Opener Policy</th>
       <th>Final Policy</th>
     </tr>
@@ -408,15 +408,15 @@ includes, as well as its parent's or opener's [=document/embedding policy=], res
 </table>
 </div>
 
-### Initializing a global object's Embedding Policy ### {#initialize-embedding-policy-for-global}
+### Initializing a global object's Embedder policy ### {#initialize-embedder-policy-for-global}
 
-<div algorithm="to initialize a global object's embedding policy from a response">
-To <dfn abstract-op>initialize a global object's embedding policy from a response</dfn>, given a
+<div algorithm="to initialize a global object's embedder policy from a response">
+To <dfn abstract-op>initialize a global object's embedder policy from a response</dfn>, given a
 [=global object=] (|global|) and a [=response=] (|response|):
 
 1.  Let |policy| be "`none`".
 
-2.  Let |response policy| be the result of [$parse header|obtaining an embedding policy$] from
+2.  Let |response policy| be the result of [$parse header|obtaining an embedder policy$] from
     |response|.
 
 3.  Run the steps corresponding to the first matching statement:
@@ -425,7 +425,7 @@ To <dfn abstract-op>initialize a global object's embedding policy from a respons
     :   |global| is a {{DedicatedWorkerGlobalScope}}:
     ::  1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
     
-            1.  If the item's [=/embedding policy=] is "`require-corp`", set |policy| to
+            1.  If the item's [=/embedder policy=] is "`require-corp`", set |policy| to
                 "`require-corp`".
 
     :   |global| is a {{SharedWorkerGlobalScope}}:
@@ -433,7 +433,7 @@ To <dfn abstract-op>initialize a global object's embedding policy from a respons
 
         2.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
     
-            1.  If the item's [=/embedding policy=] is "`require-corp`", set |policy| to
+            1.  If the item's [=/embedder policy=] is "`require-corp`", set |policy| to
                 "`require-corp`".
 
         ISSUE: Is this the right model for {{SharedWorker}}? See also the questions around
@@ -447,7 +447,7 @@ To <dfn abstract-op>initialize a global object's embedding policy from a respons
         controls? Would it be enough to ensure that we perform a CORP check when delivering a
         resource from the service worker to a document?
 
-4.  Set |global|'s [=WorkerGlobalScope/embedding policy=] to |policy|.
+4.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
 
 </div>
 
@@ -456,12 +456,12 @@ Integration with Fetch {#integration-fetch}
 -------------------------------------------
 
 When fetching resources, user agents should examine both the [=request=]'s [=request/client=] and
-[=request/reserved client=] to determine the applicable [=/embedding policy=], and apply any constraints that policy expresses
+[=request/reserved client=] to determine the applicable [=/embedder policy=], and apply any constraints that policy expresses
 to incoming responses. To do so, Fetch is patched as follows:
 
 1.  The `Cross-Origin-Resource-Policy` grammar is extended to include a "`cross-site`" value.
 
-2.  The [$cross-origin resource policy check$] is rewritten to take the [=/embedding policy=] into
+2.  The [$cross-origin resource policy check$] is rewritten to take the [=/embedder policy=] into
     account, and to cover some [=navigation requests=] in addition to `no-cors` requests.
 
 ### Cross-Origin Resource Policy Checks ### {#corp-check}
@@ -469,28 +469,28 @@ to incoming responses. To do so, Fetch is patched as follows:
 To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [=request=]
 (|request|) and a [=response=] (|response|), run these steps:
 
-1.  Let |embedding policy| be "`require-corp`".
+1.  Let |embedder policy| be "`require-corp`".
 
-2.  Set |embedding policy| to "`none`" if both of the following statements are true:
+2.  Set |embedder policy| to "`none`" if both of the following statements are true:
 
-    *    |request|'s [=request/client=]'s [=environment settings object/embedding policy=] is
+    *    |request|'s [=request/client=]'s [=environment settings object/embedder policy=] is
          "`none`".
     *    |request|'s [=request/reserved client=] is not `null`, and its
-         [=environment settings object/embedding policy=] is "`none`".
+         [=environment settings object/embedder policy=] is "`none`".
 
 
 3.  Return `allowed` if any of the following statements are true:
 
     *    |request|'s [=request/mode=] is "`same-origin`", "`cors`", or "`websocket`".
-    *    |request|'s [=request/mode=] is "`navigate`", and |embedding policy| is "`none`".
+    *    |request|'s [=request/mode=] is "`navigate`", and |embedder policy| is "`none`".
 
 4.  ASSERT: |request|'s [=request/mode=] is "`no-cors`" or "`navigate`". If |request|'s
-    [=request/mode=] is "`navigate`", |embedding policy| is "`require-corp`".
+    [=request/mode=] is "`navigate`", |embedder policy| is "`require-corp`".
 
 5.  Let |policy| be the result of [=header list/getting=] `Cross-Origin-Resource-Policy` from
     |response|'s [=response/header list=].
 
-6.  If |policy| is `null` ,and |embedding policy| is "`require-corp`", set |policy| to
+6.  If |policy| is `null`, and |embedder policy| is "`require-corp`", set |policy| to
     "`same-origin`".
 
 7.  Switch on |policy| and run the associated steps:
