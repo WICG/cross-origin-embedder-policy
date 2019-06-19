@@ -305,6 +305,15 @@ To <dfn abstract-op>initialize a Document's embedding policy from a response</df
 
 </div>
 
+ISSUE: We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
+to do the right thing with regard to process isolation for top-level windows.
+
+ISSUE: Inheriting into frames might be the wrong model. Instead, we could require the frame itself
+to assert `Cross-Origin-Embedding-Policy: require-corp`, and block the load if it doesn't. That
+would likely be safer, insofar as it would give the embedder less control over the embedee's state,
+and the embedee's developer would always see consistent behavior in the given document no matter how
+it's loaded.
+
 <div class="example">
 If `https://example.com/` is loaded as a non-auxiliary top-level document, its
 [=document/embedding policy=] will depend soley upon the `Cross-Origin-Embedding-Policy` header
@@ -424,10 +433,16 @@ To <dfn abstract-op>initialize a global object's embedding policy from a respons
             1.  If the item's [=/embedding policy=] is "`require-corp`", set |policy| to
                 "`require-corp`".
 
-        ISSUE: Is this the right model for {{SharedWorker}}?
+        ISSUE: Is this the right model for {{SharedWorker}}? See also the questions around
+        {{ServiceWorker}} below.
 
     :   |global| is a {{ServiceWorkerGlobalScope}}:
     ::  1.   Set |policy| to |response policy|.
+
+        ISSUE: Do we need to ensure that {{ServiceWorker}} can't have a distinct COEP from pages
+        it controls? Do we need to inherit the {{ServiceWorker}}'s policy into documents it
+        controls? Would it be enough to ensure that we perform a CORP check when delivering a
+        resource from the service worker to a document?
 
 4.  Set |global|'s [=WorkerGlobalScope/embedding policy=] to |policy|.
 
