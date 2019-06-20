@@ -260,30 +260,23 @@ so, HTML is patched as follows:
         :   For {{WorkerGlobalScope}} objects:
         ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedder policy=].
 
-3.  [=Browsing context=] objects are given an associated <dfn for="browsing context">creator
-    embedder policy</dfn>, whose value is an [=/embedder policy=] defaulting to "`none`".
+3.  The [$create a new browsing context$] algorithm sets the [=document/embedder policy=] for
+    a browsing context's initial `about:blank` document by adding a new step directly after Referrer
+    Policy is initialized in step 11 of the existing algorithm  which will copy any
+    <var ignore>creator</var> document's policy:
 
-4.  The [$create a new browsing context$] algorithm sets the [=document/embedder policy=] for
-    a browsing context's initial `about:blank` document by:
+        > 12.  If <var ignore>creator</var> is not null, set <var ignore>document</var>'s
+        >      [=document/embedder policy=] to <var ignore>creator</var>
+        >      [=document/embedder policy=].
 
-    1.  Persisting the <var ignore>creator</var> {{Document}}'s [=document/embedder policy=] on the
-        newly created [=browsing context=]'s [=browsing context/creator embedder policy=] in step 2
-        of the existing algorithm.
-
-    2.  Adding a new step directly after Referrer Policy is initialized in step 11 of the existing
-        algorithm  which will copy any <var ignore>creator</var> document's policy:
-
-        > 12.  Set <var ignore>document</var>'s [=document/embedder policy=] to
-        >      <var ignore>browsingContext</var>'s [=browsing context/creator embedder policy=].
-
-5.  The [$initialize the Document object$] algorithm sets the [=document/embedder policy=] for
+4.  The [$initialize the Document object$] algorithm sets the [=document/embedder policy=] for
     {{Document}}s to which a [=browsing context=] is navigated by adding a new step directly after
     Referrer Policy is initialized in step 6:
 
     > 7.  Call [$initialize a Document's embedder policy from a response$] given
     >     <var ignore>document</var> and <var ignore>response</var>.
 
-6.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
+5.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
     {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
     in step 12.5:
 
