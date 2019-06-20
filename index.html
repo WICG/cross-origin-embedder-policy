@@ -1,7 +1,7 @@
 <!doctype html><html lang="en">
  <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-  <title>Cross-Origin Embedding Policy</title>
+  <title>Cross-Origin Embedder Policy</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
 <style data-fill-with="stylesheet">/******************************************************************************
  *                   Style sheet for the W3C specifications                   *
@@ -1213,7 +1213,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 872cce6d3026423d677f3bd5837f1a1a46299a04" name="generator">
-  <meta content="cf5e4cdf51044a359a31e7b1f83511b0fc0bde7e" name="document-revision">
+  <meta content="4ad7dabe87c016669e9dbd4c6a5346a23ddb5d71" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1412,12 +1412,12 @@ pre .property::before, pre .property::after {
  <body class="h-entry">
   <div class="head">
    <p data-fill-with="logo"></p>
-   <h1 class="p-name no-ref" id="title">Cross-Origin Embedding Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-06-19">19 June 2019</time></span></h2>
+   <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-06-20">20 June 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
-     <dd><a href="https://github.com/whatwg/html/labels/topic%3A%20cross-origin-embedding-policy">whatwg/html topic: cross-origin-embedding-policy</a>
+     <dd><a href="https://github.com/whatwg/html/labels/topic%3A%20cross-origin-embedder-policy">whatwg/html topic: cross-origin-embedder-policy</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editor:
      <dd class="editor p-author h-card vcard" data-editor-id="56384"><a class="p-name fn u-email email" href="mailto:mkwst@google.com">Mike West</a> (<span class="p-org org">Google Inc.</span>)
@@ -1446,7 +1446,7 @@ pre .property::before, pre .property::after {
     <li>
      <a href="#framework"><span class="secno">2</span> <span class="content">Framework</span></a>
      <ol class="toc">
-      <li><a href="#COEP"><span class="secno">2.1</span> <span class="content">The <code>Cross-Origin-Embedding-Policy</code> HTTP Response Header</span></a>
+      <li><a href="#COEP"><span class="secno">2.1</span> <span class="content">The <code>Cross-Origin-Embedder-Policy</code> HTTP Response Header</span></a>
       <li><a href="#parsing"><span class="secno">2.2</span> <span class="content">Parsing</span></a>
      </ol>
     <li>
@@ -1455,8 +1455,8 @@ pre .property::before, pre .property::after {
       <li>
        <a href="#integration-html"><span class="secno">3.1</span> <span class="content">Integration with HTML</span></a>
        <ol class="toc">
-        <li><a href="#initialize-embedding-policy-for-document"><span class="secno">3.1.1</span> <span class="content">Initializing a <code>Document</code>'s Embedding Policy</span></a>
-        <li><a href="#initialize-embedding-policy-for-global"><span class="secno">3.1.2</span> <span class="content">Initializing a global object’s Embedding Policy</span></a>
+        <li><a href="#initialize-embedder-policy-for-document"><span class="secno">3.1.1</span> <span class="content">Initializing a <code>Document</code>'s Embedder policy</span></a>
+        <li><a href="#initialize-embedder-policy-for-global"><span class="secno">3.1.2</span> <span class="content">Initializing a global object’s Embedder policy</span></a>
        </ol>
       <li>
        <a href="#integration-fetch"><span class="secno">3.2</span> <span class="content">Integration with Fetch</span></a>
@@ -1508,7 +1508,7 @@ leakage is voluntary, not accidental.</p>
      <p>It introduces a new <code>cross-site</code> value for the <a data-link-type="http-header" href="https://fetch.spec.whatwg.org/#http-cross-origin-resource-policy" id="ref-for-http-cross-origin-resource-policy"><code>Cross-Origin-Resource-Policy</code></a> HTTP response header, which constitutes an explicit declaration that a given resource may be
 embedded in cross-site contexts.</p>
     <li data-md>
-     <p>It introduces a new <code>Cross-Origin-Embedding-Policy</code> header which shifts the default behavior for
+     <p>It introduces a new <code>Cross-Origin-Embedder-Policy</code> header which shifts the default behavior for
 resources loaded in a given context to an opt-in model, in which cross-origin responses must
 either assert a <a data-link-type="http-header" href="https://fetch.spec.whatwg.org/#http-cross-origin-resource-policy" id="ref-for-http-cross-origin-resource-policy①"><code>Cross-Origin-Resource-Policy</code></a> header which allows the
 embedding, or pass a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-cors-check" id="ref-for-concept-cors-check">CORS check</a>.</p>
@@ -1516,19 +1516,19 @@ embedding, or pass a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org
      <p>It extends <a data-link-type="http-header" href="https://fetch.spec.whatwg.org/#http-cross-origin-resource-policy" id="ref-for-http-cross-origin-resource-policy②"><code>Cross-Origin-Resource-Policy</code></a> to handle some <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#navigation-request" id="ref-for-navigation-request">navigation
 requests</a> in order to deal reasonably with <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-iframe-element" id="ref-for-the-iframe-element">iframe</a></code> embeddings and <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/window-object.html#dom-open" id="ref-for-dom-open">window.open()</a></code>.</p>
    </ol>
-   <p>Together, these would allow a user agent to gate access to interesting APIs (like the aforementioned <code class="idl"><a data-link-type="idl" href="https://tc39.es/ecma262/#sec-sharedarraybuffer-objects" id="ref-for-sec-sharedarraybuffer-objects①">SharedArrayBuffer</a></code>) on a top-level context opting-into <code>Cross-Origin-Embedding-Policy</code>, which in
+   <p>Together, these would allow a user agent to gate access to interesting APIs (like the aforementioned <code class="idl"><a data-link-type="idl" href="https://tc39.es/ecma262/#sec-sharedarraybuffer-objects" id="ref-for-sec-sharedarraybuffer-objects①">SharedArrayBuffer</a></code>) on a top-level context opting-into <code>Cross-Origin-Embedder-Policy</code>, which in
 turn gives servers the ability to inspect incoming requests and make reasonable decisions about
 when to allow an embedding.</p>
    <p>The rest of this document monkey-patches <a data-link-type="biblio" href="#biblio-html">[HTML]</a> and <a data-link-type="biblio" href="#biblio-fetch">[Fetch]</a> in order to document the details of
 the bits and pieces discussed above.</p>
    <h2 class="heading settled" data-level="2" id="framework"><span class="secno">2. </span><span class="content">Framework</span><a class="self-link" href="#framework"></a></h2>
-   <h3 class="heading settled" data-level="2.1" id="COEP"><span class="secno">2.1. </span><span class="content">The <code>Cross-Origin-Embedding-Policy</code> HTTP Response Header</span><a class="self-link" href="#COEP"></a></h3>
-   <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-cross-origin-embedding-policy"><code>Cross-Origin-Embedding-Policy</code></dfn> HTTP response header field allows a
-server to declare an embedding policy for a given document. It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#" id="termref-for-">Structured Header</a> whose
+   <h3 class="heading settled" data-level="2.1" id="COEP"><span class="secno">2.1. </span><span class="content">The <code>Cross-Origin-Embedder-Policy</code> HTTP Response Header</span><a class="self-link" href="#COEP"></a></h3>
+   <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-cross-origin-embedder-policy"><code>Cross-Origin-Embedder-Policy</code></dfn> HTTP response header field allows a
+server to declare an embedder policy for a given document. It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#" id="termref-for-">Structured Header</a> whose
 value MUST be a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9">token</a>. <a data-link-type="biblio" href="#biblio-i-dietf-httpbis-header-structure">[I-D.ietf-httpbis-header-structure]</a> Its ABNF is:</p>
-<pre>Cross-Origin-Embedding-Policy = sh-token
+<pre>Cross-Origin-Embedder-Policy = sh-token
 </pre>
-   <p>The only currently valid <code>Cross-Origin-Embedding-Policy</code> value is "<code>require-corp</code>".</p>
+   <p>The only currently valid <code>Cross-Origin-Embedder-Policy</code> value is "<code>require-corp</code>".</p>
    <p>In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
 value cannot be parsed as a <a data-link-type="grammar" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9①"><code>sh-token</code></a>.</p>
@@ -1537,20 +1537,24 @@ writing it down this way, as it still seems to me to be correct, but we should d
 agree on the behavior.</p>
    <h3 class="heading settled" data-level="2.2" id="parsing"><span class="secno">2.2. </span><span class="content">Parsing</span><a class="self-link" href="#parsing"></a></h3>
    <div class="algorithm" data-algorithm="parsing the header">
-     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-lt="parse header" id="abstract-opdef-obtain-a-responses-embedding-policy">obtain a response’s embedding policy</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a> (<var>response</var>): 
+     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-lt="parse header" id="abstract-opdef-obtain-a-responses-embedder-policy">obtain a response’s embedder policy</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a> (<var>response</var>): 
     <ol>
      <li data-md>
       <p>Let <var>policy</var> be "<code>none</code>".</p>
      <li data-md>
-      <p>Let <var>header</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#extract-header-values" id="ref-for-extract-header-values">extracting header values</a> given <code>Cross-Origin-Embedding-Policy</code> and <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list">header list</a>.</p>
+      <p>Let <var>header</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-get" id="ref-for-concept-header-list-get">getting</a> <code>Cross-Origin-Embedder-Policy</code> from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list">header list</a>.</p>
      <li data-md>
-      <p>If <var>header</var> matches the <a data-link-type="grammar" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9②"><code>sh-token</code></a> grammar:</p>
+      <p>If <var>header</var> is not <code>null</code>:</p>
       <ol>
+       <li data-md>
+        <p>Set <var>header</var> to the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#isomorphic-decode" id="ref-for-isomorphic-decode">isomorphic decoding</a> <var>header</var>.</p>
        <li data-md>
         <p>Let <var>parsed policy</var> be the result of executing the <a data-link-type="abstract-op" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.7" id="ref-for-section-4.2.7">Structured Header parsing algorithm</a> with <var>input_string</var> set to <var>header</var>, and <var>header_type</var> set
 to "<code>item</code>".</p>
-        <p class="issue" id="issue-f02fbd56"><a class="self-link" href="#issue-f02fbd56"></a> Not sure if this is the right integration between Fetch’s understanding of header
-values and Structured Headers.</p>
+        <p>If parsing fails, set <var>parsed policy</var> to "<code>none</code>".</p>
+        <p class="issue" id="issue-ff9cff3d"><a class="self-link" href="#issue-ff9cff3d"></a> Not sure if this is the right integration between Fetch’s understanding of header
+values and Structured Headers. For example, the latter requires an ASCII string, the former
+decodes an ~arbitrary byte sequence.</p>
        <li data-md>
         <p>If <var>parsed policy</var> is "<code>require-corp</code>", set <var>policy</var> to "<code>require-corp</code>".</p>
       </ol>
@@ -1559,12 +1563,12 @@ values and Structured Headers.</p>
     </ol>
     <div class="note" role="note">
       Note: This fails open (by defaulting to "<code>none</code>") in the presence of a header that cannot be
-parsed as a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9③">token</a>. This includes inadvertant lists created by combining
-multiple instances of the <code>Cross-Origin-Embedding-Policy</code> header present in a given response: 
+parsed as a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9②">token</a>. This includes inadvertant lists created by combining
+multiple instances of the <code>Cross-Origin-Embedder-Policy</code> header present in a given response: 
      <table class="data">
       <thead>
        <tr>
-        <th><code>Cross-Origin-Embedding-Policy</code>
+        <th><code>Cross-Origin-Embedder-Policy</code>
         <th>Final Policy
       <tbody>
        <tr>
@@ -1593,108 +1597,97 @@ multiple instances of the <code>Cross-Origin-Embedding-Policy</code> header pres
    </div>
    <h2 class="heading settled" data-level="3" id="integrations"><span class="secno">3. </span><span class="content">Integrations</span><a class="self-link" href="#integrations"></a></h2>
    <h3 class="heading settled" data-level="3.1" id="integration-html"><span class="secno">3.1. </span><span class="content">Integration with HTML</span><a class="self-link" href="#integration-html"></a></h3>
-   <p>When creating a document, user agents will process <a data-link-type="http-header" href="#http-headerdef-cross-origin-embedding-policy" id="ref-for-http-headerdef-cross-origin-embedding-policy"><code>Cross-Origin-Embedding-Policy</code></a> headers delivered by the server, imposing any
-restrictions it asserts. Likewise, user agents MUST also take into account the embedding policy
+   <p>When creating a document, user agents will process <a data-link-type="http-header" href="#http-headerdef-cross-origin-embedder-policy" id="ref-for-http-headerdef-cross-origin-embedder-policy"><code>Cross-Origin-Embedder-Policy</code></a> headers delivered by the server, imposing any
+restrictions it asserts. Likewise, user agents MUST also take into account the embedder policy
 asserted by the document’s opener or embedder, ensuring that they’re properly imposed as well. To do
 so, HTML is patched as follows:</p>
    <ol>
     <li data-md>
-     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="embedding-policy">embedding policy</dfn> is a string with one of the following values: "<code>none</code>",
+     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="embedder-policy">embedder policy</dfn> is a string with one of the following values: "<code>none</code>",
 "<code>require-corp</code>".</p>
     <li data-md>
-     <p>The <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy">embedding policy</a> is persisted on a number of objects:</p>
+     <p>The <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy">embedder policy</a> is persisted on a number of objects:</p>
      <ol>
       <li data-md>
-       <p><code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document">Document</a></code> objects are given an <dfn class="dfn-paneled" data-dfn-for="document" data-dfn-type="dfn" data-noexport id="document-embedding-policy">embedding policy</dfn> property, whose
-value is an <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy①">embedding policy</a> defaulting to "<code>none</code>".</p>
+       <p><code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document">Document</a></code> objects are given an <dfn class="dfn-paneled" data-dfn-for="document" data-dfn-type="dfn" data-noexport id="document-embedder-policy">embedder policy</dfn> property, whose
+value is an <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy①">embedder policy</a> defaulting to "<code>none</code>".</p>
       <li data-md>
-       <p><code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope" id="ref-for-workerglobalscope">WorkerGlobalScope</a></code> objects are given a <dfn class="dfn-paneled" data-dfn-for="WorkerGlobalScope" data-dfn-type="dfn" data-lt="embedding policy" data-noexport id="workerglobalscope-embedding-policy">embedding
-policy</dfn> property, whose value is an <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy②">embedding policy</a> defaulting to "<code>none</code>".</p>
+       <p><code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope" id="ref-for-workerglobalscope">WorkerGlobalScope</a></code> objects are given a <dfn class="dfn-paneled" data-dfn-for="WorkerGlobalScope" data-dfn-type="dfn" data-lt="embedder policy" data-noexport id="workerglobalscope-embedder-policy">embedder
+policy</dfn> property, whose value is an <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy②">embedder policy</a> defaulting to "<code>none</code>".</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">Environment settings objects</a> are given a <dfn class="dfn-paneled" data-dfn-for="environment settings object" data-dfn-type="dfn" data-lt="embedding policy" data-noexport id="environment-settings-object-embedding-policy">embedding
+       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">Environment settings objects</a> are given a <dfn class="dfn-paneled" data-dfn-for="environment settings object" data-dfn-type="dfn" data-lt="embedder policy" data-noexport id="environment-settings-object-embedder-policy">embedder
 policy</dfn> accessor, which has the following implementations:</p>
        <dl>
         <dt data-md>For <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/window-object.html#window" id="ref-for-window">Window</a></code> objects:
         <dd data-md>
-         <p>Return the <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy">embedding policy</a> of <var>window</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window">associated Document</a>.</p>
+         <p>Return the <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy">embedder policy</a> of <var>window</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window">associated Document</a>.</p>
         <dt data-md>For <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope" id="ref-for-workerglobalscope①">WorkerGlobalScope</a></code> objects:
         <dd data-md>
-         <p>Return <var>worker global scope</var>’s <a data-link-type="dfn" href="#workerglobalscope-embedding-policy" id="ref-for-workerglobalscope-embedding-policy">embedding policy</a>.</p>
+         <p>Return <var>worker global scope</var>’s <a data-link-type="dfn" href="#workerglobalscope-embedder-policy" id="ref-for-workerglobalscope-embedder-policy">embedder policy</a>.</p>
        </dl>
      </ol>
     <li data-md>
-     <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context">Browsing context</a> objects are given an associated <dfn class="dfn-paneled" data-dfn-for="browsing context" data-dfn-type="dfn" data-lt="creator embedding policy" data-noexport id="browsing-context-creator-embedding-policy">creator
-embedding policy</dfn>, whose value is an <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy③">embedding policy</a> defaulting to "<code>none</code>".</p>
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsers.html#creating-a-new-browsing-context" id="ref-for-creating-a-new-browsing-context">create a new browsing context</a> algorithm sets the <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy①">embedder policy</a> for
+a browsing context’s initial <code>about:blank</code> document by adding a new step directly after Referrer
+Policy is initialized in step 11 of the existing algorithm  which will copy any <var>creator</var> document’s policy:</p>
+     <blockquote>
+      <ol start="12">
+       <li data-md>
+        <p>If <var>creator</var> is not null, set <var>document</var>’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy②">embedder policy</a> to <var>creator</var> <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy③">embedder policy</a>.</p>
+      </ol>
+     </blockquote>
     <li data-md>
-     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsers.html#creating-a-new-browsing-context" id="ref-for-creating-a-new-browsing-context">create a new browsing context</a> algorithm sets the <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy①">embedding policy</a> for
-a browsing context’s initial <code>about:blank</code> document by:</p>
-     <ol>
-      <li data-md>
-       <p>Persisting the <var>creator</var> <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document①">Document</a></code>'s <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy②">embedding policy</a> on the
-newly created <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context①">browsing context</a>'s <a data-link-type="dfn" href="#browsing-context-creator-embedding-policy" id="ref-for-browsing-context-creator-embedding-policy">creator embedding policy</a> in step 2
-of the existing algorithm.</p>
-      <li data-md>
-       <p>Adding a new step directly after Referrer Policy is initialized in step 11 of the existing
-algorithm  which will copy any <var>creator</var> document’s policy:</p>
-       <blockquote>
-        <ol start="12">
-         <li data-md>
-          <p>Set <var>document</var>’s <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy③">embedding policy</a> to <var>browsingContext</var>’s <a data-link-type="dfn" href="#browsing-context-creator-embedding-policy" id="ref-for-browsing-context-creator-embedding-policy①">creator embedding policy</a>.</p>
-        </ol>
-       </blockquote>
-     </ol>
-    <li data-md>
-     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#initialise-the-document-object" id="ref-for-initialise-the-document-object">initialize the Document object</a> algorithm sets the <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy④">embedding policy</a> for <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code>s to which a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context②">browsing context</a> is navigated by adding a new step directly after
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#initialise-the-document-object" id="ref-for-initialise-the-document-object">initialize the Document object</a> algorithm sets the <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy④">embedder policy</a> for <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document①">Document</a></code>s to which a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context">browsing context</a> is navigated by adding a new step directly after
 Referrer Policy is initialized in step 6:</p>
      <blockquote>
       <ol start="7">
        <li data-md>
-        <p>Call <a data-link-type="abstract-op" href="#abstract-opdef-initialize-a-documents-embedding-policy-from-a-response" id="ref-for-abstract-opdef-initialize-a-documents-embedding-policy-from-a-response">initialize a Document’s embedding policy from a response</a> given <var>document</var> and <var>response</var>.</p>
+        <p>Call <a data-link-type="abstract-op" href="#abstract-opdef-initialize-a-documents-embedder-policy-from-a-response" id="ref-for-abstract-opdef-initialize-a-documents-embedder-policy-from-a-response">initialize a Document’s embedder policy from a response</a> given <var>document</var> and <var>response</var>.</p>
       </ol>
      </blockquote>
     <li data-md>
-     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/workers.html#run-a-worker" id="ref-for-run-a-worker">run a worker</a> algorithm sets the <a data-link-type="dfn" href="#workerglobalscope-embedding-policy" id="ref-for-workerglobalscope-embedding-policy①">embedding policy</a> for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope" id="ref-for-workerglobalscope②">WorkerGlobalScope</a></code> objects by adding a new step directly after Referrer Policy is initialized
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/workers.html#run-a-worker" id="ref-for-run-a-worker">run a worker</a> algorithm sets the <a data-link-type="dfn" href="#workerglobalscope-embedder-policy" id="ref-for-workerglobalscope-embedder-policy①">embedder policy</a> for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope" id="ref-for-workerglobalscope②">WorkerGlobalScope</a></code> objects by adding a new step directly after Referrer Policy is initialized
 in step 12.5:</p>
      <blockquote>
       <ol start="6">
        <li data-md>
-        <p>Call <a data-link-type="abstract-op" href="#abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response" id="ref-for-abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response">initialize a global object’s embedding policy from a response</a> given <var>worker global scope</var> and <var>response</var>.</p>
+        <p>Call <a data-link-type="abstract-op" href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response" id="ref-for-abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">initialize a global object’s embedder policy from a response</a> given <var>worker global scope</var> and <var>response</var>.</p>
       </ol>
      </blockquote>
    </ol>
-   <h4 class="heading settled" data-level="3.1.1" id="initialize-embedding-policy-for-document"><span class="secno">3.1.1. </span><span class="content">Initializing a <code>Document</code>'s Embedding Policy</span><a class="self-link" href="#initialize-embedding-policy-for-document"></a></h4>
-   <div class="algorithm" data-algorithm="to initialize a Document’s embedding policy from a response">
-     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-initialize-a-documents-embedding-policy-from-a-response">initialize a Document’s embedding policy from a response</dfn>, given a <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document③">Document</a></code> object (<var>document</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response①">response</a> (<var>response</var>): 
+   <h4 class="heading settled" data-level="3.1.1" id="initialize-embedder-policy-for-document"><span class="secno">3.1.1. </span><span class="content">Initializing a <code>Document</code>'s Embedder policy</span><a class="self-link" href="#initialize-embedder-policy-for-document"></a></h4>
+   <div class="algorithm" data-algorithm="to initialize a Document’s embedder policy from a response">
+     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-initialize-a-documents-embedder-policy-from-a-response">initialize a Document’s embedder policy from a response</dfn>, given a <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code> object (<var>document</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response①">response</a> (<var>response</var>): 
     <ol>
      <li data-md>
-      <p>Let <var>policy</var> be the result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedding-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedding-policy">obtaining an embedding policy</a> from <var>response</var>.</p>
+      <p>Let <var>policy</var> be the result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedder-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedder-policy">obtaining an embedder policy</a> from <var>response</var>.</p>
      <li data-md>
       <p>Let <var>inherit from</var> be <code>null</code>.</p>
      <li data-md>
-      <p>If <var>document</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context③">browsing context</a> is a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context" id="ref-for-nested-browsing-context">nested browsing context</a>, then set <var>inherit from</var> to the <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document④">Document</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-nested-through" id="ref-for-browsing-context-nested-through">through which</a> <var>context</var> is nested.</p>
+      <p>If <var>document</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context①">browsing context</a> is a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context" id="ref-for-nested-browsing-context">nested browsing context</a>, then set <var>inherit from</var> to the <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document③">Document</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-nested-through" id="ref-for-browsing-context-nested-through">through which</a> <var>context</var> is nested.</p>
      <li data-md>
-      <p>If <var>document</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context④">browsing context</a> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#auxiliary-browsing-context" id="ref-for-auxiliary-browsing-context">auxiliary browsing context</a>, then set <var>inherit from</var> to the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#active-document" id="ref-for-active-document">active document</a> of <var>context</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#opener-browsing-context" id="ref-for-opener-browsing-context">opener browsing context</a>.</p>
+      <p>If <var>document</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context②">browsing context</a> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#auxiliary-browsing-context" id="ref-for-auxiliary-browsing-context">auxiliary browsing context</a>, then set <var>inherit from</var> to the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#active-document" id="ref-for-active-document">active document</a> of <var>context</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#opener-browsing-context" id="ref-for-opener-browsing-context">opener browsing context</a>.</p>
      <li data-md>
-      <p>If <var>inherit from</var> is not <code>null</code>, and <var>inherit from</var>’s <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy⑤">embedding policy</a> is
+      <p>If <var>inherit from</var> is not <code>null</code>, and <var>inherit from</var>’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑤">embedder policy</a> is
 "<code>require-corp</code>", set <var>policy</var> to "<code>require-corp</code>".</p>
      <li data-md>
-      <p>Set <var>document</var>’s <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy⑥">embedding policy</a> to <var>policy</var>.</p>
+      <p>Set <var>document</var>’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑥">embedder policy</a> to <var>policy</var>.</p>
     </ol>
    </div>
    <p class="issue" id="issue-cc9e3c3a"><a class="self-link" href="#issue-cc9e3c3a"></a> We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
 to do the right thing with regard to process isolation for top-level windows.</p>
-   <p class="issue" id="issue-e939c637"><a class="self-link" href="#issue-e939c637"></a> Inheriting into frames might be the wrong model. Instead, we could require the frame itself
-to assert <code>Cross-Origin-Embedding-Policy: require-corp</code>, and block the load if it doesn’t. That
+   <p class="issue" id="issue-4dd2774e"><a class="self-link" href="#issue-4dd2774e"></a> Inheriting into frames might be the wrong model. Instead, we could require the frame itself
+to assert <code>Cross-Origin-Embedder-Policy: require-corp</code>, and block the load if it doesn’t. That
 would likely be safer, insofar as it would give the embedder less control over the embedee’s state,
 and the embedee’s developer would always see consistent behavior in the given document no matter how
 it’s loaded.</p>
-   <div class="example" id="example-6bcecd8c">
-    <a class="self-link" href="#example-6bcecd8c"></a> If <code>https://example.com/</code> is loaded as a non-auxiliary top-level document, its <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy⑦">embedding policy</a> will depend soley upon the <code>Cross-Origin-Embedding-Policy</code> header
+   <div class="example" id="example-48138556">
+    <a class="self-link" href="#example-48138556"></a> If <code>https://example.com/</code> is loaded as a non-auxiliary top-level document, its <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> will depend soley upon the <code>Cross-Origin-Embedder-Policy</code> header
 it includes. That is: 
     <table class="data">
      <thead>
       <tr>
-       <th><code>Cross-Origin-Embedding-Policy</code>
+       <th><code>Cross-Origin-Embedder-Policy</code>
        <th>Final Policy
      <tbody>
       <tr>
@@ -1719,12 +1712,12 @@ it includes. That is:
        <td><code>require-corp, require-corp</code>
        <td><code>none</code>
     </table>
-    <p>If <code>https://example.com/</code> is loaded as a nested or auxiliary document, its <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy⑧">embedding policy</a> will depend both upon the <code>Cross-Origin-Embedding-Policy</code> header it
-includes, as well as its parent’s or opener’s <a data-link-type="dfn" href="#document-embedding-policy" id="ref-for-document-embedding-policy⑨">embedding policy</a>, respectively. That is:</p>
+    <p>If <code>https://example.com/</code> is loaded as a nested or auxiliary document, its <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑧">embedder policy</a> will depend both upon the <code>Cross-Origin-Embedder-Policy</code> header it
+includes, as well as its parent’s or opener’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑨">embedder policy</a>, respectively. That is:</p>
     <table class="data">
      <thead>
       <tr>
-       <th><code>Cross-Origin-Embedding-Policy</code>
+       <th><code>Cross-Origin-Embedder-Policy</code>
        <th>Parent / Opener Policy
        <th>Final Policy
      <tbody>
@@ -1754,14 +1747,14 @@ includes, as well as its parent’s or opener’s <a data-link-type="dfn" href="
        <td><code>require-corp</code>
     </table>
    </div>
-   <h4 class="heading settled" data-level="3.1.2" id="initialize-embedding-policy-for-global"><span class="secno">3.1.2. </span><span class="content">Initializing a global object’s Embedding Policy</span><a class="self-link" href="#initialize-embedding-policy-for-global"></a></h4>
-   <div class="algorithm" data-algorithm="to initialize a global object’s embedding policy from a response">
-     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response">initialize a global object’s embedding policy from a response</dfn>, given a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object">global object</a> (<var>global</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response②">response</a> (<var>response</var>): 
+   <h4 class="heading settled" data-level="3.1.2" id="initialize-embedder-policy-for-global"><span class="secno">3.1.2. </span><span class="content">Initializing a global object’s Embedder policy</span><a class="self-link" href="#initialize-embedder-policy-for-global"></a></h4>
+   <div class="algorithm" data-algorithm="to initialize a global object’s embedder policy from a response">
+     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">initialize a global object’s embedder policy from a response</dfn>, given a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object">global object</a> (<var>global</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response②">response</a> (<var>response</var>): 
     <ol>
      <li data-md>
       <p>Let <var>policy</var> be "<code>none</code>".</p>
      <li data-md>
-      <p>Let <var>response policy</var> be the result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedding-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedding-policy①">obtaining an embedding policy</a> from <var>response</var>.</p>
+      <p>Let <var>response policy</var> be the result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedder-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedder-policy①">obtaining an embedder policy</a> from <var>response</var>.</p>
      <li data-md>
       <p>Run the steps corresponding to the first matching statement:</p>
       <dl>
@@ -1773,7 +1766,7 @@ includes, as well as its parent’s or opener’s <a data-link-type="dfn" href="
           <p>For each of the items in <var>global</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set" id="ref-for-concept-WorkerGlobalScope-owner-set">owner set</a>:</p>
           <ol>
            <li data-md>
-            <p>If the item’s <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy④">embedding policy</a> is "<code>require-corp</code>", set <var>policy</var> to
+            <p>If the item’s <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy③">embedder policy</a> is "<code>require-corp</code>", set <var>policy</var> to
 "<code>require-corp</code>".</p>
           </ol>
         </ol>
@@ -1786,7 +1779,7 @@ includes, as well as its parent’s or opener’s <a data-link-type="dfn" href="
           <p>For each of the items in <var>global</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set" id="ref-for-concept-WorkerGlobalScope-owner-set①">owner set</a>:</p>
           <ol>
            <li data-md>
-            <p>If the item’s <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy⑤">embedding policy</a> is "<code>require-corp</code>", set <var>policy</var> to
+            <p>If the item’s <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy④">embedder policy</a> is "<code>require-corp</code>", set <var>policy</var> to
 "<code>require-corp</code>".</p>
           </ol>
         </ol>
@@ -1803,32 +1796,32 @@ controls? Would it be enough to ensure that we perform a CORP check when deliver
 resource from the service worker to a document?</p>
       </dl>
      <li data-md>
-      <p>Set <var>global</var>’s <a data-link-type="dfn" href="#workerglobalscope-embedding-policy" id="ref-for-workerglobalscope-embedding-policy②">embedding policy</a> to <var>policy</var>.</p>
+      <p>Set <var>global</var>’s <a data-link-type="dfn" href="#workerglobalscope-embedder-policy" id="ref-for-workerglobalscope-embedder-policy②">embedder policy</a> to <var>policy</var>.</p>
     </ol>
    </div>
    <h3 class="heading settled" data-level="3.2" id="integration-fetch"><span class="secno">3.2. </span><span class="content">Integration with Fetch</span><a class="self-link" href="#integration-fetch"></a></h3>
-   <p>When fetching resources, user agents should examine both the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client">reserved client</a> to determine the applicable <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy⑥">embedding policy</a>, and apply any constraints that policy expresses
+   <p>When fetching resources, user agents should examine both the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client">reserved client</a> to determine the applicable <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑤">embedder policy</a>, and apply any constraints that policy expresses
 to incoming responses. To do so, Fetch is patched as follows:</p>
    <ol>
     <li data-md>
      <p>The <code>Cross-Origin-Resource-Policy</code> grammar is extended to include a "<code>cross-site</code>" value.</p>
     <li data-md>
-     <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a> is rewritten to take the <a data-link-type="dfn" href="#embedding-policy" id="ref-for-embedding-policy⑦">embedding policy</a> into
+     <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a> is rewritten to take the <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑥">embedder policy</a> into
 account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#navigation-request" id="ref-for-navigation-request①">navigation requests</a> in addition to <code>no-cors</code> requests.</p>
    </ol>
    <h4 class="heading settled" data-level="3.2.1" id="corp-check"><span class="secno">3.2.1. </span><span class="content">Cross-Origin Resource Policy Checks</span><a class="self-link" href="#corp-check"></a></h4>
    <p>To perform a <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a> (<var>request</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response③">response</a> (<var>response</var>), run these steps:</p>
    <ol>
     <li data-md>
-     <p>Let <var>embedding policy</var> be "<code>require-corp</code>".</p>
+     <p>Let <var>embedder policy</var> be "<code>require-corp</code>".</p>
     <li data-md>
-     <p>Set <var>embedding policy</var> to "<code>none</code>" if both of the following statements are true:</p>
+     <p>Set <var>embedder policy</var> to "<code>none</code>" if both of the following statements are true:</p>
      <ul>
       <li data-md>
-       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a>'s <a data-link-type="dfn" href="#environment-settings-object-embedding-policy" id="ref-for-environment-settings-object-embedding-policy">embedding policy</a> is
+       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a>'s <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy">embedder policy</a> is
  "<code>none</code>".</p>
       <li data-md>
-       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client①">reserved client</a> is not <code>null</code>, and its <a data-link-type="dfn" href="#environment-settings-object-embedding-policy" id="ref-for-environment-settings-object-embedding-policy①">embedding policy</a> is "<code>none</code>".</p>
+       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client①">reserved client</a> is not <code>null</code>, and its <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy①">embedder policy</a> is "<code>none</code>".</p>
      </ul>
     <li data-md>
      <p>Return <code>allowed</code> if any of the following statements are true:</p>
@@ -1836,14 +1829,14 @@ account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.what
       <li data-md>
        <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode">mode</a> is "<code>same-origin</code>", "<code>cors</code>", or "<code>websocket</code>".</p>
       <li data-md>
-       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode①">mode</a> is "<code>navigate</code>", and <var>embedding policy</var> is "<code>none</code>".</p>
+       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode①">mode</a> is "<code>navigate</code>", and <var>embedder policy</var> is "<code>none</code>".</p>
      </ul>
     <li data-md>
-     <p class="assertion">ASSERT: <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode②">mode</a> is "<code>no-cors</code>" or "<code>navigate</code>". If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode③">mode</a> is "<code>navigate</code>", <var>embedding policy</var> is "<code>require-corp</code>".</p>
+     <p class="assertion">ASSERT: <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode②">mode</a> is "<code>no-cors</code>" or "<code>navigate</code>". If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode③">mode</a> is "<code>navigate</code>", <var>embedder policy</var> is "<code>require-corp</code>".</p>
     <li data-md>
-     <p>Let <var>policy</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-get" id="ref-for-concept-header-list-get">getting</a> <code>Cross-Origin-Resource-Policy</code> from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list①">header list</a>.</p>
+     <p>Let <var>policy</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-get" id="ref-for-concept-header-list-get①">getting</a> <code>Cross-Origin-Resource-Policy</code> from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list①">header list</a>.</p>
     <li data-md>
-     <p>If <var>policy</var> is <code>null</code> ,and <var>embedding policy</var> is "<code>require-corp</code>", set <var>policy</var> to
+     <p>If <var>policy</var> is <code>null</code>, and <var>embedder policy</var> is "<code>require-corp</code>", set <var>policy</var> to
 "<code>same-origin</code>".</p>
     <li data-md>
      <p>Switch on <var>policy</var> and run the associated steps:</p>
@@ -2051,27 +2044,26 @@ strategy to consider.</p>
   <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
   <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="index">
-   <li><a href="#browsing-context-creator-embedding-policy">creator embedding policy</a><span>, in §3.1</span>
-   <li><a href="#http-headerdef-cross-origin-embedding-policy">Cross-Origin-Embedding-Policy</a><span>, in §2.1</span>
+   <li><a href="#http-headerdef-cross-origin-embedder-policy">Cross-Origin-Embedder-Policy</a><span>, in §2.1</span>
    <li><a href="#abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a><span>, in §3.2.1</span>
    <li>
-    embedding policy
+    embedder policy
     <ul>
-     <li><a href="#embedding-policy">definition of</a><span>, in §3.1</span>
-     <li><a href="#workerglobalscope-embedding-policy">dfn for WorkerGlobalScope</a><span>, in §3.1</span>
-     <li><a href="#document-embedding-policy">dfn for document</a><span>, in §3.1</span>
-     <li><a href="#environment-settings-object-embedding-policy">dfn for environment settings object</a><span>, in §3.1</span>
+     <li><a href="#embedder-policy">definition of</a><span>, in §3.1</span>
+     <li><a href="#workerglobalscope-embedder-policy">dfn for WorkerGlobalScope</a><span>, in §3.1</span>
+     <li><a href="#document-embedder-policy">dfn for document</a><span>, in §3.1</span>
+     <li><a href="#environment-settings-object-embedder-policy">dfn for environment settings object</a><span>, in §3.1</span>
     </ul>
-   <li><a href="#abstract-opdef-initialize-a-documents-embedding-policy-from-a-response">initialize a Document’s embedding policy from a response</a><span>, in §3.1.1</span>
-   <li><a href="#abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response">initialize a global object’s embedding policy from a response</a><span>, in §3.1.2</span>
-   <li><a href="#abstract-opdef-obtain-a-responses-embedding-policy">obtain a response’s embedding policy</a><span>, in §2.2</span>
-   <li><a href="#abstract-opdef-obtain-a-responses-embedding-policy">parse header</a><span>, in §2.2</span>
+   <li><a href="#abstract-opdef-initialize-a-documents-embedder-policy-from-a-response">initialize a Document’s embedder policy from a response</a><span>, in §3.1.1</span>
+   <li><a href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">initialize a global object’s embedder policy from a response</a><span>, in §3.1.2</span>
+   <li><a href="#abstract-opdef-obtain-a-responses-embedder-policy">obtain a response’s embedder policy</a><span>, in §2.2</span>
+   <li><a href="#abstract-opdef-obtain-a-responses-embedder-policy">parse header</a><span>, in §2.2</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-document">
    <a href="https://dom.spec.whatwg.org/#document">https://dom.spec.whatwg.org/#document</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-document">3.1. Integration with HTML</a> <a href="#ref-for-document①">(2)</a> <a href="#ref-for-document②">(3)</a>
-    <li><a href="#ref-for-document③">3.1.1. Initializing a Document's Embedding Policy</a> <a href="#ref-for-document④">(2)</a>
+    <li><a href="#ref-for-document">3.1. Integration with HTML</a> <a href="#ref-for-document①">(2)</a>
+    <li><a href="#ref-for-document②">3.1.1. Initializing a Document's Embedder policy</a> <a href="#ref-for-document③">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sec-sharedarraybuffer-objects">
@@ -2105,16 +2097,11 @@ strategy to consider.</p>
     <li><a href="#ref-for-concept-request-current-url">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-request-current-url①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-extract-header-values">
-   <a href="https://fetch.spec.whatwg.org/#extract-header-values">https://fetch.spec.whatwg.org/#extract-header-values</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-extract-header-values">2.2. Parsing</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-concept-header-list-get">
    <a href="https://fetch.spec.whatwg.org/#concept-header-list-get">https://fetch.spec.whatwg.org/#concept-header-list-get</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-header-list-get">3.2.1. Cross-Origin Resource Policy Checks</a>
+    <li><a href="#ref-for-concept-header-list-get">2.2. Parsing</a>
+    <li><a href="#ref-for-concept-header-list-get①">3.2.1. Cross-Origin Resource Policy Checks</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-response-header-list">
@@ -2133,7 +2120,7 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-local-scheme">
    <a href="https://fetch.spec.whatwg.org/#local-scheme">https://fetch.spec.whatwg.org/#local-scheme</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-local-scheme">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-local-scheme">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-mode">
@@ -2173,33 +2160,33 @@ strategy to consider.</p>
    <a href="https://fetch.spec.whatwg.org/#concept-response">https://fetch.spec.whatwg.org/#concept-response</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-response">2.2. Parsing</a>
-    <li><a href="#ref-for-concept-response①">3.1.1. Initializing a Document's Embedding Policy</a>
-    <li><a href="#ref-for-concept-response②">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-concept-response①">3.1.1. Initializing a Document's Embedder policy</a>
+    <li><a href="#ref-for-concept-response②">3.1.2. Initializing a global object’s Embedder policy</a>
     <li><a href="#ref-for-concept-response③">3.2.1. Cross-Origin Resource Policy Checks</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-response-url">
    <a href="https://fetch.spec.whatwg.org/#concept-response-url">https://fetch.spec.whatwg.org/#concept-response-url</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-response-url">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-concept-response-url">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dedicatedworkerglobalscope">
    <a href="https://html.spec.whatwg.org/multipage/workers.html#dedicatedworkerglobalscope">https://html.spec.whatwg.org/multipage/workers.html#dedicatedworkerglobalscope</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dedicatedworkerglobalscope">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-dedicatedworkerglobalscope">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sharedworker">
    <a href="https://html.spec.whatwg.org/multipage/workers.html#sharedworker">https://html.spec.whatwg.org/multipage/workers.html#sharedworker</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sharedworker">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-sharedworker">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sharedworkerglobalscope">
    <a href="https://html.spec.whatwg.org/multipage/workers.html#sharedworkerglobalscope">https://html.spec.whatwg.org/multipage/workers.html#sharedworkerglobalscope</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sharedworkerglobalscope">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-sharedworkerglobalscope">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-window">
@@ -2217,7 +2204,7 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-active-document">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#active-document">https://html.spec.whatwg.org/multipage/browsers.html#active-document</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-active-document">3.1.1. Initializing a Document's Embedding Policy</a>
+    <li><a href="#ref-for-active-document">3.1.1. Initializing a Document's Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-document-window">
@@ -2229,14 +2216,14 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-auxiliary-browsing-context">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#auxiliary-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#auxiliary-browsing-context</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-auxiliary-browsing-context">3.1.1. Initializing a Document's Embedding Policy</a>
+    <li><a href="#ref-for-auxiliary-browsing-context">3.1.1. Initializing a Document's Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-browsing-context">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#browsing-context</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-browsing-context">3.1. Integration with HTML</a> <a href="#ref-for-browsing-context①">(2)</a> <a href="#ref-for-browsing-context②">(3)</a>
-    <li><a href="#ref-for-browsing-context③">3.1.1. Initializing a Document's Embedding Policy</a> <a href="#ref-for-browsing-context④">(2)</a>
+    <li><a href="#ref-for-browsing-context">3.1. Integration with HTML</a>
+    <li><a href="#ref-for-browsing-context①">3.1.1. Initializing a Document's Embedder policy</a> <a href="#ref-for-browsing-context②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-environment-settings-object">
@@ -2248,7 +2235,7 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-global-object">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object">https://html.spec.whatwg.org/multipage/webappapis.html#global-object</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-global-object">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-global-object">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-origin-host">
@@ -2266,13 +2253,13 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-nested-browsing-context">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-nested-browsing-context">3.1.1. Initializing a Document's Embedding Policy</a>
+    <li><a href="#ref-for-nested-browsing-context">3.1.1. Initializing a Document's Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-browsing-context-nested-through">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-nested-through">https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-nested-through</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-browsing-context-nested-through">3.1.1. Initializing a Document's Embedding Policy</a>
+    <li><a href="#ref-for-browsing-context-nested-through">3.1.1. Initializing a Document's Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-open">
@@ -2284,13 +2271,13 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-opener-browsing-context">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#opener-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#opener-browsing-context</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-opener-browsing-context">3.1.1. Initializing a Document's Embedding Policy</a>
+    <li><a href="#ref-for-opener-browsing-context">3.1.1. Initializing a Document's Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-WorkerGlobalScope-owner-set">
    <a href="https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set">https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-WorkerGlobalScope-owner-set">3.1.2. Initializing a global object’s Embedding Policy</a> <a href="#ref-for-concept-WorkerGlobalScope-owner-set①">(2)</a>
+    <li><a href="#ref-for-concept-WorkerGlobalScope-owner-set">3.1.2. Initializing a global object’s Embedder policy</a> <a href="#ref-for-concept-WorkerGlobalScope-owner-set①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-same-origin">
@@ -2320,33 +2307,39 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-section-3.9">
    <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-section-3.9">2.1. The Cross-Origin-Embedding-Policy HTTP Response Header</a> <a href="#ref-for-section-3.9①">(2)</a>
-    <li><a href="#ref-for-section-3.9②">2.2. Parsing</a> <a href="#ref-for-section-3.9③">(2)</a>
+    <li><a href="#ref-for-section-3.9">2.1. The Cross-Origin-Embedder-Policy HTTP Response Header</a> <a href="#ref-for-section-3.9①">(2)</a>
+    <li><a href="#ref-for-section-3.9②">2.2. Parsing</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-">
    <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">2.1. The Cross-Origin-Embedding-Policy HTTP Response Header</a>
+    <li><a href="#termref-for-">2.1. The Cross-Origin-Embedder-Policy HTTP Response Header</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-section-3.9">
    <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-section-3.9">2.1. The Cross-Origin-Embedding-Policy HTTP Response Header</a> <a href="#ref-for-section-3.9①">(2)</a>
-    <li><a href="#ref-for-section-3.9②">2.2. Parsing</a> <a href="#ref-for-section-3.9③">(2)</a>
+    <li><a href="#ref-for-section-3.9">2.1. The Cross-Origin-Embedder-Policy HTTP Response Header</a> <a href="#ref-for-section-3.9①">(2)</a>
+    <li><a href="#ref-for-section-3.9②">2.2. Parsing</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-isomorphic-decode">
+   <a href="https://infra.spec.whatwg.org/#isomorphic-decode">https://infra.spec.whatwg.org/#isomorphic-decode</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-isomorphic-decode">2.2. Parsing</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-serviceworker">
    <a href="https://w3c.github.io/ServiceWorker/#serviceworker">https://w3c.github.io/ServiceWorker/#serviceworker</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-serviceworker">3.1.2. Initializing a global object’s Embedding Policy</a> <a href="#ref-for-serviceworker①">(2)</a> <a href="#ref-for-serviceworker②">(3)</a>
+    <li><a href="#ref-for-serviceworker">3.1.2. Initializing a global object’s Embedder policy</a> <a href="#ref-for-serviceworker①">(2)</a> <a href="#ref-for-serviceworker②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-serviceworkerglobalscope">
    <a href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope">https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-serviceworkerglobalscope">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-serviceworkerglobalscope">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-url-origin">
@@ -2364,7 +2357,7 @@ strategy to consider.</p>
   <aside class="dfn-panel" data-for="term-for-concept-url-scheme">
    <a href="https://url.spec.whatwg.org/#concept-url-scheme">https://url.spec.whatwg.org/#concept-url-scheme</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-url-scheme">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-concept-url-scheme">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
@@ -2386,7 +2379,6 @@ strategy to consider.</p>
      <li><span class="dfn-paneled" id="term-for-concept-cors-check" style="color:initial">cors check</span>
      <li><span class="dfn-paneled" id="term-for-http-cross-origin-resource-policy" style="color:initial">cross-origin-resource-policy</span>
      <li><span class="dfn-paneled" id="term-for-concept-request-current-url" style="color:initial">current url</span>
-     <li><span class="dfn-paneled" id="term-for-extract-header-values" style="color:initial">extracting header values</span>
      <li><span class="dfn-paneled" id="term-for-concept-header-list-get" style="color:initial">get</span>
      <li><span class="dfn-paneled" id="term-for-concept-response-header-list" style="color:initial">header list</span>
      <li><span class="dfn-paneled" id="term-for-concept-response-https-state" style="color:initial">https state</span>
@@ -2433,6 +2425,11 @@ strategy to consider.</p>
      <li><span class="dfn-paneled" id="term-for-section-3.9①" style="color:initial">token</span>
     </ul>
    <li>
+    <a data-link-type="biblio">[INFRA]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-isomorphic-decode" style="color:initial">isomorphic decode</span>
+    </ul>
+   <li>
     <a data-link-type="biblio">[service-workers-1]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-serviceworker" style="color:initial">ServiceWorker</span>
@@ -2459,6 +2456,8 @@ strategy to consider.</p>
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-i-dietf-httpbis-header-structure">[I-D.ietf-httpbis-header-structure]
    <dd>Mark Nottingham; Poul-Henning Kamp. <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure">Structured Headers for HTTP</a>. ID. URL: <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure</a>
+   <dt id="biblio-infra">[INFRA]
+   <dd>Anne van Kesteren; Domenic Denicola. <a href="https://infra.spec.whatwg.org/">Infra Standard</a>. Living Standard. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
    <dt id="biblio-service-workers-1">[SERVICE-WORKERS-1]
@@ -2481,77 +2480,72 @@ strategy to consider.</p>
 writing it down this way, as it still seems to me to be correct, but we should discuss more until we
 agree on the behavior.<a href="#issue-d7719780"> ↵ </a></div>
    <div class="issue"> Not sure if this is the right integration between Fetch’s understanding of header
-values and Structured Headers.<a href="#issue-f02fbd56"> ↵ </a></div>
+values and Structured Headers. For example, the latter requires an ASCII string, the former
+decodes an ~arbitrary byte sequence.<a href="#issue-ff9cff3d"> ↵ </a></div>
    <div class="issue"> We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
 to do the right thing with regard to process isolation for top-level windows.<a href="#issue-cc9e3c3a"> ↵ </a></div>
    <div class="issue"> Inheriting into frames might be the wrong model. Instead, we could require the frame itself
-to assert <code>Cross-Origin-Embedding-Policy: require-corp</code>, and block the load if it doesn’t. That
+to assert <code>Cross-Origin-Embedder-Policy: require-corp</code>, and block the load if it doesn’t. That
 would likely be safer, insofar as it would give the embedder less control over the embedee’s state,
 and the embedee’s developer would always see consistent behavior in the given document no matter how
-it’s loaded.<a href="#issue-e939c637"> ↵ </a></div>
+it’s loaded.<a href="#issue-4dd2774e"> ↵ </a></div>
    <div class="issue"> Is this the right model for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworker">SharedWorker</a></code>? See also the questions around <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker">ServiceWorker</a></code> below.<a href="#issue-1f0fe121"> ↵ </a></div>
    <div class="issue"> Do we need to ensure that <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker">ServiceWorker</a></code> can’t have a distinct COEP from pages
 it controls? Do we need to inherit the <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworker">ServiceWorker</a></code>'s policy into documents it
 controls? Would it be enough to ensure that we perform a CORP check when delivering a
 resource from the service worker to a document?<a href="#issue-13500964"> ↵ </a></div>
   </div>
-  <aside class="dfn-panel" data-for="http-headerdef-cross-origin-embedding-policy">
-   <b><a href="#http-headerdef-cross-origin-embedding-policy">#http-headerdef-cross-origin-embedding-policy</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="http-headerdef-cross-origin-embedder-policy">
+   <b><a href="#http-headerdef-cross-origin-embedder-policy">#http-headerdef-cross-origin-embedder-policy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-http-headerdef-cross-origin-embedding-policy">3.1. Integration with HTML</a>
+    <li><a href="#ref-for-http-headerdef-cross-origin-embedder-policy">3.1. Integration with HTML</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="abstract-opdef-obtain-a-responses-embedding-policy">
-   <b><a href="#abstract-opdef-obtain-a-responses-embedding-policy">#abstract-opdef-obtain-a-responses-embedding-policy</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="abstract-opdef-obtain-a-responses-embedder-policy">
+   <b><a href="#abstract-opdef-obtain-a-responses-embedder-policy">#abstract-opdef-obtain-a-responses-embedder-policy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedding-policy">3.1.1. Initializing a Document's Embedding Policy</a>
-    <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedding-policy①">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedder-policy">3.1.1. Initializing a Document's Embedder policy</a>
+    <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedder-policy①">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="embedding-policy">
-   <b><a href="#embedding-policy">#embedding-policy</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="embedder-policy">
+   <b><a href="#embedder-policy">#embedder-policy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-embedding-policy">3.1. Integration with HTML</a> <a href="#ref-for-embedding-policy①">(2)</a> <a href="#ref-for-embedding-policy②">(3)</a> <a href="#ref-for-embedding-policy③">(4)</a>
-    <li><a href="#ref-for-embedding-policy④">3.1.2. Initializing a global object’s Embedding Policy</a> <a href="#ref-for-embedding-policy⑤">(2)</a>
-    <li><a href="#ref-for-embedding-policy⑥">3.2. Integration with Fetch</a> <a href="#ref-for-embedding-policy⑦">(2)</a>
+    <li><a href="#ref-for-embedder-policy">3.1. Integration with HTML</a> <a href="#ref-for-embedder-policy①">(2)</a> <a href="#ref-for-embedder-policy②">(3)</a>
+    <li><a href="#ref-for-embedder-policy③">3.1.2. Initializing a global object’s Embedder policy</a> <a href="#ref-for-embedder-policy④">(2)</a>
+    <li><a href="#ref-for-embedder-policy⑤">3.2. Integration with Fetch</a> <a href="#ref-for-embedder-policy⑥">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="document-embedding-policy">
-   <b><a href="#document-embedding-policy">#document-embedding-policy</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="document-embedder-policy">
+   <b><a href="#document-embedder-policy">#document-embedder-policy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-document-embedding-policy">3.1. Integration with HTML</a> <a href="#ref-for-document-embedding-policy①">(2)</a> <a href="#ref-for-document-embedding-policy②">(3)</a> <a href="#ref-for-document-embedding-policy③">(4)</a> <a href="#ref-for-document-embedding-policy④">(5)</a>
-    <li><a href="#ref-for-document-embedding-policy⑤">3.1.1. Initializing a Document's Embedding Policy</a> <a href="#ref-for-document-embedding-policy⑥">(2)</a> <a href="#ref-for-document-embedding-policy⑦">(3)</a> <a href="#ref-for-document-embedding-policy⑧">(4)</a> <a href="#ref-for-document-embedding-policy⑨">(5)</a>
+    <li><a href="#ref-for-document-embedder-policy">3.1. Integration with HTML</a> <a href="#ref-for-document-embedder-policy①">(2)</a> <a href="#ref-for-document-embedder-policy②">(3)</a> <a href="#ref-for-document-embedder-policy③">(4)</a> <a href="#ref-for-document-embedder-policy④">(5)</a>
+    <li><a href="#ref-for-document-embedder-policy⑤">3.1.1. Initializing a Document's Embedder policy</a> <a href="#ref-for-document-embedder-policy⑥">(2)</a> <a href="#ref-for-document-embedder-policy⑦">(3)</a> <a href="#ref-for-document-embedder-policy⑧">(4)</a> <a href="#ref-for-document-embedder-policy⑨">(5)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="workerglobalscope-embedding-policy">
-   <b><a href="#workerglobalscope-embedding-policy">#workerglobalscope-embedding-policy</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="workerglobalscope-embedder-policy">
+   <b><a href="#workerglobalscope-embedder-policy">#workerglobalscope-embedder-policy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-workerglobalscope-embedding-policy">3.1. Integration with HTML</a> <a href="#ref-for-workerglobalscope-embedding-policy①">(2)</a>
-    <li><a href="#ref-for-workerglobalscope-embedding-policy②">3.1.2. Initializing a global object’s Embedding Policy</a>
+    <li><a href="#ref-for-workerglobalscope-embedder-policy">3.1. Integration with HTML</a> <a href="#ref-for-workerglobalscope-embedder-policy①">(2)</a>
+    <li><a href="#ref-for-workerglobalscope-embedder-policy②">3.1.2. Initializing a global object’s Embedder policy</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="environment-settings-object-embedding-policy">
-   <b><a href="#environment-settings-object-embedding-policy">#environment-settings-object-embedding-policy</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="environment-settings-object-embedder-policy">
+   <b><a href="#environment-settings-object-embedder-policy">#environment-settings-object-embedder-policy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-environment-settings-object-embedding-policy">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-environment-settings-object-embedding-policy①">(2)</a>
+    <li><a href="#ref-for-environment-settings-object-embedder-policy">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-environment-settings-object-embedder-policy①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="browsing-context-creator-embedding-policy">
-   <b><a href="#browsing-context-creator-embedding-policy">#browsing-context-creator-embedding-policy</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="abstract-opdef-initialize-a-documents-embedder-policy-from-a-response">
+   <b><a href="#abstract-opdef-initialize-a-documents-embedder-policy-from-a-response">#abstract-opdef-initialize-a-documents-embedder-policy-from-a-response</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-browsing-context-creator-embedding-policy">3.1. Integration with HTML</a> <a href="#ref-for-browsing-context-creator-embedding-policy①">(2)</a>
+    <li><a href="#ref-for-abstract-opdef-initialize-a-documents-embedder-policy-from-a-response">3.1. Integration with HTML</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="abstract-opdef-initialize-a-documents-embedding-policy-from-a-response">
-   <b><a href="#abstract-opdef-initialize-a-documents-embedding-policy-from-a-response">#abstract-opdef-initialize-a-documents-embedding-policy-from-a-response</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">
+   <b><a href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-abstract-opdef-initialize-a-documents-embedding-policy-from-a-response">3.1. Integration with HTML</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response">
-   <b><a href="#abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response">#abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-abstract-opdef-initialize-a-global-objects-embedding-policy-from-a-response">3.1. Integration with HTML</a>
+    <li><a href="#ref-for-abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">3.1. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="abstract-opdef-cross-origin-resource-policy-check">
