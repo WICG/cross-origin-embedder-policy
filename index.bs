@@ -159,19 +159,24 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 
 1.  Let |policy| be "`none`".
 
-2.  Let |header| be the result of [=extracting header values=] given `Cross-Origin-Embedder-Policy`
-    and |response|'s [=response/header list=].
+2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy` from
+    |response|'s [=response/header list=].
 
-3.  If |header| matches the <a grammar>`sh-token`</a> grammar:
+3.  If |header| is not `null`:
 
-    1.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
+    1.  Set |header| to the result of [=isomorphic decoding=] |header|.
+
+    2.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
         with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
         to "`item`".
 
-        ISSUE: Not sure if this is the right integration between Fetch's understanding of header
-        values and Structured Headers.
+        If parsing fails, set |parsed policy| to "`none`".
 
-    2.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
+        ISSUE: Not sure if this is the right integration between Fetch's understanding of header
+        values and Structured Headers. For example, the latter requires an ASCII string, the former
+        decodes an ~arbitrary byte sequence.
+
+    3.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
 
 4.  Return |policy|.
 
