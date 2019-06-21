@@ -66,6 +66,7 @@ urlPrefix: https://html.spec.whatwg.org/
         text: initialize the Document object; url: multipage/browsing-the-web.html#initialise-the-document-object
         text: create a new browsing context; url: multipage/browsers.html#creating-a-new-browsing-context
         text: run a worker; url: multipage/workers.html#run-a-worker
+        text: process a navigate response; url: multipage/browsing-the-web.html#process-a-navigate-response
 </pre>
 
 <pre class="link-defaults">
@@ -287,6 +288,14 @@ so, HTML is patched as follows:
     > 6.  Call [$initialize a global object's embedder policy from a response$] given
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
 
+6.  The [$process a navigate response$] algorthm checks that documents nested in a `require-corp`
+    context themselves positively assert `require-corp` by adding a new condition to the list in
+    step 1:
+
+    > *   The [$process navigation response|check a navigation response's adherence to its
+    >     embedder's policy$] algorithm returns "`Blocked`" when executed upon
+    >     <var ignore>response</var> and <var ignore>browsingContext</var>.
+
 ### Initializing a `Document`'s Embedder policy ### {#initialize-embedder-policy-for-document}
 
 <div algorithm="to initialize a Document's embedder policy from a response">
@@ -295,33 +304,22 @@ To <dfn abstract-op>initialize a Document's embedder policy from a response</dfn
 
 1.  Let |policy| be the result of [$parse header|obtaining an embedder policy$] from |response|.
 
-2.  Let |inherit from| be `null`.
+2.  If |document|'s [=browsing context=] is an [=auxiliary browsing context=]:
 
-3.  If |document|'s [=browsing context=] is a [=nested browsing context=], then set |inherit from|
-    to the {{Document}} [=nested through|through which=] |context| is nested.
+    1.  If the [=active document=] of |document|'s [=browsing context=]'s
+        [=opener browsing context=]'s [=document/embedder policy=] "`require-corp`", set |policy|
+        to "`require-corp`".
 
-4.  If |document|'s [=browsing context=] is an [=auxiliary browsing context=], then set
-    |inherit from| to the [=active document=] of |context|'s [=opener browsing context=].
-
-5.  If |inherit from| is not `null`, and |inherit from|'s [=document/embedder policy=] is
-    "`require-corp`", set |policy| to "`require-corp`".
-
-6.  Set |document|'s [=document/embedder policy=] to |policy|.
+3.  Set |document|'s [=document/embedder policy=] to |policy|.
 
 </div>
 
 ISSUE: We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
 to do the right thing with regard to process isolation for top-level windows.
 
-ISSUE: Inheriting into frames might be the wrong model. Instead, we could require the frame itself
-to assert `Cross-Origin-Embedder-Policy: require-corp`, and block the load if it doesn't. That
-would likely be safer, insofar as it would give the embedder less control over the embedee's state,
-and the embedee's developer would always see consistent behavior in the given document no matter how
-it's loaded.
-
 <div class="example">
 If `https://example.com/` is loaded as a non-auxiliary top-level document, its
-[=document/embedder policy=] will depend soley upon the `Cross-Origin-Embedder-Policy` header
+[=document/embedder policy=] will vary based upon the `Cross-Origin-Embedder-Policy` header
 it includes. That is:
 
 <table class="data">
@@ -359,52 +357,6 @@ it includes. That is:
     <tr>
       <td>`require-corp, require-corp`</td>
       <td>`none`</td>
-    </tr>
-  </tbody>
-</table>
-
-If `https://example.com/` is loaded as a nested or auxiliary document, its
-[=document/embedder policy=] will depend both upon the `Cross-Origin-Embedder-Policy` header it
-includes, as well as its parent's or opener's [=document/embedder policy=], respectively. That is:
-
-<table class="data">
-  <thead>
-    <tr>
-      <th>`Cross-Origin-Embedder-Policy`</th>
-      <th>Parent / Opener Policy</th>
-      <th>Final Policy</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><em>No header delivered</em></td>
-      <td>`none`</td>
-      <td>`none`</td>
-    </tr>
-    <tr>
-      <td><em>No header delivered</em></td>
-      <td>`require-corp`</td>
-      <td>`require-corp`</td>
-    </tr>
-    <tr>
-      <td>`require-corp`</td>
-      <td>`none`</td>
-      <td>`require-corp`</td>
-    </tr>
-    <tr>
-      <td>`require-corp`</td>
-      <td>`require-corp`</td>
-      <td>`require-corp`</td>
-    </tr>
-    <tr>
-      <td>`unknown-value`</td>
-      <td>`none`</td>
-      <td>`none`</td>
-    </tr>
-    <tr>
-      <td>`unknown-value`</td>
-      <td>`require-corp`</td>
-      <td>`require-corp`</td>
     </tr>
   </tbody>
 </table>
@@ -453,6 +405,29 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 
 </div>
 
+### Process a navigation response ### {#process-navigation-response}
+
+<div algorithm="process a navigation response">
+If a document's [=document/embedder policy=] is "`require-corp`", then any document it embeds in a
+[=nested browsing context=] must positively assert a "`require-corp`" [=/embedder policy=] (see
+[[#cascade-vs-require]]).
+
+To <dfn abstract-op lt="process navigation response">check a navigation response's adherence to its
+embedder's policy</dfn> given a [=response=] (|response|), and a target [=browsing context=]
+(|target|), execute the following steps, which will return "`Allowed`" or "`Blocked`" as
+appropriate:
+
+1.  Return "`Allowed`" if any of the following statements are true:
+
+    *   |target| is not a [=nested browsing context=].
+    *   The {{Document}} [=nested through|through which=] |target| is nested has an
+        [=document/embedder policy=] of "`none`".
+    *   The result of [$parse header|obtaining an embedder policy$] from |response| is
+        "`require-corp`".
+
+2.  Return "`Blocked`".
+
+</div>
 
 Integration with Fetch {#integration-fetch}
 -------------------------------------------
@@ -465,6 +440,11 @@ to incoming responses. To do so, Fetch is patched as follows:
 
 2.  The [$cross-origin resource policy check$] is rewritten to take the [=/embedder policy=] into
     account, and to cover some [=navigation requests=] in addition to `no-cors` requests.
+
+3.  ISSUE: The [$cross-origin resource policy check$] needs to be performed _after_ the relevant
+    service worker has the opportunity to respond to a request, as it may otherwise be allowed to
+    respond to a `require-corp` [=request/client=] with an opaque response which doesn't assert
+    CORP.
 
 ### Cross-Origin Resource Policy Checks ### {#corp-check}
 
@@ -565,3 +545,20 @@ Perhaps it will be possible to do everything we want by defining a new tokens, b
 that we'll follow [[Referrer-Policy]] into some pretty convoluted token names if we go that route.
 Splitting out the axes along which we'd like to make decisions seems like it might be a good
 strategy to consider.
+
+Cascading vs. requiring embedder policies {#cascade-vs-require}
+---------------------------------------------------------------
+
+An earlier version of this proposal called for a nested document's [=document/embedder policy=] to
+be inherited from its parent. This would ensure that a document that asserted `require-corp` would
+require its framed children to do the same.
+
+We decided that this is the wrong model to start with. Instead, we now require the framed document
+itself to assert `Cross-Origin-Embedder-Policy: require-corp`, and block the load if it doesn't.
+That seems safer, insofar as it would give the embedder less control over the embedee's state. It
+also ensures that the embedee's developer would always see consistent behavior in the given document
+no matter whether its loaded as a frame or as a top-level document.
+
+This might be a requirement we can relax in the future, as it does have potential implications for
+eventual deployment. It makes sense to begin with the requirement, however, as loosening constraints
+is significantly simpler than imposing new constraints in the future.
