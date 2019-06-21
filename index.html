@@ -1212,8 +1212,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 872cce6d3026423d677f3bd5837f1a1a46299a04" name="generator">
-  <meta content="4ad7dabe87c016669e9dbd4c6a5346a23ddb5d71" name="document-revision">
+  <meta content="Bikeshed version 9c9e00cfdaddb9b81439182b02ae23e5d5b65b2d" name="generator">
+  <meta content="2ae15a1afd845b10eeaa2738b1e1d204abbee8ec" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1413,7 +1413,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-06-20">20 June 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-06-21">21 June 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1555,6 +1555,9 @@ to "<code>item</code>".</p>
         <p class="issue" id="issue-ff9cff3d"><a class="self-link" href="#issue-ff9cff3d"></a> Not sure if this is the right integration between Fetch’s understanding of header
 values and Structured Headers. For example, the latter requires an ASCII string, the former
 decodes an ~arbitrary byte sequence.</p>
+        <p class="issue" id="issue-40cb8ace"><a class="self-link" href="#issue-40cb8ace"></a> The ASCII requirements of Structured Headers are
+somewhat unclear to me. Do we need to check whether <var>header</var> is an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string" id="ref-for-ascii-string">ASCII string</a> before
+passing it into the parsing algorithm? <a href="https://github.com/httpwg/http-extensions/issues/662">&lt;https://github.com/httpwg/http-extensions/issues/662></a></p>
        <li data-md>
         <p>If <var>parsed policy</var> is "<code>require-corp</code>", set <var>policy</var> to "<code>require-corp</code>".</p>
       </ol>
@@ -2324,6 +2327,12 @@ strategy to consider.</p>
     <li><a href="#ref-for-section-3.9②">2.2. Parsing</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-ascii-string">
+   <a href="https://infra.spec.whatwg.org/#ascii-string">https://infra.spec.whatwg.org/#ascii-string</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-ascii-string">2.2. Parsing</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-isomorphic-decode">
    <a href="https://infra.spec.whatwg.org/#isomorphic-decode">https://infra.spec.whatwg.org/#isomorphic-decode</a><b>Referenced in:</b>
    <ul>
@@ -2427,6 +2436,7 @@ strategy to consider.</p>
    <li>
     <a data-link-type="biblio">[INFRA]</a> defines the following terms:
     <ul>
+     <li><span class="dfn-paneled" id="term-for-ascii-string" style="color:initial">ascii string</span>
      <li><span class="dfn-paneled" id="term-for-isomorphic-decode" style="color:initial">isomorphic decode</span>
     </ul>
    <li>
@@ -2482,6 +2492,9 @@ agree on the behavior.<a href="#issue-d7719780"> ↵ </a></div>
    <div class="issue"> Not sure if this is the right integration between Fetch’s understanding of header
 values and Structured Headers. For example, the latter requires an ASCII string, the former
 decodes an ~arbitrary byte sequence.<a href="#issue-ff9cff3d"> ↵ </a></div>
+   <div class="issue"> The ASCII requirements of Structured Headers are
+somewhat unclear to me. Do we need to check whether <var>header</var> is an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string">ASCII string</a> before
+passing it into the parsing algorithm? <a href="https://github.com/httpwg/http-extensions/issues/662">&lt;https://github.com/httpwg/http-extensions/issues/662></a><a href="#issue-40cb8ace"> ↵ </a></div>
    <div class="issue"> We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
 to do the right thing with regard to process isolation for top-level windows.<a href="#issue-cc9e3c3a"> ↵ </a></div>
    <div class="issue"> Inheriting into frames might be the wrong model. Instead, we could require the frame itself
