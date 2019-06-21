@@ -176,6 +176,10 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
         values and Structured Headers. For example, the latter requires an ASCII string, the former
         decodes an ~arbitrary byte sequence.
 
+        ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
+        somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
+        passing it into the parsing algorithm?
+
     3.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
 
 4.  Return |policy|.
