@@ -146,10 +146,6 @@ In order to support forward-compatibility with as-yet-unknown request types, use
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
 value cannot be parsed as a <a grammar>`sh-token`</a>.
 
-ISSUE: Anne suggested that we ought to fail closed instead in
-[a comment on the relevant PR](https://github.com/whatwg/fetch/pull/893#discussion_r274867414). I'm
-writing it down this way, as it still seems to me to be correct, but we should discuss more until we
-agree on the behavior.
 
 Parsing {#parsing}
 ------------------
@@ -172,10 +168,6 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
         to "`item`".
 
         If parsing fails, set |parsed policy| to "`none`".
-
-        ISSUE: Not sure if this is the right integration between Fetch's understanding of header
-        values and Structured Headers. For example, the latter requires an ASCII string, the former
-        decodes an ~arbitrary byte sequence.
 
         ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
         somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
@@ -278,8 +270,8 @@ so, HTML is patched as follows:
     {{Document}}s to which a [=browsing context=] is navigated by adding a new step directly after
     Referrer Policy is initialized in step 6:
 
-    > 7.  Call [$initialize a Document's embedder policy from a response$] given
-    >     <var ignore>document</var> and <var ignore>response</var>.
+    > 7.  Let <var ignore>document</var>'s [=document/embedder policy=] be the result of
+    >     [$parse header|obtaining an embedder policy$] from |response|.
 
 5.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
     {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
@@ -296,71 +288,6 @@ so, HTML is patched as follows:
     >     embedder's policy$] algorithm returns "`Blocked`" when executed upon
     >     <var ignore>response</var> and <var ignore>browsingContext</var>.
 
-### Initializing a `Document`'s Embedder policy ### {#initialize-embedder-policy-for-document}
-
-<div algorithm="to initialize a Document's embedder policy from a response">
-To <dfn abstract-op>initialize a Document's embedder policy from a response</dfn>, given a
-{{Document}} object (|document|) and a [=response=] (|response|):
-
-1.  Let |policy| be the result of [$parse header|obtaining an embedder policy$] from |response|.
-
-2.  If |document|'s [=browsing context=] is an [=auxiliary browsing context=]:
-
-    1.  If the [=active document=] of |document|'s [=browsing context=]'s
-        [=opener browsing context=]'s [=document/embedder policy=] "`require-corp`", set |policy|
-        to "`require-corp`".
-
-3.  Set |document|'s [=document/embedder policy=] to |policy|.
-
-</div>
-
-ISSUE: We might not need to inhert the COEP state into auxiliary frames, if we can rely on COOP
-to do the right thing with regard to process isolation for top-level windows.
-
-<div class="example">
-If `https://example.com/` is loaded as a non-auxiliary top-level document, its
-[=document/embedder policy=] will vary based upon the `Cross-Origin-Embedder-Policy` header
-it includes. That is:
-
-<table class="data">
-  <thead>
-    <tr>
-      <th>`Cross-Origin-Embedder-Policy`</th>
-      <th>Final Policy</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><em>No header delivered</em></td>
-      <td>`none`</td>
-    </tr>
-    <tr>
-      <td>`require-corp`</td>
-      <td>`require-corp`</td>
-    </tr>
-    <tr>
-      <td>`unknown-value`</td>
-      <td>`none`</td>
-    </tr>
-    <tr>
-      <td>`require-corp, unknown-value`</td>
-      <td>`none`</td>
-    </tr>
-    <tr>
-      <td>`unknown-value, unknown-value`</td>
-      <td>`none`</td>
-    </tr>
-    <tr>
-      <td>`unknown-value, require-corp`</td>
-      <td>`none`</td>
-    </tr>
-    <tr>
-      <td>`require-corp, require-corp`</td>
-      <td>`none`</td>
-    </tr>
-  </tbody>
-</table>
-</div>
 
 ### Initializing a global object's Embedder policy ### {#initialize-embedder-policy-for-global}
 
@@ -383,23 +310,8 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
                 "`require-corp`".
 
     :   |global| is a {{SharedWorkerGlobalScope}}:
-    ::  1.   Set |policy| to |response policy|.
-
-        2.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
-    
-            1.  If the item's [=/embedder policy=] is "`require-corp`", set |policy| to
-                "`require-corp`".
-
-        ISSUE: Is this the right model for {{SharedWorker}}? See also the questions around
-        {{ServiceWorker}} below.
-
     :   |global| is a {{ServiceWorkerGlobalScope}}:
     ::  1.   Set |policy| to |response policy|.
-
-        ISSUE: Do we need to ensure that {{ServiceWorker}} can't have a distinct COEP from pages
-        it controls? Do we need to inherit the {{ServiceWorker}}'s policy into documents it
-        controls? Would it be enough to ensure that we perform a CORP check when delivering a
-        resource from the service worker to a document?
 
 4.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
 
@@ -502,6 +414,14 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
 
     :   Otherwise
     ::  Return `allowed`.
+
+        ISSUE: Anne suggested that we ought to fail closed instead in the presence of COEP in
+        [a comment on the relevant PR](https://github.com/whatwg/fetch/pull/893#discussion_r274867414).
+        That seems reasonable to me, if we can get some changes into CORP along the lines of
+        [whatwg/fetch#760](https://github.com/whatwg/fetch/issues/760), as they seem like useful
+        extensions, and I think it'll be more difficult to ship them after inverting the
+        error-handling behavior.
+
 
 Implementation Considerations {#impl-considerations}
 ====================================================
