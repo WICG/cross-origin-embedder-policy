@@ -104,9 +104,9 @@ leakage is voluntary, not accidental.
 
 To that end, this proposal does three things:
 
-1.  It introduces a new `cross-site` value for the <a http-header>`Cross-Origin-Resource-Policy`</a>
+1.  It introduces a new `cross-origin` value for the <a http-header>`Cross-Origin-Resource-Policy`</a>
     HTTP response header, which constitutes an explicit declaration that a given resource may be
-    embedded in cross-site contexts.
+    embedded in cross-origin contexts.
 
 2.  It introduces a new `Cross-Origin-Embedder-Policy` header which shifts the default behavior for
     resources loaded in a given context to an opt-in model, in which cross-origin responses must
@@ -348,7 +348,7 @@ When fetching resources, user agents should examine both the [=request=]'s [=req
 [=request/reserved client=] to determine the applicable [=/embedder policy=], and apply any constraints that policy expresses
 to incoming responses. To do so, Fetch is patched as follows:
 
-1.  The `Cross-Origin-Resource-Policy` grammar is extended to include a "`cross-site`" value.
+1.  The `Cross-Origin-Resource-Policy` grammar is extended to include a "`cross-origin`" value.
 
 2.  The [$cross-origin resource policy check$] is rewritten to take the [=/embedder policy=] into
     account, and to cover some [=navigation requests=] in addition to `no-cors` requests.
