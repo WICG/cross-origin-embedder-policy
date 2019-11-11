@@ -1,6 +1,6 @@
 <pre class='metadata'>
-Title: Cross-Origin Embedder Policy
-Shortname: coep
+Title: COÖP (or: How I Learned to Stop Worrying and Love Cross-Origin Side-Channels)
+Shortname: coöp
 Level: 1
 Status: DREAM
 Editor: Mike West 56384, Google Inc., mkwst@google.com
@@ -11,9 +11,12 @@ Boilerplate: repository-issue-tracking off
 Abstract:
     In order to support interesting and powerful APIs in a post-Spectre world, it seems necessary
     to ensure that resoures are only voluntarily embedded into a potentially-dangerous context.
-    This document sketches out a potential opt-in mechanism which relies upon explicit declaration
-    of a `Cross-Origin-Resource-Policy` for each embedded resource, defined as a series of
-    monkey-patches against HTML and Fetch which are intended to be upstreamed.
+    This document outlines two opt-in mechanisms which, together, should give user agents the
+    ability to load cross-origin resources into a context that exposes APIs which increase the risk
+    of side-channel attacks.
+
+    This document consists of a series of monkey-patches against HTML and Fetch which are intended
+    for upstreaming once the design is settled.
 </pre>
 <pre boilerplate="copyright">&copy;2019, Google, Inc. All rights reserved.</pre>
 
@@ -51,14 +54,15 @@ urlPrefix: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure; spec
         text: structured header; url: #
     for: structured header
         type: dfn
-            text: dictionary; url: #section-3.1
-            text: token; url: #section-3.9
-            text: boolean; url: #section-3.11
+            text: dictionary; url: #section-3.2
+            text: token; url: #section-3.3.4
+            text: boolean; url: #section-3.3.6
     type: grammar
-        text: sh-token; url: #section-3.9
+        text: sh-dictionary; url: #section-3.2
+        text: sh-token; url: #section-3.3.4
     type: abstract-op
         text: serialize Structured Header; url: #section-4.1
-        text: Structured Header parsing algorithm; url: #section-4.2.7
+        text: Structured Header parsing algorithm; url: #section-4.2
 urlPrefix: https://html.spec.whatwg.org/
     type: dfn
         text: top-level browsing context group; url: multipage/browsers.html#tlbc-group
@@ -70,64 +74,83 @@ urlPrefix: https://html.spec.whatwg.org/
 </pre>
 
 <pre class="link-defaults">
-spec:fetch; type:dfn; for:/; text:request
-spec:fetch; type:dfn; text: cors check
-spec:url; type:dfn; for:/; text:url
-spec:html; type:dfn; for:/; text:browsing context
-spec:html; type:dfn; text:environment
-spec:html; type:dfn; text: browsing context group
-spec:fetch; type:dfn; for:/; text:response
 spec:fetch; type:dfn; for:/; text:cross-origin resource policy check
+spec:fetch; type:dfn; for:/; text:request
+spec:fetch; type:dfn; for:/; text:response
+spec:fetch; type:dfn; text: cors check
+spec:html; type:dfn; for:/; text:browsing context
 spec:html; type:dfn; for:/; text:global object
+spec:html; type:dfn; text:browsing context group
+spec:html; type:dfn; text:environment
+spec:html; type:element; text:script
+spec:infra; type:dfn; text:string
+spec:infra; type:dfn; text:struct
+spec:url; type:dfn; for:/; text:url
 </pre>
 
 Introduction {#intro}
 =====================
 
 The same-origin policy's restrictions against direct access to another origin's resources is,
-unfortunately, insufficient in the face of speculative execution attacks like [[spectre]]. Merely
+unfortunately, insufficient in the face of speculative execution attacks such as Spectre [[spectre]]. Merely
 _loading_ another origins' resource may be enough to bring its content into a memory space which
 may be probed by an attacker, even if the browser would otherwise prevent access to the resource
-through explicit channels.
+through explicit channels. Similarly, _navigating to_ another origin's resources in a new window
+(via `window.open()`, for instance) might bring its content into an attacker's memory space.
 
 Given this context, user agents are rethinking the threat model under which they operate (e.g.
 [[chromium-post-spectre-rethink]]). It would be unfortunate indeed to prevent the web platform from
 legitimately using APIs like {{SharedArrayBuffer}} that accidentally improve attackers' ability to
-exploit speculation attacks, but at the same time, many user agents have agreed that it seems
+exploit speculation attacks. At the same time, however, many user agents have agreed that it seems
 unreasonable to enable those APIs without additional mitigation.
 
-The approach sketched out in this document tackles one piece of the broader problem by giving
-developers the ability to require an explicit opt-in from any resource which would be embedded in
-a given context. User agents can make that requirement a precondition for some APIs that might
-otherwise leak data about cross-origin resources, which goes some way towards ensuring that any
-leakage is voluntary, not accidental.
+This document proposes a bifurcated approach to these and related problems:
 
-To that end, this proposal does three things:
+1.  It introduces `Cross-Origin-Embedder-Policy`, which layers on top of the existing
+    <a http-header>`Cross-Origin-Resource-Policy`</a> mechanism to give developers the ability to
+    require an explicit opt-in from any resource which would be embedded in a given context they
+    control. This has the effect of ensuring that any accidental exposure of an origin's data to
+    a cross-origin process is consistent with the ways in which the resource is expected to be
+    used, and that the resource's owner has affirmatively opted-into the risks associated with
+    potential exposure. This mechanism is described in [[#section-embedder-policy]].
 
-1.  It introduces a new `cross-origin` value for the <a http-header>`Cross-Origin-Resource-Policy`</a>
-    HTTP response header, which constitutes an explicit declaration that a given resource may be
-    embedded in cross-origin contexts.
+2.  It introduces `Cross-Origin-Opener-Policy`, which gives developers the ability to ensure that
+    a given document will not share a [=browsing context group=] with a cross-origin document. This
+    indirectly ensures that any `opener` relationship is severed, and has implications for
+    cross-document communication mechanisms generally. By shutting down these channels, it aims to
+    give user agents the ability to safely place the document into a process distinct from that of
+    its opener. This mechanism is described in [[#section-opener-policy]].
 
-2.  It introduces a new `Cross-Origin-Embedder-Policy` header which shifts the default behavior for
-    resources loaded in a given context to an opt-in model, in which cross-origin responses must
-    either assert a <a http-header>`Cross-Origin-Resource-Policy`</a> header which allows the
-    embedding, or pass a [=CORS check=].
+Together, the assertions made via these two mechanims seem to be both necessary and sufficient
+conditions for access to interesting APIs (like the aforementioned {{SharedArrayBuffer}}). The
+remainder of this document will introduce the two mechanisms separately, and then point to the
+places in HTML and Fetch where the mechanisms dovetail into web-visible effects on API exposure.
 
-3.  It extends <a http-header>`Cross-Origin-Resource-Policy`</a> to handle some <a>navigation
-    requests</a> in order to deal reasonably with <{iframe}> embeddings and
-    {{Window/open|window.open()}}.
+Embedder Policy {#section-embedder-policy}
+===============
 
-Together, these would allow a user agent to gate access to interesting APIs (like the aforementioned
-{{SharedArrayBuffer}}) on a top-level context opting-into `Cross-Origin-Embedder-Policy`, which in
-turn gives servers the ability to inspect incoming requests and make reasonable decisions about
-when to allow an embedding.
+The Embedder Policy portion of this proposal aims to ensure that a resource must opt-into the risks
+associated with being loaded directly (via <{img}> or <{script}>, for instance) into a cross-origin
+context that might be capable of exploiting side-channels to gain access to that resources'
+(meta-)data. At a high-level, the story is this:
 
-The rest of this document monkey-patches [[HTML]] and [[Fetch]] in order to document the details of
-the bits and pieces discussed above.
+1.  We lean on the existing <a http-header>`Cross-Origin-Resource-Policy`</a> header as the way in
+    which a given resource expresses its embedding preferences. The existing `same-origin` and
+    `same-site` policy values confine a resource to its own [=/origin=] or [=host/same site|site=],
+    respectively. We introduce a new `cross-origin` policy value to explicitly widen a resource's
+    embeddability to cross-origin contexts.
 
+2.  We introduce a new `Cross-Origin-Embedder-Policy` header which asks the user agent to ensure
+    that cross-origin responses either explicitly assert the new `cross-origin`
+    <a http-header>`Cross-Origin-Resource-Policy`</a>, or that they pass a [=CORS check=]. Either
+    mechanism seems sufficient as an expression of the resource owner's intent (in particular, note
+    that direct access to a resource's content via CORS is a superset of the embedding capability
+    we're concerned with here).
 
-Framework {#framework}
-======================
+3.  We extend <a http-header>`Cross-Origin-Resource-Policy`</a> to handle some <a>navigation
+    requests</a> in order to be able to apply the `Cross-Origin-Embedder-Policy` with respect to
+    embeddings via <{iframe}> and <{frame}>, as well as {{Window/open|window.open()}}.
+
 
 The `Cross-Origin-Embedder-Policy` HTTP Response Header {#COEP}
 ----------------------------------------------------------------
@@ -147,11 +170,10 @@ this header if it contains an invalid value. Likewise, user agents MUST ignore t
 value cannot be parsed as a <a grammar>`sh-token`</a>.
 
 
-Parsing {#parsing}
-------------------
+### Parsing ### {#COEP-parsing}
 
-<div algorithm="parsing the header">
-To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy</dfn> given a
+<div algorithm="parsing the COEP header">
+To <dfn abstract-op local-lt="parse COEP header">obtain a response's embedder policy</dfn> given a
 [=response=] (|response|):
 
 1.  Let |policy| be "`none`".
@@ -161,17 +183,11 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 
 3.  If |header| is not `null`:
 
-    1.  Set |header| to the result of [=isomorphic decoding=] |header|.
-
-    2.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
-        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
+    1.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
+        with <var ignore>input_bytes</var> set to |header|, and <var ignore>header_type</var> set
         to "`item`".
 
         If parsing fails, set |parsed policy| to "`none`".
-
-        ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
-        somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
-        passing it into the parsing algorithm?
 
     3.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
 
@@ -221,14 +237,10 @@ multiple instances of the `Cross-Origin-Embedder-Policy` header present in a giv
   </tbody>
 </table>
 </div>
-
 </div>
 
 
-Integrations {#integrations}
-============================
-
-Integration with HTML {#integration-html}
+Integration with HTML {#COEP-integration-html}
 -----------------------------------------
 
 When creating a document, user agents will process
@@ -237,8 +249,8 @@ restrictions it asserts. Likewise, user agents MUST also take into account the e
 asserted by the document's opener or embedder, ensuring that they're properly imposed as well. To do
 so, HTML is patched as follows:
 
-1.  An <dfn>embedder policy</dfn> is a string with one of the following values: "`none`",
-    "`require-corp`".
+1.  An <dfn>embedder policy</dfn> is defined as a [=string=] with one of the following values:
+    "`none`", "`require-corp`".
 
 2.  The [=/embedder policy=] is persisted on a number of objects:
 
@@ -259,10 +271,10 @@ so, HTML is patched as follows:
 
 3.  The [$create a new browsing context$] algorithm sets the [=document/embedder policy=] for
     a browsing context's initial `about:blank` document by adding a new step directly after Referrer
-    Policy is initialized in step 11 of the existing algorithm  which will copy any
+    Policy is initialized in step 13 of the existing algorithm  which will copy any
     <var ignore>creator</var> document's policy:
 
-        > 12.  If <var ignore>creator</var> is not null, set <var ignore>document</var>'s
+        > 14.  If <var ignore>creator</var> is not null, set <var ignore>document</var>'s
         >      [=document/embedder policy=] to <var ignore>creator</var>
         >      [=document/embedder policy=].
 
@@ -271,7 +283,11 @@ so, HTML is patched as follows:
     Referrer Policy is initialized in step 6:
 
     > 7.  Let <var ignore>document</var>'s [=document/embedder policy=] be the result of
-    >     [$parse header|obtaining an embedder policy$] from |response|.
+    >     [$parse COEP header|obtaining an embedder policy$] from |response|.
+
+    Note: We don't need to walk the new document's ancestor tree or inherit a policy here, as the
+    check in #6 below will ensure that nested navigations are performed iff the declared policy in
+    the nested navigation response is consistent with the embedder's policy.
 
 5.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
     {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
@@ -280,7 +296,10 @@ so, HTML is patched as follows:
     > 6.  Call [$initialize a global object's embedder policy from a response$] given
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
 
-6.  The [$process a navigate response$] algorthm checks that documents nested in a `require-corp`
+    Note: As above, we don't need to examine the worker's associated documents, as Fetch will ensure
+    consistency between policies.
+
+6.  The [$process a navigate response$] algorithm checks that documents nested in a `require-corp`
     context themselves positively assert `require-corp` by adding a new condition to the list in
     step 1:
 
@@ -289,7 +308,7 @@ so, HTML is patched as follows:
     >     <var ignore>response</var> and <var ignore>browsingContext</var>.
 
 
-### Initializing a global object's Embedder policy ### {#initialize-embedder-policy-for-global}
+### Initializing a global object's Embedder policy ### {#COEP-initialize-embedder-policy-for-global}
 
 <div algorithm="to initialize a global object's embedder policy from a response">
 To <dfn abstract-op>initialize a global object's embedder policy from a response</dfn>, given a
@@ -297,7 +316,7 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 
 1.  Let |policy| be "`none`".
 
-2.  Let |response policy| be the result of [$parse header|obtaining an embedder policy$] from
+2.  Let |response policy| be the result of [$parse COEP header|obtaining an embedder policy$] from
     |response|.
 
 3.  Run the steps corresponding to the first matching statement:
@@ -317,9 +336,9 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 
 </div>
 
-### Process a navigation response ### {#process-navigation-response}
+### Process a navigation response ### {#COEP-process-navigation-response}
 
-<div algorithm="process a navigation response">
+<div algorithm="process a COEP navigation response">
 If a document's [=document/embedder policy=] is "`require-corp`", then any document it embeds in a
 [=nested browsing context=] must positively assert a "`require-corp`" [=/embedder policy=] (see
 [[#cascade-vs-require]]).
@@ -334,14 +353,14 @@ appropriate:
     *   |target| is not a [=nested browsing context=].
     *   The {{Document}} [=nested through|through which=] |target| is nested has an
         [=document/embedder policy=] of "`none`".
-    *   The result of [$parse header|obtaining an embedder policy$] from |response| is
+    *   The result of [$parse COEP header|obtaining an embedder policy$] from |response| is
         "`require-corp`".
 
 2.  Return "`Blocked`".
 
 </div>
 
-Integration with Fetch {#integration-fetch}
+Integration with Fetch {#COEP-integration-fetch}
 -------------------------------------------
 
 When fetching resources, user agents should examine both the [=request=]'s [=request/client=] and
@@ -423,14 +442,167 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
         error-handling behavior.
 
 
+Opener Policy {#section-opener-policy}
+=============
+
+The Opener Policy portion of this proposal aims to ensure that a top-level document has control over
+the [=browsing context group=] it occupies in relation to a document that caused it to be opened, or
+to a document that it opens. In particular, it allows a document to assert that it refuses to join a
+[=browsing context group=] that includes cross-origin (or cross-site) documents.
+
+The `Cross-Origin-Opener-Policy` HTTP Response Header {#COOP}
+-------------------------------------------------------------
+
+The <dfn http-header>`Cross-Origin-Opener-Policy`</dfn> HTTP response header field allows a
+server to declare an cross-origin opener policy for a given document. It is a [=Structured Header=]
+whose value MUST be a [=structured header/dictionary=]. [[!I-D.ietf-httpbis-header-structure]] Its
+ABNF is:
+
+```
+Cross-Origin-Opener-Policy = sh-dictionary
+```
+
+The dictionary has three valid members:
+
+:   "`opener-relationship`"
+::  This member describes the set of origins with whom a given response would consent to sharing a
+    [=browsing context group=]. Its value is one of the following [=structured header/tokens=]:
+    "`same-origin`" or "`same-site`".
+:   "`unsafe-outgoing`"
+::  This member is a [=structured header/boolean=], which defaults to false if not present in the
+    header's value. If true, it would allow a document to initiate a navigation in an [=auxiliary
+    browsing context=] that could join its [=browsing context group=]. This is somewhat risky, but
+    necessary for flows that require a document to initiate collaboration with a cross-site popup
+    (common for relying parties in an OAuth flow, for example).
+:   "`unsafe-inherit`".
+::  This member is a [=structured header/boolean=], which defaults to false if not present in the
+    header's value. If true, the response will inherit its opener's opener policy. This is somewhat
+    risky, but convinient for documents that aim to collaborate with cross-site openers (common for
+    identity providers in an OAuth flow, for example).
+
+In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
+this header if it contains an invalid member, or a member contains an invalid value. Likewise, user
+agents MUST ignore this header if the value cannot be parsed as a <a grammar>`sh-dictionary`</a>.
+
+Detailed parsing requirements can be found in [[#COOP-parsing]].
+
+
+### Parsing ### {#COOP-parsing}
+
+<div algorithm="parsing the COOP header">
+To <dfn abstract-op local-lt="parse COOP header">obtain a response's opener policy</dfn> given a
+[=response=] (|response|) and an [=opener policy=] (|initiator|):
+
+1.  Let |policy| be an [=opener policy=] whose value is `null`.
+
+2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Opener-Policy` from
+    |response|'s [=response/header list=].
+
+3.  If |header| is not `null`:
+
+    1.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
+        with <var ignore>input_bytes</var> set to |header|, and <var ignore>header_type</var> set
+        to "`dictionary`".
+
+        If parsing fails, set |parsed policy| to "`none`".
+
+    2.  Return |policy| if any of the following statements are true:
+
+        1.  |parsed policy| has a member whose name is not [=contained=] in « "`opener-relationship`",
+            "`unsafe-outgoing`", "`unsafe-inherit`" ».
+
+        2.  |parsed policy| has a member named "`opener-relationship`" whose value is not
+            [=contained=] in « "`same-origin`", "`same-site`" ».
+
+        3.  |parsed policy| has a member named "`unsafe-inherit`" whose value is `true`, and also a
+            member with any other name.
+
+    3.  If |parsed policy| has a member named `unsafe-inherit` whose value is `true`, return
+        |initiator|.
+
+    4.  Otherwise, set |policy| to a [=struct=] whose [=opener policy/opener relationship=] is
+        the value of |parsed policy|'s "`opener-relationship`" member, and whose
+        [=opener policy/unsafe-allow-outgoing=] is the value of |parsed policy|'s
+        "`unsafe-outgoing`" member.
+
+    3.  If |parsed policy| has a member named "`unsafe-inherit`", and a member named either
+        "`opener-relationship`" or "`unsafe-outgoing`", then return |policy|.
+
+    3.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
+
+4.  Return |policy|.
+
+<div class="note">
+Note: This fails open (by defaulting to "`none`") in the presence of a header that cannot be
+parsed as a [=structured header/token=]. This includes inadvertant lists created by combining
+multiple instances of the `Cross-Origin-Embedder-Policy` header present in a given response:
+
+<table class="data">
+  <thead>
+    <tr>
+      <th>`Cross-Origin-Embedder-Policy`</th>
+      <th>Final Policy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>No header delivered</em></td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp`</td>
+      <td>`require-corp`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp, unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value, unknown-value`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`unknown-value, require-corp`</td>
+      <td>`none`</td>
+    </tr>
+    <tr>
+      <td>`require-corp, require-corp`</td>
+      <td>`none`</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+
+Integration with HTML {#COOP-integration-html}
+---------------------
+
+When creating a top-level document, user agents will process
+<a http-header>`Cross-Origin-Opener-Policy`</a> headers delivered by the server, imposing any
+restrictions it asserts. Likewise, user agents MUST also take into account the opener policy
+asserted by the document's opener, ensuring that they're properly imposed as well. To do
+so, HTML is patched as follows:
+
+1.  An <dfn>opener policy</dfn> is defined as either `null`, or a [=struct=] consisting of an
+    <dfn for="opener policy">opener relationship</dfn> [=string=] whose value is either
+    "`same-origin`" or "`same-site`", and an <dfn for="opener policy">unsafe-allow-outgoing</dfn>
+    [=/boolean=]. Unless otherwise specified, [=opener policies=] are `null`.
+
+
+
 Implementation Considerations {#impl-considerations}
 ====================================================
 
-Why not require CORS instead? {#why-not-cors}
+Why not require CORS instead of CORP? {#why-not-cors}
 ---------------------------------------------
 
-An earlier version of this propsal leaned on CORS rather than CORP. Why didn't we run with that
-model instead?
+An earlier version of the `Cross-Origin-Embedder-Policy` proposal leaned on CORS rather than CORP. Why
+didn't we run with that model instead?
 
 This proposal posits that there's a meaningful distinction between a server's assertions that "You,
 vague acquaintance, may embed me." and "You, dearest friend, may read me."
@@ -458,7 +630,7 @@ defining yet another header. Perhaps something more generic that accepts a
 [=structured header/dictionary=] rather than a single token? That is:
 
 ```
-Embedee-Policy: opt-in=required, credentials=cors-only
+Embedder-Policy: embedee-opt-in=required, embedee-credentials=cors-only
 ```
 
 Perhaps it will be possible to do everything we want by defining a new tokens, but I worry a bit
