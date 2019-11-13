@@ -1212,8 +1212,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 08c4b0e94d147852f66673459784d3429bb3bda1" name="generator">
-  <meta content="93c4ed80811ce222163d87097347050c46495950" name="document-revision">
+  <meta content="Bikeshed version b76a1f3caa65320a39ee72dbf2680ea887ace619" name="generator">
+  <meta content="2189b5a47422640491e5298c1f7142fc1b26ba85" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1413,7 +1413,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">COÖP (or: How I Learned to Stop Worrying and Love Cross-Origin Side-Channels)</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-11-11">11 November 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-11-12">12 November 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1474,7 +1474,11 @@ pre .property::before, pre .property::after {
        <ol class="toc">
         <li><a href="#COOP-parsing"><span class="secno">3.1.1</span> <span class="content">Parsing</span></a>
        </ol>
-      <li><a href="#COOP-integration-html"><span class="secno">3.2</span> <span class="content">Integration with HTML</span></a>
+      <li>
+       <a href="#COOP-integration-html"><span class="secno">3.2</span> <span class="content">Integration with HTML</span></a>
+       <ol class="toc">
+        <li><a href="#initialize-coop"><span class="secno">3.2.1</span> <span class="content">Initializing a Document’s opener policy</span></a>
+       </ol>
      </ol>
     <li>
      <a href="#impl-considerations"><span class="secno">4</span> <span class="content">Implementation Considerations</span></a>
@@ -1483,6 +1487,7 @@ pre .property::before, pre .property::after {
       <li><a href="#forward-compat"><span class="secno">4.2</span> <span class="content">Forward-compatibility</span></a>
       <li><a href="#cascade-vs-require"><span class="secno">4.3</span> <span class="content">Cascading vs. requiring embedder policies</span></a>
      </ol>
+    <li><a href="#acknowledgements"><span class="secno">5</span> <span class="content">Acknowledgements</span></a>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
     <li>
      <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
@@ -1656,7 +1661,7 @@ Policy is initialized in step 13 of the existing algorithm  which will copy any 
      <blockquote>
       <ol start="14">
        <li data-md>
-        <p>If <var>creator</var> is not null, set <var>document</var>’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy②">embedder policy</a> to <var>creator</var> <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy③">embedder policy</a>.</p>
+        <p>If <var>creator</var> is not null, set <var>document</var>’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy②">embedder policy</a> to a copy of <var>creator</var>’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy③">embedder policy</a>.</p>
       </ol>
      </blockquote>
     <li data-md>
@@ -1833,37 +1838,19 @@ the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browser
 to a document that it opens. In particular, it allows a document to assert that it refuses to join a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-group" id="ref-for-browsing-context-group②">browsing context group</a> that includes cross-origin (or cross-site) documents.</p>
    <h3 class="heading settled" data-level="3.1" id="COOP"><span class="secno">3.1. </span><span class="content">The <code>Cross-Origin-Opener-Policy</code> HTTP Response Header</span><a class="self-link" href="#COOP"></a></h3>
    <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-cross-origin-opener-policy"><code>Cross-Origin-Opener-Policy</code></dfn> HTTP response header field allows a
-server to declare an cross-origin opener policy for a given document. It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#" id="termref-for-①">Structured Header</a> whose value MUST be a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2" id="ref-for-section-3.2">dictionary</a>. <a data-link-type="biblio" href="#biblio-i-dietf-httpbis-header-structure">[I-D.ietf-httpbis-header-structure]</a> Its
+server to declare an cross-origin opener policy for a given document. It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#" id="termref-for-①">Structured Header</a> whose value MUST be a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3" id="ref-for-section-3.3">item</a>. <a data-link-type="biblio" href="#biblio-i-dietf-httpbis-header-structure">[I-D.ietf-httpbis-header-structure]</a> Its
 ABNF is:</p>
-<pre>Cross-Origin-Opener-Policy = sh-dictionary
+<pre>Cross-Origin-Opener-Policy = sh-item
 </pre>
-   <p>The dictionary has three valid members:</p>
-   <dl>
-    <dt data-md>"<code>opener-relationship</code>"
-    <dd data-md>
-     <p>This member describes the set of origins with whom a given response would consent to sharing a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-group" id="ref-for-browsing-context-group③">browsing context group</a>. Its value is one of the following <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3.4" id="ref-for-section-3.3.4③">tokens</a>:
-"<code>same-origin</code>" or "<code>same-site</code>".</p>
-    <dt data-md>"<code>unsafe-outgoing</code>"
-    <dd data-md>
-     <p>This member is a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3.6" id="ref-for-section-3.3.6">boolean</a>, which defaults to false if not present in the
-header’s value. If true, it would allow a document to initiate a navigation in an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#auxiliary-browsing-context" id="ref-for-auxiliary-browsing-context">auxiliary
-browsing context</a> that could join its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-group" id="ref-for-browsing-context-group④">browsing context group</a>. This is somewhat risky, but
-necessary for flows that require a document to initiate collaboration with a cross-site popup
-(common for relying parties in an OAuth flow, for example).</p>
-    <dt data-md>"<code>unsafe-inherit</code>".
-    <dd data-md>
-     <p>This member is a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3.6" id="ref-for-section-3.3.6①">boolean</a>, which defaults to false if not present in the
-header’s value. If true, the response will inherit its opener’s opener policy. This is somewhat
-risky, but convinient for documents that aim to collaborate with cross-site openers (common for
-identity providers in an OAuth flow, for example).</p>
-   </dl>
+   <p>There are currently three valid item values: "<code>same-origin</code>", "<code>same-site</code>" and "<code>unsafe-inherit</code>".
+The "<code>same-origin</code>" and "<code>same-site</code>" values MAY have a "<code>unsafe-allow-outgoing</code>" <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.1.2" id="ref-for-section-3.1.2">parameter</a>.</p>
    <p>In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
-this header if it contains an invalid member, or a member contains an invalid value. Likewise, user
-agents MUST ignore this header if the value cannot be parsed as a <a data-link-type="grammar" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2" id="ref-for-section-3.2①"><code>sh-dictionary</code></a>.</p>
+this header if it contains an unknown item or parameter. Likewise, user agents MUST ignore this
+header if the value cannot be parsed as a <a data-link-type="grammar" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3" id="ref-for-section-3.3①"><code>sh-item</code></a>.</p>
    <p>Detailed parsing requirements can be found in <a href="#COOP-parsing">§ 3.1.1 Parsing</a>.</p>
    <h4 class="heading settled" data-level="3.1.1" id="COOP-parsing"><span class="secno">3.1.1. </span><span class="content">Parsing</span><a class="self-link" href="#COOP-parsing"></a></h4>
    <div class="algorithm" data-algorithm="parsing the COOP header">
-     To <dfn data-dfn-type="abstract-op" data-export data-local-lt="parse COOP header" id="abstract-opdef-obtain-a-responses-opener-policy">obtain a response’s opener policy<a class="self-link" href="#abstract-opdef-obtain-a-responses-opener-policy"></a></dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response④">response</a> (<var>response</var>) and an <a data-link-type="dfn" href="#opener-policy" id="ref-for-opener-policy">opener policy</a> (<var>initiator</var>): 
+     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-lt="parse COOP header" id="abstract-opdef-obtain-a-responses-opener-policy">obtain a response’s opener policy</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response④">response</a> (<var>response</var>) and an <a data-link-type="dfn" href="#opener-policy" id="ref-for-opener-policy">opener policy</a> (<var>initiator</var>): 
     <ol>
      <li data-md>
       <p>Let <var>policy</var> be an <a data-link-type="dfn" href="#opener-policy" id="ref-for-opener-policy①">opener policy</a> whose value is <code>null</code>.</p>
@@ -1874,66 +1861,75 @@ agents MUST ignore this header if the value cannot be parsed as a <a data-link-t
       <ol>
        <li data-md>
         <p>Let <var>parsed policy</var> be the result of executing the <a data-link-type="abstract-op" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2" id="ref-for-section-4.2①">Structured Header parsing algorithm</a> with <var>input_bytes</var> set to <var>header</var>, and <var>header_type</var> set
-to "<code>dictionary</code>".</p>
-        <p>If parsing fails, set <var>parsed policy</var> to "<code>none</code>".</p>
+to "<code>item</code>".</p>
+        <p>If parsing fails, return <code>null</code>.</p>
        <li data-md>
-        <p>Return <var>policy</var> if any of the following statements are true:</p>
-        <ol>
-         <li data-md>
-          <p><var>parsed policy</var> has a member whose name is not <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#contained" id="ref-for-contained">contained</a> in « "<code>opener-relationship</code>",
-"<code>unsafe-outgoing</code>", "<code>unsafe-inherit</code>" ».</p>
-         <li data-md>
-          <p><var>parsed policy</var> has a member named "<code>opener-relationship</code>" whose value is not <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#contained" id="ref-for-contained①">contained</a> in « "<code>same-origin</code>", "<code>same-site</code>" ».</p>
-         <li data-md>
-          <p><var>parsed policy</var> has a member named "<code>unsafe-inherit</code>" whose value is <code>true</code>, and also a
-member with any other name.</p>
-        </ol>
-       <li data-md>
-        <p>If <var>parsed policy</var> has a member named <code>unsafe-inherit</code> whose value is <code>true</code>, return <var>initiator</var>.</p>
-       <li data-md>
-        <p>Otherwise, set <var>policy</var> to a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct">struct</a> whose <a data-link-type="dfn" href="#opener-policy-opener-relationship" id="ref-for-opener-policy-opener-relationship">opener relationship</a> is
-the value of <var>parsed policy</var>’s "<code>opener-relationship</code>" member, and whose <a data-link-type="dfn" href="#opener-policy-unsafe-allow-outgoing" id="ref-for-opener-policy-unsafe-allow-outgoing">unsafe-allow-outgoing</a> is the value of <var>parsed policy</var>’s
-"<code>unsafe-outgoing</code>" member.</p>
-       <li data-md>
-        <p>If <var>parsed policy</var> has a member named "<code>unsafe-inherit</code>", and a member named either
-"<code>opener-relationship</code>" or "<code>unsafe-outgoing</code>", then return <var>policy</var>.</p>
-       <li data-md>
-        <p>If <var>parsed policy</var> is "<code>require-corp</code>", set <var>policy</var> to "<code>require-corp</code>".</p>
+        <p>Switch on <var>parsed policy</var>’s value:</p>
+        <dl>
+         <dt data-md>"<code>same-origin</code>"
+         <dt data-md>"<code>same-site</code>"
+         <dd data-md>
+          <ol>
+           <li data-md>
+            <p>If <var>parsed policy</var>’s value has a parameter whose key is not
+"<code>unsafe-allow-outgoing</code>", return <code>null</code>.</p>
+           <li data-md>
+            <p>Let <var>unsafe-allow-outgoing</var> be true if <var>parsed policy</var>’s value has a parameter whose
+key is "<code>unsafe-allow-outgoing</code>", and false otherwise.</p>
+           <li data-md>
+            <p>Set <var>policy</var> to a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct">struct</a> whose <a data-link-type="dfn" href="#opener-policy-sameness" id="ref-for-opener-policy-sameness">sameness</a> is <var>parsed policy</var>’s
+value, and whose <a data-link-type="dfn" href="#opener-policy-unsafe-allow-outgoing" id="ref-for-opener-policy-unsafe-allow-outgoing">unsafe-allow-outgoing</a> is <var>unsafe-allow-outgoing</var>.</p>
+          </ol>
+         <dt data-md>"<code>unsafe-inherit</code>"
+         <dd data-md>
+          <ol>
+           <li data-md>
+            <p>If <var>parsed policy</var>’s value has any parameters, return <code>null</code>.</p>
+           <li data-md>
+            <p>Return <var>initiator</var>.</p>
+          </ol>
+         <dt data-md>Otherwise
+         <dd data-md>
+          <p>Return <code>null</code>.</p>
+        </dl>
       </ol>
      <li data-md>
       <p>Return <var>policy</var>.</p>
     </ol>
     <div class="note" role="note">
-      Note: This fails open (by defaulting to "<code>none</code>") in the presence of a header that cannot be
-parsed as a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3.4" id="ref-for-section-3.3.4④">token</a>. This includes inadvertant lists created by combining
-multiple instances of the <code>Cross-Origin-Embedder-Policy</code> header present in a given response: 
+      Note: This fails open (by defaulting to <code>null</code>) in the presence of a header that cannot be
+parsed as an <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3" id="ref-for-section-3.3②">item</a>. This includes inadvertant lists created by combining
+multiple instances of the <code>Cross-Origin-Opener-Policy</code> header present in a given response: 
      <table class="data">
       <thead>
        <tr>
-        <th><code>Cross-Origin-Embedder-Policy</code>
+        <th><code>Cross-Origin-Opener-Policy</code>
         <th>Final Policy
       <tbody>
        <tr>
         <td><em>No header delivered</em>
-        <td><code>none</code>
+        <td><code>null</code>
        <tr>
-        <td><code>require-corp</code>
-        <td><code>require-corp</code>
+        <td><code>same-origin</code>
+        <td>(<code>same-origin</code>, false)
+       <tr>
+        <td><code>same-site</code>
+        <td>(<code>same-site</code>, false)
+       <tr>
+        <td><code>same-origin; unsafe-allow-outgoing</code>
+        <td>(<code>same-origin</code>, true)
+       <tr>
+        <td><code>same-site; unsafe-allow-outgoing</code>
+        <td>(<code>same-site</code>, true)
        <tr>
         <td><code>unknown-value</code>
-        <td><code>none</code>
+        <td><code>null</code>
        <tr>
-        <td><code>require-corp, unknown-value</code>
-        <td><code>none</code>
+        <td><code>same-origin, same-site</code>
+        <td><code>null</code>
        <tr>
-        <td><code>unknown-value, unknown-value</code>
-        <td><code>none</code>
-       <tr>
-        <td><code>unknown-value, require-corp</code>
-        <td><code>none</code>
-       <tr>
-        <td><code>require-corp, require-corp</code>
-        <td><code>none</code>
+        <td><code>same-origin; unknown-paramter</code>
+        <td><code>null</code>
      </table>
     </div>
    </div>
@@ -1944,9 +1940,90 @@ asserted by the document’s opener, ensuring that they’re properly imposed as
 so, HTML is patched as follows:</p>
    <ol>
     <li data-md>
-     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="opener-policy">opener policy</dfn> is defined as either <code>null</code>, or a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct①">struct</a> consisting of an <dfn class="dfn-paneled" data-dfn-for="opener policy" data-dfn-type="dfn" data-noexport id="opener-policy-opener-relationship">opener relationship</dfn> <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①">string</a> whose value is either
-"<code>same-origin</code>" or "<code>same-site</code>", and an <dfn class="dfn-paneled" data-dfn-for="opener policy" data-dfn-type="dfn" data-noexport id="opener-policy-unsafe-allow-outgoing">unsafe-allow-outgoing</dfn> <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#boolean" id="ref-for-boolean">boolean</a>. Unless otherwise specified, <a data-link-type="dfn" href="#opener-policy" id="ref-for-opener-policy②">opener policies</a> are <code>null</code>.</p>
+     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="opener-policy">opener policy</dfn> is defined as either <code>null</code>, or a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct①">struct</a> consisting of an <dfn class="dfn-paneled" data-dfn-for="opener policy" data-dfn-type="dfn" data-noexport id="opener-policy-sameness">sameness</dfn> <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①">string</a> whose value is either "<code>same-origin</code>" or
+"<code>same-site</code>", and an <dfn class="dfn-paneled" data-dfn-for="opener policy" data-dfn-type="dfn" data-noexport id="opener-policy-unsafe-allow-outgoing">unsafe-allow-outgoing</dfn> <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#boolean" id="ref-for-boolean">boolean</a>. Unless otherwise specified, <a data-link-type="dfn" href="#opener-policy" id="ref-for-opener-policy②">opener policies</a> are <code>null</code>.</p>
+    <li data-md>
+     <p><code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document③">Document</a></code> objects are given an <dfn class="dfn-paneled" data-dfn-for="document" data-dfn-type="dfn" data-noexport id="document-opener-policy">opener policy</dfn> property, whose value
+is an <a data-link-type="dfn" href="#opener-policy" id="ref-for-opener-policy③">opener policy</a> defaulting to <code>null</code>.</p>
+     <p class="issue" id="issue-787d7142"><a class="self-link" href="#issue-787d7142"></a> It seems as though we can avoid giving either dedicated or shared workers an opener
+policy. We might, however, need to hold such a policy on service workers in order to deal with
+the capability exposed by <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dom-clients-openwindow" id="ref-for-dom-clients-openwindow">openWindow()</a></code>.</p>
+    <li data-md>
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsers.html#creating-a-new-browsing-context" id="ref-for-creating-a-new-browsing-context①">create a new browsing context</a> algorithm sets the <a data-link-type="dfn" href="#document-opener-policy" id="ref-for-document-opener-policy">opener policy</a> for
+a browsing context’s initial <code>about:blank</code> document by adding a new step directly after Referrer
+Policy is initialized in step 13 of the existing algorithm  which will copy any <var>creator</var> document’s policy:</p>
+     <blockquote>
+      <ol start="14">
+       <li data-md>
+        <p>If <var>creator</var> is not null, set <var>document</var>’s <a data-link-type="dfn" href="#document-opener-policy" id="ref-for-document-opener-policy①">opener policy</a> to a copy of <var>creator</var>’s <a data-link-type="dfn" href="#document-opener-policy" id="ref-for-document-opener-policy②">opener policy</a>.</p>
+      </ol>
+     </blockquote>
+    <li data-md>
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#initialise-the-document-object" id="ref-for-initialise-the-document-object①">initialize the Document object</a> algorithm sets the <a data-link-type="dfn" href="#document-opener-policy" id="ref-for-document-opener-policy③">opener policy</a> for <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document④">Document</a></code>s to which a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context②">browsing context</a> is navigated by adding a new step directly after
+Referrer Policy is initialized in step 6:</p>
+     <blockquote>
+      <ol start="7">
+       <li data-md>
+        <p>Let <var>document</var>’s <a data-link-type="dfn" href="#document-opener-policy" id="ref-for-document-opener-policy④">opener policy</a> be the result of calling <a data-link-type="abstract-op" href="#abstract-opdef-initialize-a-documents-opener-policy-from-a-response" id="ref-for-abstract-opdef-initialize-a-documents-opener-policy-from-a-response">initialize a document’s opener policy from a response</a> on <var>document</var> and <var>response</var>.</p>
+      </ol>
+     </blockquote>
+    <li data-md>
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/workers.html#run-a-worker" id="ref-for-run-a-worker①">run a worker</a> algorithm sets the <a data-link-type="dfn" href="#workerglobalscope-embedder-policy" id="ref-for-workerglobalscope-embedder-policy③">embedder policy</a> for <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope" id="ref-for-workerglobalscope③">WorkerGlobalScope</a></code> objects by adding a new step directly after Referrer Policy is initialized
+in step 12.5:</p>
+     <blockquote>
+      <ol start="6">
+       <li data-md>
+        <p>Call <a data-link-type="abstract-op" href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response" id="ref-for-abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response①">initialize a global object’s embedder policy from a response</a> given <var>worker global scope</var> and <var>response</var>.</p>
+      </ol>
+     </blockquote>
+     <p class="note" role="note"><span>Note:</span> As above, we don’t need to examine the worker’s associated documents, as Fetch will ensure
+consistency between policies.</p>
+    <li data-md>
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#process-a-navigate-response" id="ref-for-process-a-navigate-response①">process a navigate response</a> algorithm checks that documents nested in a <code>require-corp</code> context themselves positively assert <code>require-corp</code> by adding a new condition to the list in
+step 1:</p>
+     <blockquote>
+      <ul>
+       <li data-md>
+        <p>The <a data-link-type="abstract-op" href="#abstract-opdef-process-navigation-response" id="ref-for-abstract-opdef-process-navigation-response①">check a navigation response’s adherence to its
+embedder’s policy</a> algorithm returns "<code>Blocked</code>" when executed upon <var>response</var> and <var>browsingContext</var>.</p>
+      </ul>
+     </blockquote>
    </ol>
+   <h4 class="heading settled" data-level="3.2.1" id="initialize-coop"><span class="secno">3.2.1. </span><span class="content">Initializing a Document’s opener policy</span><a class="self-link" href="#initialize-coop"></a></h4>
+   <div class="algorithm" data-algorithm="to initialize a document’s opener policy from a response">
+     To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-initialize-a-documents-opener-policy-from-a-response">initialize a document’s opener policy from a response</dfn>, given a <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document⑤">Document</a></code> (<var>document</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response⑤">response</a> (<var>response</var>): 
+    <ol>
+     <li data-md>
+      <p>Let <var>policy</var> be the result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-opener-policy" id="ref-for-abstract-opdef-obtain-a-responses-opener-policy">obtaining a response’s opener policy</a> from <var>response</var>.</p>
+     <li data-md>
+      <p>Let <var>response policy</var> be the result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedder-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedder-policy③">obtaining an embedder policy</a> from <var>response</var>.</p>
+     <li data-md>
+      <p>Run the steps corresponding to the first matching statement:</p>
+      <dl>
+       <dt data-md><var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-url" id="ref-for-concept-response-url①">url</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-scheme" id="ref-for-concept-url-scheme①">scheme</a> is a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#local-scheme" id="ref-for-local-scheme①">local scheme</a>
+       <dt data-md><var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#dedicatedworkerglobalscope" id="ref-for-dedicatedworkerglobalscope①">DedicatedWorkerGlobalScope</a></code>:
+       <dd data-md>
+        <ol>
+         <li data-md>
+          <p>For each of the items in <var>global</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set" id="ref-for-concept-WorkerGlobalScope-owner-set①">owner set</a>:</p>
+          <ol>
+           <li data-md>
+            <p>If the item’s <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑦">embedder policy</a> is "<code>require-corp</code>", set <var>policy</var> to
+"<code>require-corp</code>".</p>
+          </ol>
+        </ol>
+       <dt data-md><var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworkerglobalscope" id="ref-for-sharedworkerglobalscope①">SharedWorkerGlobalScope</a></code>:
+       <dt data-md><var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope" id="ref-for-serviceworkerglobalscope①">ServiceWorkerGlobalScope</a></code>:
+       <dd data-md>
+        <ol>
+         <li data-md>
+          <p>Set <var>policy</var> to <var>response policy</var>.</p>
+        </ol>
+      </dl>
+     <li data-md>
+      <p>Set <var>global</var>’s <a data-link-type="dfn" href="#workerglobalscope-embedder-policy" id="ref-for-workerglobalscope-embedder-policy④">embedder policy</a> to <var>policy</var>.</p>
+    </ol>
+   </div>
    <h2 class="heading settled" data-level="4" id="impl-considerations"><span class="secno">4. </span><span class="content">Implementation Considerations</span><a class="self-link" href="#impl-considerations"></a></h2>
    <h3 class="heading settled" data-level="4.1" id="why-not-cors"><span class="secno">4.1. </span><span class="content">Why not require CORS instead of CORP?</span><a class="self-link" href="#why-not-cors"></a></h3>
    <p>An earlier version of the <code>Cross-Origin-Embedder-Policy</code> proposal leaned on CORS rather than CORP. Why
@@ -1967,7 +2044,7 @@ place for us to start.</p>
    <p>The header defined in this document is small and single-purpose, which is a real advantage for
 comprehensibility. I wonder, however, if an extensible alternative would be reasonable. For
 example, if we’re serious about moving to credentialless requests, it would be annoying to do so by
-defining yet another header. Perhaps something more generic that accepts a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2" id="ref-for-section-3.2②">dictionary</a> rather than a single token? That is:</p>
+defining yet another header. Perhaps something more generic that accepts a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2" id="ref-for-section-3.2">dictionary</a> rather than a single token? That is:</p>
 <pre>Embedder-Policy: embedee-opt-in=required, embedee-credentials=cors-only
 </pre>
    <p>Perhaps it will be possible to do everything we want by defining a new tokens, but I worry a bit
@@ -1986,6 +2063,13 @@ no matter whether its loaded as a frame or as a top-level document.</p>
    <p>This might be a requirement we can relax in the future, as it does have potential implications for
 eventual deployment. It makes sense to begin with the requirement, however, as loosening constraints
 is significantly simpler than imposing new constraints in the future.</p>
+   <h2 class="heading settled" data-level="5" id="acknowledgements"><span class="secno">5. </span><span class="content">Acknowledgements</span><a class="self-link" href="#acknowledgements"></a></h2>
+   <ul>
+    <li data-md>
+     <p>@annevk: https://gist.github.com/annevk/6f2dd8c79c77123f39797f6bdac43f3e</p>
+    <li data-md>
+     <p>@arturjanc: https://docs.google.com/document/d/1zDlfvfTJ_9e8Jdc8ehuV4zMEu9ySMCiTGMS9y0GU92k/edit</p>
+   </ul>
   </main>
   <div data-fill-with="conformance">
    <h2 class="no-ref no-num heading settled" id="conformance"><span class="content"> Conformance</span><a class="self-link" href="#conformance"></a></h2>
@@ -2147,14 +2231,20 @@ is significantly simpler than imposing new constraints in the future.</p>
      <li><a href="#document-embedder-policy">dfn for document</a><span>, in §2.2</span>
      <li><a href="#environment-settings-object-embedder-policy">dfn for environment settings object</a><span>, in §2.2</span>
     </ul>
+   <li><a href="#abstract-opdef-initialize-a-documents-opener-policy-from-a-response">initialize a document’s opener policy from a response</a><span>, in §3.2.1</span>
    <li><a href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">initialize a global object’s embedder policy from a response</a><span>, in §2.2.1</span>
    <li><a href="#abstract-opdef-obtain-a-responses-embedder-policy">obtain a response’s embedder policy</a><span>, in §2.1.1</span>
    <li><a href="#abstract-opdef-obtain-a-responses-opener-policy">obtain a response’s opener policy</a><span>, in §3.1.1</span>
-   <li><a href="#opener-policy">opener policy</a><span>, in §3.2</span>
-   <li><a href="#opener-policy-opener-relationship">opener relationship</a><span>, in §3.2</span>
+   <li>
+    opener policy
+    <ul>
+     <li><a href="#opener-policy">definition of</a><span>, in §3.2</span>
+     <li><a href="#document-opener-policy">dfn for document</a><span>, in §3.2</span>
+    </ul>
    <li><a href="#abstract-opdef-obtain-a-responses-embedder-policy">parse COEP header</a><span>, in §2.1.1</span>
    <li><a href="#abstract-opdef-obtain-a-responses-opener-policy">parse COOP header</a><span>, in §3.1.1</span>
    <li><a href="#abstract-opdef-process-navigation-response">process navigation response</a><span>, in §2.2.2</span>
+   <li><a href="#opener-policy-sameness">sameness</a><span>, in §3.2</span>
    <li><a href="#opener-policy-unsafe-allow-outgoing">unsafe-allow-outgoing</a><span>, in §3.2</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-document">
@@ -2162,12 +2252,8 @@ is significantly simpler than imposing new constraints in the future.</p>
    <ul>
     <li><a href="#ref-for-document">2.2. Integration with HTML</a> <a href="#ref-for-document①">(2)</a>
     <li><a href="#ref-for-document②">2.2.2. Process a navigation response</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="term-for-contained">
-   <a href="https://dom.spec.whatwg.org/#contained">https://dom.spec.whatwg.org/#contained</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-contained">3.1.1. Parsing</a> <a href="#ref-for-contained①">(2)</a>
+    <li><a href="#ref-for-document③">3.2. Integration with HTML</a> <a href="#ref-for-document④">(2)</a>
+    <li><a href="#ref-for-document⑤">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sec-sharedarraybuffer-objects">
@@ -2228,6 +2314,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://fetch.spec.whatwg.org/#local-scheme">https://fetch.spec.whatwg.org/#local-scheme</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-local-scheme">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-local-scheme①">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-mode">
@@ -2271,24 +2358,28 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-concept-response②">2.2.2. Process a navigation response</a>
     <li><a href="#ref-for-concept-response③">2.3.1. Cross-Origin Resource Policy Checks</a>
     <li><a href="#ref-for-concept-response④">3.1.1. Parsing</a>
+    <li><a href="#ref-for-concept-response⑤">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-response-url">
    <a href="https://fetch.spec.whatwg.org/#concept-response-url">https://fetch.spec.whatwg.org/#concept-response-url</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-response-url">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-concept-response-url①">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dedicatedworkerglobalscope">
    <a href="https://html.spec.whatwg.org/multipage/workers.html#dedicatedworkerglobalscope">https://html.spec.whatwg.org/multipage/workers.html#dedicatedworkerglobalscope</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dedicatedworkerglobalscope">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-dedicatedworkerglobalscope①">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sharedworkerglobalscope">
    <a href="https://html.spec.whatwg.org/multipage/workers.html#sharedworkerglobalscope">https://html.spec.whatwg.org/multipage/workers.html#sharedworkerglobalscope</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-sharedworkerglobalscope">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-sharedworkerglobalscope①">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-window">
@@ -2301,6 +2392,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope">https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-workerglobalscope">2.2. Integration with HTML</a> <a href="#ref-for-workerglobalscope①">(2)</a> <a href="#ref-for-workerglobalscope②">(3)</a>
+    <li><a href="#ref-for-workerglobalscope③">3.2. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-document-window">
@@ -2309,17 +2401,12 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-concept-document-window">2.2. Integration with HTML</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-auxiliary-browsing-context">
-   <a href="https://html.spec.whatwg.org/multipage/browsers.html#auxiliary-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#auxiliary-browsing-context</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-auxiliary-browsing-context">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-browsing-context">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#browsing-context</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-browsing-context">2.2. Integration with HTML</a>
     <li><a href="#ref-for-browsing-context①">2.2.2. Process a navigation response</a>
+    <li><a href="#ref-for-browsing-context②">3.2. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-browsing-context-group">
@@ -2327,7 +2414,6 @@ is significantly simpler than imposing new constraints in the future.</p>
    <ul>
     <li><a href="#ref-for-browsing-context-group">1. Introduction</a>
     <li><a href="#ref-for-browsing-context-group①">3. Opener Policy</a> <a href="#ref-for-browsing-context-group②">(2)</a>
-    <li><a href="#ref-for-browsing-context-group③">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a> <a href="#ref-for-browsing-context-group④">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-environment-settings-object">
@@ -2394,6 +2480,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set">https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-WorkerGlobalScope-owner-set">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-concept-WorkerGlobalScope-owner-set①">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-same-origin">
@@ -2421,24 +2508,30 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-section-4.2①">3.1.1. Parsing</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-section-3.3.6">
-   <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3.6">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3.6</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-section-3.3.6">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a> <a href="#ref-for-section-3.3.6①">(2)</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-section-3.2">
    <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-section-3.2">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a> <a href="#ref-for-section-3.2①">(2)</a>
-    <li><a href="#ref-for-section-3.2②">4.2. Forward-compatibility</a>
+    <li><a href="#ref-for-section-3.2">4.2. Forward-compatibility</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-section-3.2">
-   <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.2</a><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="term-for-section-3.3">
+   <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-section-3.2">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a> <a href="#ref-for-section-3.2①">(2)</a>
-    <li><a href="#ref-for-section-3.2②">4.2. Forward-compatibility</a>
+    <li><a href="#ref-for-section-3.3">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a> <a href="#ref-for-section-3.3①">(2)</a>
+    <li><a href="#ref-for-section-3.3②">3.1.1. Parsing</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-section-3.1.2">
+   <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.1.2">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.1.2</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-section-3.1.2">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-section-3.3">
+   <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.3</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-section-3.3">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a> <a href="#ref-for-section-3.3①">(2)</a>
+    <li><a href="#ref-for-section-3.3②">3.1.1. Parsing</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-section-3.3.4">
@@ -2446,8 +2539,6 @@ is significantly simpler than imposing new constraints in the future.</p>
    <ul>
     <li><a href="#ref-for-section-3.3.4">2.1. The Cross-Origin-Embedder-Policy HTTP Response Header</a> <a href="#ref-for-section-3.3.4①">(2)</a>
     <li><a href="#ref-for-section-3.3.4②">2.1.1. Parsing</a>
-    <li><a href="#ref-for-section-3.3.4③">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a>
-    <li><a href="#ref-for-section-3.3.4④">3.1.1. Parsing</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-">
@@ -2462,8 +2553,6 @@ is significantly simpler than imposing new constraints in the future.</p>
    <ul>
     <li><a href="#ref-for-section-3.3.4">2.1. The Cross-Origin-Embedder-Policy HTTP Response Header</a> <a href="#ref-for-section-3.3.4①">(2)</a>
     <li><a href="#ref-for-section-3.3.4②">2.1.1. Parsing</a>
-    <li><a href="#ref-for-section-3.3.4③">3.1. The Cross-Origin-Opener-Policy HTTP Response Header</a>
-    <li><a href="#ref-for-section-3.3.4④">3.1.1. Parsing</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-boolean">
@@ -2490,6 +2579,13 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope">https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-serviceworkerglobalscope">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-serviceworkerglobalscope①">3.2.1. Initializing a Document’s opener policy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-clients-openwindow">
+   <a href="https://w3c.github.io/ServiceWorker/#dom-clients-openwindow">https://w3c.github.io/ServiceWorker/#dom-clients-openwindow</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-clients-openwindow">3.2. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-url-origin">
@@ -2509,6 +2605,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://url.spec.whatwg.org/#concept-url-scheme">https://url.spec.whatwg.org/#concept-url-scheme</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-url-scheme">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-concept-url-scheme①">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
@@ -2517,7 +2614,6 @@ is significantly simpler than imposing new constraints in the future.</p>
     <a data-link-type="biblio">[DOM]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-document" style="color:initial">Document</span>
-     <li><span class="dfn-paneled" id="term-for-contained" style="color:initial">contained</span>
     </ul>
    <li>
     <a data-link-type="biblio">[ECMASCRIPT]</a> defines the following terms:
@@ -2551,7 +2647,6 @@ is significantly simpler than imposing new constraints in the future.</p>
      <li><span class="dfn-paneled" id="term-for-window" style="color:initial">Window</span>
      <li><span class="dfn-paneled" id="term-for-workerglobalscope" style="color:initial">WorkerGlobalScope</span>
      <li><span class="dfn-paneled" id="term-for-concept-document-window" style="color:initial">associated document</span>
-     <li><span class="dfn-paneled" id="term-for-auxiliary-browsing-context" style="color:initial">auxiliary browsing context</span>
      <li><span class="dfn-paneled" id="term-for-browsing-context" style="color:initial">browsing context</span>
      <li><span class="dfn-paneled" id="term-for-browsing-context-group" style="color:initial">browsing context group</span>
      <li><span class="dfn-paneled" id="term-for-environment-settings-object" style="color:initial">environment settings object</span>
@@ -2573,9 +2668,10 @@ is significantly simpler than imposing new constraints in the future.</p>
     <a data-link-type="biblio">[I-D.ietf-httpbis-header-structure]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-section-4.2" style="color:initial">Structured Header parsing algorithm</span>
-     <li><span class="dfn-paneled" id="term-for-section-3.3.6" style="color:initial">boolean</span>
      <li><span class="dfn-paneled" id="term-for-section-3.2" style="color:initial">dictionary</span>
-     <li><span class="dfn-paneled" id="term-for-section-3.2①" style="color:initial">sh-dictionary</span>
+     <li><span class="dfn-paneled" id="term-for-section-3.3" style="color:initial">item</span>
+     <li><span class="dfn-paneled" id="term-for-section-3.1.2" style="color:initial">parameter</span>
+     <li><span class="dfn-paneled" id="term-for-section-3.3①" style="color:initial">sh-item</span>
      <li><span class="dfn-paneled" id="term-for-section-3.3.4" style="color:initial">sh-token</span>
      <li><span class="dfn-paneled" id="term-for-" style="color:initial">structured header</span>
      <li><span class="dfn-paneled" id="term-for-section-3.3.4①" style="color:initial">token</span>
@@ -2591,6 +2687,7 @@ is significantly simpler than imposing new constraints in the future.</p>
     <a data-link-type="biblio">[service-workers-1]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-serviceworkerglobalscope" style="color:initial">ServiceWorkerGlobalScope</span>
+     <li><span class="dfn-paneled" id="term-for-dom-clients-openwindow" style="color:initial">openWindow(url)</span>
     </ul>
    <li>
     <a data-link-type="biblio">[URL]</a> defines the following terms:
@@ -2641,6 +2738,9 @@ CORP.<a href="#issue-524333ea"> ↵ </a></div>
 That seems reasonable to me, if we can get some changes into CORP along the lines of <a href="https://github.com/whatwg/fetch/issues/760">whatwg/fetch#760</a>, as they seem like useful
 extensions, and I think it’ll be more difficult to ship them after inverting the
 error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
+   <div class="issue"> It seems as though we can avoid giving either dedicated or shared workers an opener
+policy. We might, however, need to hold such a policy on service workers in order to deal with
+the capability exposed by <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dom-clients-openwindow">openWindow()</a></code>.<a href="#issue-787d7142"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="http-headerdef-cross-origin-embedder-policy">
    <b><a href="#http-headerdef-cross-origin-embedder-policy">#http-headerdef-cross-origin-embedder-policy</a></b><b>Referenced in:</b>
@@ -2654,6 +2754,7 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
     <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedder-policy">2.2. Integration with HTML</a>
     <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedder-policy①">2.2.1. Initializing a global object’s Embedder policy</a>
     <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedder-policy②">2.2.2. Process a navigation response</a>
+    <li><a href="#ref-for-abstract-opdef-obtain-a-responses-embedder-policy③">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="embedder-policy">
@@ -2663,6 +2764,7 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
     <li><a href="#ref-for-embedder-policy③">2.2.1. Initializing a global object’s Embedder policy</a>
     <li><a href="#ref-for-embedder-policy④">2.2.2. Process a navigation response</a>
     <li><a href="#ref-for-embedder-policy⑤">2.3. Integration with Fetch</a> <a href="#ref-for-embedder-policy⑥">(2)</a>
+    <li><a href="#ref-for-embedder-policy⑦">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="document-embedder-policy">
@@ -2678,6 +2780,8 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
    <ul>
     <li><a href="#ref-for-workerglobalscope-embedder-policy">2.2. Integration with HTML</a> <a href="#ref-for-workerglobalscope-embedder-policy①">(2)</a>
     <li><a href="#ref-for-workerglobalscope-embedder-policy②">2.2.1. Initializing a global object’s Embedder policy</a>
+    <li><a href="#ref-for-workerglobalscope-embedder-policy③">3.2. Integration with HTML</a>
+    <li><a href="#ref-for-workerglobalscope-embedder-policy④">3.2.1. Initializing a Document’s opener policy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="environment-settings-object-embedder-policy">
@@ -2690,12 +2794,14 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
    <b><a href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">2.2. Integration with HTML</a>
+    <li><a href="#ref-for-abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response①">3.2. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="abstract-opdef-process-navigation-response">
    <b><a href="#abstract-opdef-process-navigation-response">#abstract-opdef-process-navigation-response</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-abstract-opdef-process-navigation-response">2.2. Integration with HTML</a>
+    <li><a href="#ref-for-abstract-opdef-process-navigation-response①">3.2. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="abstract-opdef-cross-origin-resource-policy-check">
@@ -2710,23 +2816,41 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
     <li><a href="#ref-for-http-headerdef-cross-origin-opener-policy">3.2. Integration with HTML</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="abstract-opdef-obtain-a-responses-opener-policy">
+   <b><a href="#abstract-opdef-obtain-a-responses-opener-policy">#abstract-opdef-obtain-a-responses-opener-policy</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-abstract-opdef-obtain-a-responses-opener-policy">3.2.1. Initializing a Document’s opener policy</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="opener-policy">
    <b><a href="#opener-policy">#opener-policy</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-opener-policy">3.1.1. Parsing</a> <a href="#ref-for-opener-policy①">(2)</a>
-    <li><a href="#ref-for-opener-policy②">3.2. Integration with HTML</a>
+    <li><a href="#ref-for-opener-policy②">3.2. Integration with HTML</a> <a href="#ref-for-opener-policy③">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="opener-policy-opener-relationship">
-   <b><a href="#opener-policy-opener-relationship">#opener-policy-opener-relationship</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="opener-policy-sameness">
+   <b><a href="#opener-policy-sameness">#opener-policy-sameness</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-opener-policy-opener-relationship">3.1.1. Parsing</a>
+    <li><a href="#ref-for-opener-policy-sameness">3.1.1. Parsing</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="opener-policy-unsafe-allow-outgoing">
    <b><a href="#opener-policy-unsafe-allow-outgoing">#opener-policy-unsafe-allow-outgoing</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-opener-policy-unsafe-allow-outgoing">3.1.1. Parsing</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="document-opener-policy">
+   <b><a href="#document-opener-policy">#document-opener-policy</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-document-opener-policy">3.2. Integration with HTML</a> <a href="#ref-for-document-opener-policy①">(2)</a> <a href="#ref-for-document-opener-policy②">(3)</a> <a href="#ref-for-document-opener-policy③">(4)</a> <a href="#ref-for-document-opener-policy④">(5)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="abstract-opdef-initialize-a-documents-opener-policy-from-a-response">
+   <b><a href="#abstract-opdef-initialize-a-documents-opener-policy-from-a-response">#abstract-opdef-initialize-a-documents-opener-policy-from-a-response</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-abstract-opdef-initialize-a-documents-opener-policy-from-a-response">3.2. Integration with HTML</a>
    </ul>
   </aside>
 <script>/* script-var-click-highlighting */
