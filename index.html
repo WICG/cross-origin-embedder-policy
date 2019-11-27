@@ -1029,7 +1029,7 @@ Possible extra rowspan handling
 		}
 	/* } */
 
-	@supports (display:grid) {
+	@supports (display:grid) and (display:contents) {
 		/* Use #toc over .toc to override non-@supports rules. */
 		#toc {
 			display: grid;
@@ -1212,8 +1212,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 872cce6d3026423d677f3bd5837f1a1a46299a04" name="generator">
-  <meta content="b017662e318012b4ef1512075ea7829d97a886f2" name="document-revision">
+  <meta content="Bikeshed version 83d3ceadc5400c8422976bbcbe49615aace9cf1e" name="generator">
+  <meta content="93c4ed80811ce222163d87097347050c46495950" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1413,7 +1413,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-06-25">25 June 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-11-27">27 November 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1506,8 +1506,8 @@ leakage is voluntary, not accidental.</p>
    <p>To that end, this proposal does three things:</p>
    <ol>
     <li data-md>
-     <p>It introduces a new <code>cross-site</code> value for the <a data-link-type="http-header" href="https://fetch.spec.whatwg.org/#http-cross-origin-resource-policy" id="ref-for-http-cross-origin-resource-policy"><code>Cross-Origin-Resource-Policy</code></a> HTTP response header, which constitutes an explicit declaration that a given resource may be
-embedded in cross-site contexts.</p>
+     <p>It introduces a new <code>cross-origin</code> value for the <a data-link-type="http-header" href="https://fetch.spec.whatwg.org/#http-cross-origin-resource-policy" id="ref-for-http-cross-origin-resource-policy"><code>Cross-Origin-Resource-Policy</code></a> HTTP response header, which constitutes an explicit declaration that a given resource may be
+embedded in cross-origin contexts.</p>
     <li data-md>
      <p>It introduces a new <code>Cross-Origin-Embedder-Policy</code> header which shifts the default behavior for
 resources loaded in a given context to an opt-in model, in which cross-origin responses must
@@ -1711,7 +1711,7 @@ appropriate:</p>
        <li data-md>
         <p><var>target</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context" id="ref-for-nested-browsing-context①">nested browsing context</a>.</p>
        <li data-md>
-        <p>The <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-nested-through" id="ref-for-browsing-context-nested-through">through which</a> <var>target</var> is nested has an <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> of "<code>none</code>".</p>
+        <p>The <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code> <a data-link-type="dfn">through which</a> <var>target</var> is nested has an <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> of "<code>none</code>".</p>
        <li data-md>
         <p>The result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedder-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedder-policy②">obtaining an embedder policy</a> from <var>response</var> is
 "<code>require-corp</code>".</p>
@@ -1725,7 +1725,7 @@ appropriate:</p>
 to incoming responses. To do so, Fetch is patched as follows:</p>
    <ol>
     <li data-md>
-     <p>The <code>Cross-Origin-Resource-Policy</code> grammar is extended to include a "<code>cross-site</code>" value.</p>
+     <p>The <code>Cross-Origin-Resource-Policy</code> grammar is extended to include a "<code>cross-origin</code>" value.</p>
     <li data-md>
      <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a> is rewritten to take the <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑥">embedder policy</a> into
 account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#navigation-request" id="ref-for-navigation-request①">navigation requests</a> in addition to <code>no-cors</code> requests.</p>
@@ -1779,14 +1779,14 @@ CORP.</p>
        <p>If both of the following statements are true, then return <code>allowed</code>:</p>
        <ul>
         <li data-md>
-         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host">host</a> is <a data-link-type="dfn" href="https://url.spec.whatwg.org/#host-same-site" id="ref-for-host-same-site">same site</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host①">host</a>.</p>
+         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host">host</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-site" id="ref-for-same-site">same site</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host①">host</a>.</p>
         <li data-md>
          <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin②">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-scheme" id="ref-for-concept-origin-scheme">scheme</a> is "<code>https</code>", or <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-https-state" id="ref-for-concept-response-https-state">HTTPS state</a> is "<code>none</code>".</p>
        </ul>
        <p>Otherwise, return <code>blocked</code>.</p>
        <p class="note" role="note"><span>Note:</span> <code>Cross-Origin-Resource-Policy: same-site</code> does not consider a response delivered
 via a secure transport to match a non-secure requesting origin, even if their hosts are
-otherwise <a data-link-type="dfn" href="https://url.spec.whatwg.org/#host-same-site" id="ref-for-host-same-site①">same site</a>. Securely-transported responses will only match a
+otherwise <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-site" id="ref-for-same-site①">same site</a>. Securely-transported responses will only match a
 securely-transported initiator.</p>
       <dt data-md>Otherwise
       <dd data-md>
@@ -2180,12 +2180,6 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-nested-browsing-context">3.1.2. Process a navigation response</a> <a href="#ref-for-nested-browsing-context①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-browsing-context-nested-through">
-   <a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-nested-through">https://html.spec.whatwg.org/multipage/browsers.html#browsing-context-nested-through</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-browsing-context-nested-through">3.1.2. Process a navigation response</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-dom-open">
    <a href="https://html.spec.whatwg.org/multipage/window-object.html#dom-open">https://html.spec.whatwg.org/multipage/window-object.html#dom-open</a><b>Referenced in:</b>
    <ul>
@@ -2202,6 +2196,12 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://html.spec.whatwg.org/multipage/origin.html#same-origin">https://html.spec.whatwg.org/multipage/origin.html#same-origin</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-same-origin">3.2.1. Cross-Origin Resource Policy Checks</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-same-site">
+   <a href="https://html.spec.whatwg.org/multipage/origin.html#same-site">https://html.spec.whatwg.org/multipage/origin.html#same-site</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-same-site">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-same-site①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-origin-scheme">
@@ -2266,12 +2266,6 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-concept-url-origin">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-url-origin①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-host-same-site">
-   <a href="https://url.spec.whatwg.org/#host-same-site">https://url.spec.whatwg.org/#host-same-site</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-host-same-site">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-host-same-site①">(2)</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-concept-url-scheme">
    <a href="https://url.spec.whatwg.org/#concept-url-scheme">https://url.spec.whatwg.org/#concept-url-scheme</a><b>Referenced in:</b>
    <ul>
@@ -2323,10 +2317,10 @@ is significantly simpler than imposing new constraints in the future.</p>
      <li><span class="dfn-paneled" id="term-for-concept-origin-host" style="color:initial">host</span>
      <li><span class="dfn-paneled" id="term-for-the-iframe-element" style="color:initial">iframe</span>
      <li><span class="dfn-paneled" id="term-for-nested-browsing-context" style="color:initial">nested browsing context</span>
-     <li><span class="dfn-paneled" id="term-for-browsing-context-nested-through" style="color:initial">nested through</span>
      <li><span class="dfn-paneled" id="term-for-dom-open" style="color:initial">open()</span>
      <li><span class="dfn-paneled" id="term-for-concept-WorkerGlobalScope-owner-set" style="color:initial">owner set</span>
      <li><span class="dfn-paneled" id="term-for-same-origin" style="color:initial">same origin</span>
+     <li><span class="dfn-paneled" id="term-for-same-site" style="color:initial">same site</span>
      <li><span class="dfn-paneled" id="term-for-concept-origin-scheme" style="color:initial">scheme</span>
     </ul>
    <li>
@@ -2353,7 +2347,6 @@ is significantly simpler than imposing new constraints in the future.</p>
     <a data-link-type="biblio">[URL]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-concept-url-origin" style="color:initial">origin</span>
-     <li><span class="dfn-paneled" id="term-for-host-same-site" style="color:initial">same site</span>
      <li><span class="dfn-paneled" id="term-for-concept-url-scheme" style="color:initial">scheme</span>
     </ul>
   </ul>
@@ -2363,7 +2356,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <dt id="biblio-dom">[DOM]
    <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-ecmascript">[ECMASCRIPT]
-   <dd><a href="https://tc39.github.io/ecma262/">ECMAScript Language Specification</a>. URL: <a href="https://tc39.github.io/ecma262/">https://tc39.github.io/ecma262/</a>
+   <dd><a href="https://tc39.es/ecma262/">ECMAScript Language Specification</a>. URL: <a href="https://tc39.es/ecma262/">https://tc39.es/ecma262/</a>
    <dt id="biblio-fetch">[Fetch]
    <dd>Anne van Kesteren. <a href="https://fetch.spec.whatwg.org/">Fetch Standard</a>. Living Standard. URL: <a href="https://fetch.spec.whatwg.org/">https://fetch.spec.whatwg.org/</a>
    <dt id="biblio-html">[HTML]
@@ -2375,7 +2368,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
    <dt id="biblio-service-workers-1">[SERVICE-WORKERS-1]
-   <dd>Alex Russell; et al. <a href="https://www.w3.org/TR/service-workers-1/">Service Workers 1</a>. 2 November 2017. WD. URL: <a href="https://www.w3.org/TR/service-workers-1/">https://www.w3.org/TR/service-workers-1/</a>
+   <dd>Alex Russell; et al. <a href="https://www.w3.org/TR/service-workers-1/">Service Workers 1</a>. 19 November 2019. CR. URL: <a href="https://www.w3.org/TR/service-workers-1/">https://www.w3.org/TR/service-workers-1/</a>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL Standard</a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
   </dl>
