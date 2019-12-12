@@ -58,7 +58,6 @@ urlPrefix: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure; spec
         text: sh-token; url: #section-3.9
     type: abstract-op
         text: serialize Structured Header; url: #section-4.1
-        text: Structured Header parsing algorithm; url: #section-4.2.7
 urlPrefix: https://html.spec.whatwg.org/
     type: dfn
         text: top-level browsing context group; url: multipage/browsers.html#tlbc-group
@@ -143,9 +142,10 @@ Cross-Origin-Embedder-Policy = sh-token
 
 The only currently valid `Cross-Origin-Embedder-Policy` value is "`require-corp`".
 
-In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
-this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
-value cannot be parsed as a <a grammar>`sh-token`</a>.
+Note: In order to support forward-compatibility with as-yet-unknown request types, user agents will ignore
+this header if it contains an invalid value. Likewise, user agents will ignore this header if the
+value cannot be parsed as a <a grammar>`sh-token`</a>. Parameters are not allowed; user agents will
+ignore this header if any parameters are present.
 
 
 Parsing {#parsing}
@@ -157,24 +157,22 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 
 1.  Let |policy| be "`unsafe-none`".
 
-2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy` from
+2.  Let |value| be the result of [=header list/get a structured header=]
+    `Cross-Origin-Embedder-Policy` and "`item`" from
     |response|'s [=response/header list=].
 
-3.  If |header| is not `null`:
+3.  If |value| is not `null` and is not failure:
 
-    1.  Set |header| to the result of [=isomorphic decoding=] |header|.
+    1. Let |parsed policy| be |value|[0].
 
-    2.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
-        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
-        to "`item`".
+    2. Let |parameters| be |value|[1].
 
-        If parsing fails, set |parsed policy| to "`unsafe-none`".
+    3. If |parsed policy| is not a [=structured header/token=], then return |policy|.
 
-        ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
-        somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
-        passing it into the parsing algorithm?
+    4. If |parameters| is not empty, then return |policy|.
 
-    3.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
+    5. If |parsed policy| is "`require-corp`", then set |policy| to
+        "`require-corp`".
 
 4.  Return |policy|.
 
