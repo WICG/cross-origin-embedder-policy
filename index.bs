@@ -417,16 +417,21 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
         extensions, and I think it'll be more difficult to ship them after inverting the
         error-handling behavior.
 
-
 Integration with Service Worker {#integration-sw}
 -------------------------------------------------
 
-In https://w3c.github.io/ServiceWorker/#dom-fetchevent-respondwith, insert the following item
-after 10.1.
+In https://w3c.github.io/ServiceWorker/#dom-fetchevent-respondwith, replace 10.1 with the following
+item.
 
-2. Else if the result of performing a [$cross-origin resource policy check$] with _event_'s
-request's associated request and _response_'s associated response is `blocked`, then set
-the respond-with-error flag.
+1. If |response| is not a `Response` object, or the result of performing a
+[$cross-origin resource policy check$] with _event_'s request's associated request and _response_'s
+associated response is `blocked`, then set the respond-with-error flag.
+
+Also add the following note.
+
+The [$cross-origin resource policy check$] needs to be performed _after_ the relevant service
+worker has the opportunity to respond to a request, as it may otherwise be allowed to respond to a
+`require-corp` [=request/client=] with an opaque response which doesn't assert CORP.
 
 Implementation Considerations {#impl-considerations}
 ====================================================
