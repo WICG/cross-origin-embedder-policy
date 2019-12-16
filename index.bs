@@ -429,9 +429,8 @@ associated response is `blocked`, then set the respond-with-error flag.
 
 Also add the following note.
 
-The [$cross-origin resource policy check$] needs to be performed _after_ the relevant service
-worker has the opportunity to respond to a request, as it may otherwise be allowed to respond to a
-`require-corp` [=request/client=] with an opaque response which doesn't assert CORP.
+The [$cross-origin resource policy check$] performed here ensures that a Service Worker
+cannot respond to a client that requires CORP with an opaque response that doesn't assert CORP.
 
 Implementation Considerations {#impl-considerations}
 ====================================================
