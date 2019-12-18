@@ -391,6 +391,7 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
     :   `same-origin`
     ::  If |request|'s [=request/origin=] is [=same origin=] with |request|'s
         [=request/current URL=]'s [=url/origin=], then return `allowed`.
+
         Otherwise, return `blocked`.
 
     :   `same-site`
@@ -424,7 +425,7 @@ Integration with Service Worker {#integration-sw}
 In https://w3c.github.io/ServiceWorker/#dom-fetchevent-respondwith, replace 10.1 with the following
 item.
 
-1. If |response| is not a `Response` object, or the result of performing a
+1.  If |response| is not a `Response` object, or the result of performing a
     [$cross-origin resource policy check$] with _event_'s request's associated request and
     _response_'s associated response is `blocked`, then set the respond-with-error flag.
 
