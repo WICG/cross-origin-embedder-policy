@@ -1212,8 +1212,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 83d3ceadc5400c8422976bbcbe49615aace9cf1e" name="generator">
-  <meta content="93c4ed80811ce222163d87097347050c46495950" name="document-revision">
+  <meta content="Bikeshed version c2a4ab239714a7c0374d0c7ad8cb001030becba3" name="generator">
+  <meta content="8e81e277a63e192c8b7ff5f84ef929a9c11ee3e9" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1413,7 +1413,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-11-27">27 November 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-12-18">18 December 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1463,6 +1463,7 @@ pre .property::before, pre .property::after {
        <ol class="toc">
         <li><a href="#corp-check"><span class="secno">3.2.1</span> <span class="content">Cross-Origin Resource Policy Checks</span></a>
        </ol>
+      <li><a href="#integration-sw"><span class="secno">3.3</span> <span class="content">Integration with Service Worker</span></a>
      </ol>
     <li>
      <a href="#impl-considerations"><span class="secno">4</span> <span class="content">Implementation Considerations</span></a>
@@ -1729,11 +1730,6 @@ to incoming responses. To do so, Fetch is patched as follows:</p>
     <li data-md>
      <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a> is rewritten to take the <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑥">embedder policy</a> into
 account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#navigation-request" id="ref-for-navigation-request①">navigation requests</a> in addition to <code>no-cors</code> requests.</p>
-    <li data-md>
-     <p class="issue" id="issue-524333ea"><a class="self-link" href="#issue-524333ea"></a> The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check①">cross-origin resource policy check</a> needs to be performed _after_ the relevant
-service worker has the opportunity to respond to a request, as it may otherwise be allowed to
-respond to a <code>require-corp</code> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a> with an opaque response which doesn’t assert
-CORP.</p>
    </ol>
    <h4 class="heading settled" data-level="3.2.1" id="corp-check"><span class="secno">3.2.1. </span><span class="content">Cross-Origin Resource Policy Checks</span><a class="self-link" href="#corp-check"></a></h4>
    <p>To perform a <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a> (<var>request</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response③">response</a> (<var>response</var>), run these steps:</p>
@@ -1744,7 +1740,7 @@ CORP.</p>
      <p>Set <var>embedder policy</var> to "<code>none</code>" if both of the following statements are true:</p>
      <ul>
       <li data-md>
-       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client②">client</a>'s <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy">embedder policy</a> is
+       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a>'s <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy">embedder policy</a> is
  "<code>none</code>".</p>
       <li data-md>
        <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client①">reserved client</a> is not <code>null</code>, and its <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy①">embedder policy</a> is "<code>none</code>".</p>
@@ -1774,6 +1770,7 @@ CORP.</p>
       <dt data-md><code>same-origin</code>
       <dd data-md>
        <p>If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin">origin</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-origin" id="ref-for-same-origin">same origin</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin">origin</a>, then return <code>allowed</code>.</p>
+       <p>Otherwise, return <code>blocked</code>.</p>
       <dt data-md><code>same-site</code>
       <dd data-md>
        <p>If both of the following statements are true, then return <code>allowed</code>:</p>
@@ -1797,6 +1794,17 @@ extensions, and I think it’ll be more difficult to ship them after inverting t
 error-handling behavior.</p>
      </dl>
    </ol>
+   <h3 class="heading settled" data-level="3.3" id="integration-sw"><span class="secno">3.3. </span><span class="content">Integration with Service Worker</span><a class="self-link" href="#integration-sw"></a></h3>
+   <p>In https://w3c.github.io/ServiceWorker/#dom-fetchevent-respondwith, replace 10.1 with the following
+item.</p>
+   <ol>
+    <li data-md>
+     <p>If <var>response</var> is not a <code>Response</code> object, or the result of performing a <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check①">cross-origin resource policy check</a> with _event_’s request’s associated request and
+_response_’s associated response is <code>blocked</code>, then set the respond-with-error flag.</p>
+   </ol>
+   <p>Also add the following note.</p>
+   <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check②">cross-origin resource policy check</a> performed here ensures that a Service Worker
+cannot respond to a client that requires CORP with an opaque response that doesn’t assert CORP.</p>
    <h2 class="heading settled" data-level="4" id="impl-considerations"><span class="secno">4. </span><span class="content">Implementation Considerations</span><a class="self-link" href="#impl-considerations"></a></h2>
    <h3 class="heading settled" data-level="4.1" id="why-not-cors"><span class="secno">4.1. </span><span class="content">Why not require CORS instead?</span><a class="self-link" href="#why-not-cors"></a></h3>
    <p>An earlier version of this propsal leaned on CORS rather than CORP. Why didn’t we run with that
@@ -2017,8 +2025,8 @@ is significantly simpler than imposing new constraints in the future.</p>
   <aside class="dfn-panel" data-for="term-for-concept-request-client">
    <a href="https://fetch.spec.whatwg.org/#concept-request-client">https://fetch.spec.whatwg.org/#concept-request-client</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-request-client">3.2. Integration with Fetch</a> <a href="#ref-for-concept-request-client①">(2)</a>
-    <li><a href="#ref-for-concept-request-client②">3.2.1. Cross-Origin Resource Policy Checks</a>
+    <li><a href="#ref-for-concept-request-client">3.2. Integration with Fetch</a>
+    <li><a href="#ref-for-concept-request-client①">3.2.1. Cross-Origin Resource Policy Checks</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-cors-check">
@@ -2386,10 +2394,6 @@ is significantly simpler than imposing new constraints in the future.</p>
    <div class="issue"> The ASCII requirements of Structured Headers are
 somewhat unclear to me. Do we need to check whether <var>header</var> is an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string">ASCII string</a> before
 passing it into the parsing algorithm? <a href="https://github.com/httpwg/http-extensions/issues/662">&lt;https://github.com/httpwg/http-extensions/issues/662></a><a href="#issue-40cb8ace"> ↵ </a></div>
-   <div class="issue"> The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a> needs to be performed _after_ the relevant
-service worker has the opportunity to respond to a request, as it may otherwise be allowed to
-respond to a <code>require-corp</code> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client">client</a> with an opaque response which doesn’t assert
-CORP.<a href="#issue-524333ea"> ↵ </a></div>
    <div class="issue"> Anne suggested that we ought to fail closed instead in the presence of COEP in <a href="https://github.com/whatwg/fetch/pull/893#discussion_r274867414">a comment on the relevant PR</a>.
 That seems reasonable to me, if we can get some changes into CORP along the lines of <a href="https://github.com/whatwg/fetch/issues/760">whatwg/fetch#760</a>, as they seem like useful
 extensions, and I think it’ll be more difficult to ship them after inverting the
@@ -2454,7 +2458,8 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
   <aside class="dfn-panel" data-for="abstract-opdef-cross-origin-resource-policy-check">
    <b><a href="#abstract-opdef-cross-origin-resource-policy-check">#abstract-opdef-cross-origin-resource-policy-check</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check">3.2. Integration with Fetch</a> <a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check①">(2)</a>
+    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check">3.2. Integration with Fetch</a>
+    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check①">3.3. Integration with Service Worker</a> <a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check②">(2)</a>
    </ul>
   </aside>
 <script>/* script-var-click-highlighting */

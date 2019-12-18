@@ -305,7 +305,7 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
     :   |response|'s [=response/url=]'s [=url/scheme=] is a [=local scheme=]
     :   |global| is a {{DedicatedWorkerGlobalScope}}:
     ::  1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
-    
+
             1.  If the item's [=/embedder policy=] is "`require-corp`", set |policy| to
                 "`require-corp`".
 
@@ -392,9 +392,11 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
     ::  If |request|'s [=request/origin=] is [=same origin=] with |request|'s
         [=request/current URL=]'s [=url/origin=], then return `allowed`.
 
+        Otherwise, return `blocked`.
+
     :   `same-site`
     ::  If both of the following statements are true, then return `allowed`:
-    
+
         *   |request|'s [=request/origin=]'s [=origin/host=] is [=same site=] with |request|'s
             [=request/current URL=]'s [=url/origin=]'s [=origin/host=].
         *   |request|'s [=request/origin=]'s [=origin/scheme=] is "`https`", or |response|'s
@@ -423,9 +425,9 @@ Integration with Service Worker {#integration-sw}
 In https://w3c.github.io/ServiceWorker/#dom-fetchevent-respondwith, replace 10.1 with the following
 item.
 
-1. If |response| is not a `Response` object, or the result of performing a
-[$cross-origin resource policy check$] with _event_'s request's associated request and _response_'s
-associated response is `blocked`, then set the respond-with-error flag.
+1.  If |response| is not a `Response` object, or the result of performing a
+    [$cross-origin resource policy check$] with _event_'s request's associated request and
+    _response_'s associated response is `blocked`, then set the respond-with-error flag.
 
 Also add the following note.
 
