@@ -58,7 +58,7 @@ urlPrefix: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure; spec
         text: sh-token; url: #section-3.9
     type: abstract-op
         text: serialize Structured Header; url: #section-4.1
-        text: Structured Header parsing algorithm; url: #section-4.2.7
+        text: Parsing a Token from Text; url: #section-4.2.6
 urlPrefix: https://html.spec.whatwg.org/
     type: dfn
         text: top-level browsing context group; url: multipage/browsers.html#tlbc-group
@@ -163,9 +163,8 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 
     1.  Set |header| to the result of [=isomorphic decoding=] |header|.
 
-    2.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
-        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
-        to "`item`".
+    2.  Let |parsed policy| be the result of [$Parsing a Token from Text$]
+        with <var ignore>input_string</var> set to |header|.
 
         If parsing fails, set |parsed policy| to "`none`".
 

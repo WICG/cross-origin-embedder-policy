@@ -1213,7 +1213,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version c2a4ab239714a7c0374d0c7ad8cb001030becba3" name="generator">
-  <meta content="8e81e277a63e192c8b7ff5f84ef929a9c11ee3e9" name="document-revision">
+  <meta content="915c808a750e17f553b1385e435ac2cad11761bb" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1548,8 +1548,7 @@ value cannot be parsed as a <a data-link-type="grammar" href="https://tools.ietf
        <li data-md>
         <p>Set <var>header</var> to the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#isomorphic-decode" id="ref-for-isomorphic-decode">isomorphic decoding</a> <var>header</var>.</p>
        <li data-md>
-        <p>Let <var>parsed policy</var> be the result of executing the <a data-link-type="abstract-op" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.7" id="ref-for-section-4.2.7">Structured Header parsing algorithm</a> with <var>input_string</var> set to <var>header</var>, and <var>header_type</var> set
-to "<code>item</code>".</p>
+        <p>Let <var>parsed policy</var> be the result of <a data-link-type="abstract-op" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.6" id="ref-for-section-4.2.6">Parsing a Token from Text</a> with <var>input_string</var> set to <var>header</var>.</p>
         <p>If parsing fails, set <var>parsed policy</var> to "<code>none</code>".</p>
         <p class="issue" id="issue-40cb8ace"><a class="self-link" href="#issue-40cb8ace"></a> The ASCII requirements of Structured Headers are
 somewhat unclear to me. Do we need to check whether <var>header</var> is an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string" id="ref-for-ascii-string">ASCII string</a> before
@@ -2218,10 +2217,10 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-concept-origin-scheme">3.2.1. Cross-Origin Resource Policy Checks</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-section-4.2.7">
-   <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.7">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.7</a><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="term-for-section-4.2.6">
+   <a href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.6">https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.6</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-section-4.2.7">2.2. Parsing</a>
+    <li><a href="#ref-for-section-4.2.6">2.2. Parsing</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-section-3.1">
@@ -2334,7 +2333,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <li>
     <a data-link-type="biblio">[I-D.ietf-httpbis-header-structure]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-section-4.2.7" style="color:initial">Structured Header parsing algorithm</span>
+     <li><span class="dfn-paneled" id="term-for-section-4.2.6" style="color:initial">Parsing a Token from Text</span>
      <li><span class="dfn-paneled" id="term-for-section-3.1" style="color:initial">dictionary</span>
      <li><span class="dfn-paneled" id="term-for-section-3.9" style="color:initial">sh-token</span>
      <li><span class="dfn-paneled" id="term-for-" style="color:initial">structured header</span>
