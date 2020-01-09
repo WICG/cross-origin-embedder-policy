@@ -1212,8 +1212,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version c2a4ab239714a7c0374d0c7ad8cb001030becba3" name="generator">
-  <meta content="8e81e277a63e192c8b7ff5f84ef929a9c11ee3e9" name="document-revision">
+  <meta content="Bikeshed version 83d3ceadc5400c8422976bbcbe49615aace9cf1e" name="generator">
+  <meta content="915c808a750e17f553b1385e435ac2cad11761bb" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1413,7 +1413,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2019-12-18">18 December 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-01-09">9 January 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1539,7 +1539,7 @@ value cannot be parsed as a <a data-link-type="grammar" href="https://tools.ietf
      To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-lt="parse header" id="abstract-opdef-obtain-a-responses-embedder-policy">obtain a response’s embedder policy</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a> (<var>response</var>): 
     <ol>
      <li data-md>
-      <p>Let <var>policy</var> be "<code>none</code>".</p>
+      <p>Let <var>policy</var> be "<code>unsafe-none</code>".</p>
      <li data-md>
       <p>Let <var>header</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-get" id="ref-for-concept-header-list-get">getting</a> <code>Cross-Origin-Embedder-Policy</code> from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list">header list</a>.</p>
      <li data-md>
@@ -1550,7 +1550,7 @@ value cannot be parsed as a <a data-link-type="grammar" href="https://tools.ietf
        <li data-md>
         <p>Let <var>parsed policy</var> be the result of executing the <a data-link-type="abstract-op" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-4.2.7" id="ref-for-section-4.2.7">Structured Header parsing algorithm</a> with <var>input_string</var> set to <var>header</var>, and <var>header_type</var> set
 to "<code>item</code>".</p>
-        <p>If parsing fails, set <var>parsed policy</var> to "<code>none</code>".</p>
+        <p>If parsing fails, set <var>parsed policy</var> to "<code>unsafe-none</code>".</p>
         <p class="issue" id="issue-40cb8ace"><a class="self-link" href="#issue-40cb8ace"></a> The ASCII requirements of Structured Headers are
 somewhat unclear to me. Do we need to check whether <var>header</var> is an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string" id="ref-for-ascii-string">ASCII string</a> before
 passing it into the parsing algorithm? <a href="https://github.com/httpwg/http-extensions/issues/662">&lt;https://github.com/httpwg/http-extensions/issues/662></a></p>
@@ -1561,7 +1561,7 @@ passing it into the parsing algorithm? <a href="https://github.com/httpwg/http-e
       <p>Return <var>policy</var>.</p>
     </ol>
     <div class="note" role="note">
-      Note: This fails open (by defaulting to "<code>none</code>") in the presence of a header that cannot be
+      Note: This fails open (by defaulting to "<code>unsafe-none</code>") in the presence of a header that cannot be
 parsed as a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9②">token</a>. This includes inadvertant lists created by combining
 multiple instances of the <code>Cross-Origin-Embedder-Policy</code> header present in a given response: 
      <table class="data">
@@ -1572,25 +1572,25 @@ multiple instances of the <code>Cross-Origin-Embedder-Policy</code> header prese
       <tbody>
        <tr>
         <td><em>No header delivered</em>
-        <td><code>none</code>
+        <td><code>unsafe-none</code>
        <tr>
         <td><code>require-corp</code>
         <td><code>require-corp</code>
        <tr>
         <td><code>unknown-value</code>
-        <td><code>none</code>
+        <td><code>unsafe-none</code>
        <tr>
         <td><code>require-corp, unknown-value</code>
-        <td><code>none</code>
+        <td><code>unsafe-none</code>
        <tr>
         <td><code>unknown-value, unknown-value</code>
-        <td><code>none</code>
+        <td><code>unsafe-none</code>
        <tr>
         <td><code>unknown-value, require-corp</code>
-        <td><code>none</code>
+        <td><code>unsafe-none</code>
        <tr>
         <td><code>require-corp, require-corp</code>
-        <td><code>none</code>
+        <td><code>unsafe-none</code>
      </table>
     </div>
    </div>
@@ -1602,17 +1602,17 @@ asserted by the document’s opener or embedder, ensuring that they’re properl
 so, HTML is patched as follows:</p>
    <ol>
     <li data-md>
-     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="embedder-policy">embedder policy</dfn> is a string with one of the following values: "<code>none</code>",
+     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="embedder-policy">embedder policy</dfn> is a string with one of the following values: "<code>unsafe-none</code>",
 "<code>require-corp</code>".</p>
     <li data-md>
      <p>The <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy">embedder policy</a> is persisted on a number of objects:</p>
      <ol>
       <li data-md>
        <p><code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document">Document</a></code> objects are given an <dfn class="dfn-paneled" data-dfn-for="document" data-dfn-type="dfn" data-noexport id="document-embedder-policy">embedder policy</dfn> property, whose
-value is an <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy①">embedder policy</a> defaulting to "<code>none</code>".</p>
+value is an <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy①">embedder policy</a> defaulting to "<code>unsafe-none</code>".</p>
       <li data-md>
        <p><code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#workerglobalscope" id="ref-for-workerglobalscope">WorkerGlobalScope</a></code> objects are given a <dfn class="dfn-paneled" data-dfn-for="WorkerGlobalScope" data-dfn-type="dfn" data-lt="embedder policy" data-noexport id="workerglobalscope-embedder-policy">embedder
-policy</dfn> property, whose value is an <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy②">embedder policy</a> defaulting to "<code>none</code>".</p>
+policy</dfn> property, whose value is an <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy②">embedder policy</a> defaulting to "<code>unsafe-none</code>".</p>
       <li data-md>
        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">Environment settings objects</a> are given a <dfn class="dfn-paneled" data-dfn-for="environment settings object" data-dfn-type="dfn" data-lt="embedder policy" data-noexport id="environment-settings-object-embedder-policy">embedder
 policy</dfn> accessor, which has the following implementations:</p>
@@ -1669,7 +1669,7 @@ embedder’s policy</a> algorithm returns "<code>Blocked</code>" when executed u
      To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">initialize a global object’s embedder policy from a response</dfn>, given a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object">global object</a> (<var>global</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response①">response</a> (<var>response</var>): 
     <ol>
      <li data-md>
-      <p>Let <var>policy</var> be "<code>none</code>".</p>
+      <p>Let <var>policy</var> be "<code>unsafe-none</code>".</p>
      <li data-md>
       <p>Let <var>response policy</var> be the result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedder-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedder-policy①">obtaining an embedder policy</a> from <var>response</var>.</p>
      <li data-md>
@@ -1712,7 +1712,7 @@ appropriate:</p>
        <li data-md>
         <p><var>target</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context" id="ref-for-nested-browsing-context①">nested browsing context</a>.</p>
        <li data-md>
-        <p>The <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code> <a data-link-type="dfn">through which</a> <var>target</var> is nested has an <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> of "<code>none</code>".</p>
+        <p>The <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code> <a data-link-type="dfn">through which</a> <var>target</var> is nested has an <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> of "<code>unsafe-none</code>".</p>
        <li data-md>
         <p>The result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedder-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedder-policy②">obtaining an embedder policy</a> from <var>response</var> is
 "<code>require-corp</code>".</p>
@@ -1737,13 +1737,13 @@ account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.what
     <li data-md>
      <p>Let <var>embedder policy</var> be "<code>require-corp</code>".</p>
     <li data-md>
-     <p>Set <var>embedder policy</var> to "<code>none</code>" if both of the following statements are true:</p>
+     <p>Set <var>embedder policy</var> to "<code>unsafe-none</code>" if both of the following statements are true:</p>
      <ul>
       <li data-md>
        <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a>'s <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy">embedder policy</a> is
- "<code>none</code>".</p>
+ "<code>unsafe-none</code>".</p>
       <li data-md>
-       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client①">reserved client</a> is not <code>null</code>, and its <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy①">embedder policy</a> is "<code>none</code>".</p>
+       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client①">reserved client</a> is not <code>null</code>, and its <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy①">embedder policy</a> is "<code>unsafe-none</code>".</p>
      </ul>
     <li data-md>
      <p>Return <code>allowed</code> if any of the following statements are true:</p>
@@ -1751,7 +1751,7 @@ account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.what
       <li data-md>
        <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode">mode</a> is "<code>same-origin</code>", "<code>cors</code>", or "<code>websocket</code>".</p>
       <li data-md>
-       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode①">mode</a> is "<code>navigate</code>", and <var>embedder policy</var> is "<code>none</code>".</p>
+       <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode①">mode</a> is "<code>navigate</code>", and <var>embedder policy</var> is "<code>unsafe-none</code>".</p>
      </ul>
     <li data-md>
      <p class="assertion">ASSERT: <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode②">mode</a> is "<code>no-cors</code>" or "<code>navigate</code>". If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode③">mode</a> is "<code>navigate</code>", <var>embedder policy</var> is "<code>require-corp</code>".</p>
@@ -1778,7 +1778,7 @@ account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.what
         <li data-md>
          <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host">host</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-site" id="ref-for-same-site">same site</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host①">host</a>.</p>
         <li data-md>
-         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin②">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-scheme" id="ref-for-concept-origin-scheme">scheme</a> is "<code>https</code>", or <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-https-state" id="ref-for-concept-response-https-state">HTTPS state</a> is "<code>none</code>".</p>
+         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin②">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-scheme" id="ref-for-concept-origin-scheme">scheme</a> is "<code>https</code>", or <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-https-state" id="ref-for-concept-response-https-state">HTTPS state</a> is "<code>unsafe-none</code>".</p>
        </ul>
        <p>Otherwise, return <code>blocked</code>.</p>
        <p class="note" role="note"><span>Note:</span> <code>Cross-Origin-Resource-Policy: same-site</code> does not consider a response delivered

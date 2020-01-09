@@ -154,7 +154,7 @@ Parsing {#parsing}
 To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy</dfn> given a
 [=response=] (|response|):
 
-1.  Let |policy| be "`none`".
+1.  Let |policy| be "`unsafe-none`".
 
 2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy` from
     |response|'s [=response/header list=].
@@ -167,7 +167,7 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
         with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
         to "`item`".
 
-        If parsing fails, set |parsed policy| to "`none`".
+        If parsing fails, set |parsed policy| to "`unsafe-none`".
 
         ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
         somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
@@ -178,7 +178,7 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 4.  Return |policy|.
 
 <div class="note">
-Note: This fails open (by defaulting to "`none`") in the presence of a header that cannot be
+Note: This fails open (by defaulting to "`unsafe-none`") in the presence of a header that cannot be
 parsed as a [=structured header/token=]. This includes inadvertant lists created by combining
 multiple instances of the `Cross-Origin-Embedder-Policy` header present in a given response:
 
@@ -192,7 +192,7 @@ multiple instances of the `Cross-Origin-Embedder-Policy` header present in a giv
   <tbody>
     <tr>
       <td><em>No header delivered</em></td>
-      <td>`none`</td>
+      <td>`unsafe-none`</td>
     </tr>
     <tr>
       <td>`require-corp`</td>
@@ -200,23 +200,23 @@ multiple instances of the `Cross-Origin-Embedder-Policy` header present in a giv
     </tr>
     <tr>
       <td>`unknown-value`</td>
-      <td>`none`</td>
+      <td>`unsafe-none`</td>
     </tr>
     <tr>
       <td>`require-corp, unknown-value`</td>
-      <td>`none`</td>
+      <td>`unsafe-none`</td>
     </tr>
     <tr>
       <td>`unknown-value, unknown-value`</td>
-      <td>`none`</td>
+      <td>`unsafe-none`</td>
     </tr>
     <tr>
       <td>`unknown-value, require-corp`</td>
-      <td>`none`</td>
+      <td>`unsafe-none`</td>
     </tr>
     <tr>
       <td>`require-corp, require-corp`</td>
-      <td>`none`</td>
+      <td>`unsafe-none`</td>
     </tr>
   </tbody>
 </table>
@@ -237,16 +237,16 @@ restrictions it asserts. Likewise, user agents MUST also take into account the e
 asserted by the document's opener or embedder, ensuring that they're properly imposed as well. To do
 so, HTML is patched as follows:
 
-1.  An <dfn>embedder policy</dfn> is a string with one of the following values: "`none`",
+1.  An <dfn>embedder policy</dfn> is a string with one of the following values: "`unsafe-none`",
     "`require-corp`".
 
 2.  The [=/embedder policy=] is persisted on a number of objects:
 
     1.  {{Document}} objects are given an <dfn for="document">embedder policy</dfn> property, whose
-        value is an [=/embedder policy=] defaulting to "`none`".
+        value is an [=/embedder policy=] defaulting to "`unsafe-none`".
 
     2.  {{WorkerGlobalScope}} objects are given a <dfn for="WorkerGlobalScope">embedder
-        policy</dfn> property, whose value is an [=/embedder policy=] defaulting to "`none`".
+        policy</dfn> property, whose value is an [=/embedder policy=] defaulting to "`unsafe-none`".
 
     3.  [=Environment settings objects=] are given a <dfn for="environment settings object">embedder
         policy</dfn> accessor, which has the following implementations:
@@ -295,7 +295,7 @@ so, HTML is patched as follows:
 To <dfn abstract-op>initialize a global object's embedder policy from a response</dfn>, given a
 [=global object=] (|global|) and a [=response=] (|response|):
 
-1.  Let |policy| be "`none`".
+1.  Let |policy| be "`unsafe-none`".
 
 2.  Let |response policy| be the result of [$parse header|obtaining an embedder policy$] from
     |response|.
@@ -333,7 +333,7 @@ appropriate:
 
     *   |target| is not a [=nested browsing context=].
     *   The {{Document}} [=nested through|through which=] |target| is nested has an
-        [=document/embedder policy=] of "`none`".
+        [=document/embedder policy=] of "`unsafe-none`".
     *   The result of [$parse header|obtaining an embedder policy$] from |response| is
         "`require-corp`".
 
@@ -360,18 +360,18 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
 
 1.  Let |embedder policy| be "`require-corp`".
 
-2.  Set |embedder policy| to "`none`" if both of the following statements are true:
+2.  Set |embedder policy| to "`unsafe-none`" if both of the following statements are true:
 
     *    |request|'s [=request/client=]'s [=environment settings object/embedder policy=] is
-         "`none`".
+         "`unsafe-none`".
     *    |request|'s [=request/reserved client=] is not `null`, and its
-         [=environment settings object/embedder policy=] is "`none`".
+         [=environment settings object/embedder policy=] is "`unsafe-none`".
 
 
 3.  Return `allowed` if any of the following statements are true:
 
     *    |request|'s [=request/mode=] is "`same-origin`", "`cors`", or "`websocket`".
-    *    |request|'s [=request/mode=] is "`navigate`", and |embedder policy| is "`none`".
+    *    |request|'s [=request/mode=] is "`navigate`", and |embedder policy| is "`unsafe-none`".
 
 4.  ASSERT: |request|'s [=request/mode=] is "`no-cors`" or "`navigate`". If |request|'s
     [=request/mode=] is "`navigate`", |embedder policy| is "`require-corp`".
@@ -400,7 +400,7 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
         *   |request|'s [=request/origin=]'s [=origin/host=] is [=same site=] with |request|'s
             [=request/current URL=]'s [=url/origin=]'s [=origin/host=].
         *   |request|'s [=request/origin=]'s [=origin/scheme=] is "`https`", or |response|'s
-            [=response/HTTPS state=] is "`none`".
+            [=response/HTTPS state=] is "`unsafe-none`".
 
         Otherwise, return `blocked`.
 
