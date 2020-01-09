@@ -400,7 +400,7 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
         *   |request|'s [=request/origin=]'s [=origin/host=] is [=same site=] with |request|'s
             [=request/current URL=]'s [=url/origin=]'s [=origin/host=].
         *   |request|'s [=request/origin=]'s [=origin/scheme=] is "`https`", or |response|'s
-            [=response/HTTPS state=] is "`unsafe-none`".
+            [=response/HTTPS state=] is "`none`".
 
         Otherwise, return `blocked`.
 
