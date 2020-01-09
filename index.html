@@ -1213,7 +1213,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 83d3ceadc5400c8422976bbcbe49615aace9cf1e" name="generator">
-  <meta content="915c808a750e17f553b1385e435ac2cad11761bb" name="document-revision">
+  <meta content="3eecea4eca0328c6c6959d8a978071121611bc60" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1710,9 +1710,9 @@ appropriate:</p>
       <p>Return "<code>Allowed</code>" if any of the following statements are true:</p>
       <ul>
        <li data-md>
-        <p><var>target</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context" id="ref-for-nested-browsing-context①">nested browsing context</a>.</p>
+        <p><var>target</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context" id="ref-for-child-browsing-context">child browsing context</a>.</p>
        <li data-md>
-        <p>The <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code> <a data-link-type="dfn">through which</a> <var>target</var> is nested has an <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> of "<code>unsafe-none</code>".</p>
+        <p><var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document">container document</a>'s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> is "<code>unsafe-none</code>".</p>
        <li data-md>
         <p>The result of <a data-link-type="abstract-op" href="#abstract-opdef-obtain-a-responses-embedder-policy" id="ref-for-abstract-opdef-obtain-a-responses-embedder-policy②">obtaining an embedder policy</a> from <var>response</var> is
 "<code>require-corp</code>".</p>
@@ -1778,7 +1778,7 @@ account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.what
         <li data-md>
          <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host">host</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-site" id="ref-for-same-site">same site</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host①">host</a>.</p>
         <li data-md>
-         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin②">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-scheme" id="ref-for-concept-origin-scheme">scheme</a> is "<code>https</code>", or <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-https-state" id="ref-for-concept-response-https-state">HTTPS state</a> is "<code>unsafe-none</code>".</p>
+         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin②">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-scheme" id="ref-for-concept-origin-scheme">scheme</a> is "<code>https</code>", or <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-https-state" id="ref-for-concept-response-https-state">HTTPS state</a> is "<code>none</code>".</p>
        </ul>
        <p>Otherwise, return <code>blocked</code>.</p>
        <p class="note" role="note"><span>Note:</span> <code>Cross-Origin-Resource-Policy: same-site</code> does not consider a response delivered
@@ -2013,7 +2013,6 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://dom.spec.whatwg.org/#document">https://dom.spec.whatwg.org/#document</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-document">3.1. Integration with HTML</a> <a href="#ref-for-document①">(2)</a>
-    <li><a href="#ref-for-document②">3.1.2. Process a navigation response</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sec-sharedarraybuffer-objects">
@@ -2158,6 +2157,18 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-browsing-context①">3.1.2. Process a navigation response</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-child-browsing-context">
+   <a href="https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-child-browsing-context">3.1.2. Process a navigation response</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-bc-container-document">
+   <a href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document">https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bc-container-document">3.1.2. Process a navigation response</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-environment-settings-object">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object</a><b>Referenced in:</b>
    <ul>
@@ -2185,7 +2196,7 @@ is significantly simpler than imposing new constraints in the future.</p>
   <aside class="dfn-panel" data-for="term-for-nested-browsing-context">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-nested-browsing-context">3.1.2. Process a navigation response</a> <a href="#ref-for-nested-browsing-context①">(2)</a>
+    <li><a href="#ref-for-nested-browsing-context">3.1.2. Process a navigation response</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-open">
@@ -2320,6 +2331,8 @@ is significantly simpler than imposing new constraints in the future.</p>
      <li><span class="dfn-paneled" id="term-for-workerglobalscope" style="color:initial">WorkerGlobalScope</span>
      <li><span class="dfn-paneled" id="term-for-concept-document-window" style="color:initial">associated document</span>
      <li><span class="dfn-paneled" id="term-for-browsing-context" style="color:initial">browsing context</span>
+     <li><span class="dfn-paneled" id="term-for-child-browsing-context" style="color:initial">child browsing context</span>
+     <li><span class="dfn-paneled" id="term-for-bc-container-document" style="color:initial">container document</span>
      <li><span class="dfn-paneled" id="term-for-environment-settings-object" style="color:initial">environment settings object</span>
      <li><span class="dfn-paneled" id="term-for-global-object" style="color:initial">global object</span>
      <li><span class="dfn-paneled" id="term-for-concept-origin-host" style="color:initial">host</span>

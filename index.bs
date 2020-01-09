@@ -79,6 +79,7 @@ spec:html; type:dfn; text: browsing context group
 spec:fetch; type:dfn; for:/; text:response
 spec:fetch; type:dfn; for:/; text:cross-origin resource policy check
 spec:html; type:dfn; for:/; text:global object
+spec:html; type:dfn; for:/; text:container document
 </pre>
 
 Introduction {#intro}
@@ -331,9 +332,8 @@ appropriate:
 
 1.  Return "`Allowed`" if any of the following statements are true:
 
-    *   |target| is not a [=nested browsing context=].
-    *   The {{Document}} [=nested through|through which=] |target| is nested has an
-        [=document/embedder policy=] of "`unsafe-none`".
+    *   |target| is not a [=child browsing context=].
+    *   |target|'s [=container document=]'s [=document/embedder policy=] is "`unsafe-none`".
     *   The result of [$parse header|obtaining an embedder policy$] from |response| is
         "`require-corp`".
 
