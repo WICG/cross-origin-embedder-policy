@@ -1221,8 +1221,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 2a881f0ee698433d75c6a1555514334adb37d8c7" name="generator">
-  <meta content="7ee7f1eb787a913a7085c88152caac3f3f7d8156" name="document-revision">
+  <meta content="Bikeshed version 811139e88557b020c23cfc4db749a6220e4f7dcb" name="generator">
+  <meta content="d14cdf6b6936d0e11be01627bea0d916df1320d2" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1422,7 +1422,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-01-16">16 January 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-01-20">20 January 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1563,6 +1563,8 @@ ignore this header if any parameters are present.</p>
         <p>If <var>parsed policy</var> is not a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9②">token</a>, then return <var>policy</var>.</p>
        <li data-md>
         <p>If <var>parameters</var> is not empty, then return <var>policy</var>.</p>
+        <p class="issue" id="issue-d56d22a8"><a class="self-link" href="#issue-d56d22a8"></a> This step is expected to change when the Structured Headers for HTTP specification is
+more stable. See <a href="https://github.com/whatwg/html/issues/5172">whatwg/html issue #5172</a>. <a data-link-type="biblio" href="#biblio-i-dietf-httpbis-header-structure">[I-D.ietf-httpbis-header-structure]</a></p>
        <li data-md>
         <p>If <var>parsed policy</var> is "<code>require-corp</code>", then set <var>policy</var> to
 "<code>require-corp</code>".</p>
@@ -2393,6 +2395,8 @@ is significantly simpler than imposing new constraints in the future.</p>
   </dl>
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
+   <div class="issue"> This step is expected to change when the Structured Headers for HTTP specification is
+more stable. See <a href="https://github.com/whatwg/html/issues/5172">whatwg/html issue #5172</a>. <a data-link-type="biblio" href="#biblio-i-dietf-httpbis-header-structure">[I-D.ietf-httpbis-header-structure]</a><a href="#issue-d56d22a8"> ↵ </a></div>
    <div class="issue"> Anne suggested that we ought to fail closed instead in the presence of COEP in <a href="https://github.com/whatwg/fetch/pull/893#discussion_r274867414">a comment on the relevant PR</a>.
 That seems reasonable to me, if we can get some changes into CORP along the lines of <a href="https://github.com/whatwg/fetch/issues/760">whatwg/fetch#760</a>, as they seem like useful
 extensions, and I think it’ll be more difficult to ship them after inverting the

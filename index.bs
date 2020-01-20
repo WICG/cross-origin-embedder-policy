@@ -171,6 +171,10 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 
     4. If |parameters| is not empty, then return |policy|.
 
+        ISSUE: This step is expected to change when the Structured Headers for HTTP specification is
+        more stable. See [whatwg/html issue #5172](https://github.com/whatwg/html/issues/5172).
+        [[I-D.ietf-httpbis-header-structure]]
+
     5. If |parsed policy| is "`require-corp`", then set |policy| to
         "`require-corp`".
 
