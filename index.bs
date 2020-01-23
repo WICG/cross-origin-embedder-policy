@@ -313,7 +313,7 @@ so, HTML is patched as follows:
         policy reporting endpoint</dfn> accessor, which has the following implementations:
 
         :   For {{Window}} objects:
-        ::  Return the [=document/embedder policy policy=] of <var ignore>window</var>'s
+        ::  Return the [=document/embedder policy reporting endpoint=] of <var ignore>window</var>'s
             [=associated Document=].
         :   For {{WorkerGlobalScope}} objects:
         ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedder policy
