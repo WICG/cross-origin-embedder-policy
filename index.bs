@@ -148,6 +148,23 @@ this header if it contains an invalid value. Likewise, user agents MUST ignore t
 value cannot be parsed as a <a grammar>`sh-token`</a>.
 
 
+The `Cross-Origin-Embedder-Policy-Report-To` HTTP Response Header {#COEP-REPORT-TO}
+----------------------------------------------------------------
+
+The <dfn http-header>`Cross-Origin-Embedder-Policy-Report-To`</dfn> HTTP response header field
+allows a server to specify an endpoint for reporting potential policy violations. It is a
+[=Structured Header=] whose value MUST be a [=structured header/token=].
+[[!I-D.ietf-httpbis-header-structure]] Its ABNF is:
+
+```
+Cross-Origin-Embedder-Policy-Report-To = sh-token
+```
+
+In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
+this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
+value cannot be parsed as a <a grammar>`sh-token`</a>.
+
+
 Parsing {#parsing}
 ------------------
 
@@ -225,6 +242,27 @@ multiple instances of the `Cross-Origin-Embedder-Policy` header present in a giv
 
 </div>
 
+<div algorithm="parsing the report-to header">
+To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy reporting
+endpoint</dfn> given a [=response=] (|response|):
+
+1.  Let |endpoint| be `null`.
+
+2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy-Report-To`
+    from |response|'s [=response/header list=].
+
+3.  If |header| is not `null`:
+
+    1.  Set |header| to the result of [=isomorphic decoding=] |header|.
+
+    2.  Set |endpoint| to the result of executing the [$Structured Header parsing algorithm$]
+        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
+        to "`item`".
+
+        If parsing fails, set |endpoint| to `null`.
+
+4.  Return |endpoint|.
+</div>
 
 Integrations {#integrations}
 ============================
@@ -233,8 +271,9 @@ Integration with HTML {#integration-html}
 -----------------------------------------
 
 When creating a document, user agents will process
-<a http-header>`Cross-Origin-Embedder-Policy`</a> headers delivered by the server, imposing any
-restrictions it asserts. Likewise, user agents MUST also take into account the embedder policy
+<a http-header>`Cross-Origin-Embedder-Policy`</a> and
+<a http-header>`Cross-Origin-Embedder-Policy-Report-To`</a> headers delivered by the server, imposing
+any restrictions it asserts. Likewise, user agents MUST also take into account the embedder policy
 asserted by the document's opener or embedder, ensuring that they're properly imposed as well. To do
 so, HTML is patched as follows:
 
@@ -258,7 +297,29 @@ so, HTML is patched as follows:
         :   For {{WorkerGlobalScope}} objects:
         ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedder policy=].
 
-3.  The [$create a new browsing context$] algorithm sets the [=document/embedder policy=] for
+3. An <dfn>embeedder policy reporting endpoint</dfn> is a nullable string.
+
+4. The [=/embedder policy reporting endpoint=] is persisted on a number of objects:
+
+    1.  {{Document}} objects are given an <dfn for="document">embedder policy reporting
+        endpoint</dfn> property, whose value is an [=/embedder policy reporting endpoint=] defaulting
+        to `null`.
+
+    2.  {{WorkerGlobalScope}} objects are given a <dfn for="WorkerGlobalScope">embedder policy
+        reporting endpoint</dfn> property, whose value is an [=/embedder policy reporting endpoint=]
+        defaulting to `null`.
+
+    3.  [=Environment settings objects=] are given a <dfn for="environment settings object">embedder
+        policy reporting endpoint</dfn> accessor, which has the following implementations:
+
+        :   For {{Window}} objects:
+        ::  Return the [=document/embedder policy policy=] of <var ignore>window</var>'s
+            [=associated Document=].
+        :   For {{WorkerGlobalScope}} objects:
+        ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedder policy
+        reporting endpoint=].
+
+5.  The [$create a new browsing context$] algorithm sets the [=document/embedder policy=] for
     a browsing context's initial `about:blank` document by adding a new step directly after Referrer
     Policy is initialized in step 11 of the existing algorithm  which will copy any
     <var ignore>creator</var> document's policy:
@@ -267,21 +328,21 @@ so, HTML is patched as follows:
         >      [=document/embedder policy=] to <var ignore>creator</var>
         >      [=document/embedder policy=].
 
-4.  The [$initialize the Document object$] algorithm sets the [=document/embedder policy=] for
+6.  The [$initialize the Document object$] algorithm sets the [=document/embedder policy=] for
     {{Document}}s to which a [=browsing context=] is navigated by adding a new step directly after
     Referrer Policy is initialized in step 6:
 
     > 7.  Let <var ignore>document</var>'s [=document/embedder policy=] be the result of
     >     [$parse header|obtaining an embedder policy$] from |response|.
 
-5.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
+7.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
     {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
     in step 12.5:
 
     > 6.  Call [$initialize a global object's embedder policy from a response$] given
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
 
-6.  The [$process a navigate response$] algorthm checks that documents nested in a `require-corp`
+8.  The [$process a navigate response$] algorthm checks that documents nested in a `require-corp`
     context themselves positively assert `require-corp` by adding a new condition to the list in
     step 1:
 
@@ -316,6 +377,33 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 
 4.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
 
+</div>
+
+### Initializing a global object's Embedder policy reporting endpoint ### {#initialize-embedder-policy-reporting-endpoint-for-global}
+
+<div algorithm="to initialize a global object's embedder policy reporting endpoint from a response">
+To <dfn abstract-op>initialize a global object's embedder policy reporting endpoint from a
+response</dfn>, given a [=global object=] (|global|) and a [=response=] (|response|):
+
+1.  Let |endpoint| be `null`.
+
+2.  Let |response endpoint| be the result of [$parse header|obtaining an embedder policy reporting
+    endpoint$] from |response|.
+
+3.  Run the steps corresponding to the first matching statement:
+
+    :   |response|'s [=response/url=]'s [=url/scheme=] is a [=local scheme=]
+    :   |global| is a {{DedicatedWorkerGlobalScope}}:
+    ::  1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
+
+            1.  If the item's [=/embedder policy reporting endpoint=] is non-null, then
+                set |endpoint| to the value and break this loop.
+
+    :   |global| is a {{SharedWorkerGlobalScope}}:
+    :   |global| is a {{ServiceWorkerGlobalScope}}:
+    ::  1.   Set |endpoint| to |response endpoint|.
+
+4.  Set |global|'s [=WorkerGlobalScope/embedder policy reporting endpoint=] to |endpoint|.
 </div>
 
 ### Process a navigation response ### {#process-navigation-response}
