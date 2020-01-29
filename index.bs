@@ -142,7 +142,7 @@ Cross-Origin-Embedder-Policy = sh-token [parameter]
 ```
 
 The `Cross-Origin-Embedder-Policy` value consists of one token (either "`require-corp`" or
-"`unsafe-none`") with at most one parameter which specify an endpoint for violation reporting.
+"`unsafe-none`") with possibly a parameter which specify an endpoint for violation reporting.
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
@@ -242,9 +242,8 @@ Integration with HTML {#integration-html}
 -----------------------------------------
 
 When creating a document, user agents will process
-<a http-header>`Cross-Origin-Embedder-Policy`</a> and
-<a http-header>`Cross-Origin-Embedder-Policy-Report-To`</a> headers delivered by the server, imposing
-any restrictions it asserts. Likewise, user agents MUST also take into account the embedder policy
+<a http-header>`Cross-Origin-Embedder-Policy`</a> headers delivered by the server, imposing any
+restrictions it asserts. Likewise, user agents MUST also take into account the embedder policy
 asserted by the document's opener or embedder, ensuring that they're properly imposed as well. To do
 so, HTML is patched as follows:
 
