@@ -138,27 +138,11 @@ server to declare an embedder policy for a given document. It is a [=Structured 
 value MUST be a [=structured header/token=]. [[!I-D.ietf-httpbis-header-structure]] Its ABNF is:
 
 ```
-Cross-Origin-Embedder-Policy = sh-token
+Cross-Origin-Embedder-Policy = sh-token [parameter]
 ```
 
-The only currently valid `Cross-Origin-Embedder-Policy` value is "`require-corp`".
-
-In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
-this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
-value cannot be parsed as a <a grammar>`sh-token`</a>.
-
-
-The `Cross-Origin-Embedder-Policy-Report-To` HTTP Response Header {#COEP-REPORT-TO}
-----------------------------------------------------------------
-
-The <dfn http-header>`Cross-Origin-Embedder-Policy-Report-To`</dfn> HTTP response header field
-allows a server to specify an endpoint for reporting potential policy violations. It is a
-[=Structured Header=] whose value MUST be a [=structured header/token=].
-[[!I-D.ietf-httpbis-header-structure]] Its ABNF is:
-
-```
-Cross-Origin-Embedder-Policy-Report-To = sh-token
-```
+The `Cross-Origin-Embedder-Policy` value consists of one token (either "`require-corp`" or
+"`unsafe-none`") with at most one parameter which specify an endpoint for violation reporting.
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
@@ -172,28 +156,37 @@ Parsing {#parsing}
 To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy</dfn> given a
 [=response=] (|response|):
 
-1.  Let |policy| be "`unsafe-none`".
-
-2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy` from
+1.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy` from
     |response|'s [=response/header list=].
 
-3.  If |header| is not `null`:
+2.  If |header| is `null`, then return "`unsafe-none`" and `null`.
 
-    1.  Set |header| to the result of [=isomorphic decoding=] |header|.
+3.  Set |header| to the result of [=isomorphic decoding=] |header|.
 
-    2.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
-        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
-        to "`item`".
+4.  Let |parsed item| be the result of executing the [$Structured Header parsing algorithm$]
+    with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
+    to "`item`".
 
-        If parsing fails, set |parsed policy| to "`unsafe-none`".
+    If parsing fails, then return "`unsafe-none`" and `null`.
 
-        ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
-        somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
-        passing it into the parsing algorithm?
+    ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
+    somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
+    passing it into the parsing algorithm?
 
-    3.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
+5.  Let |policy| be the first component of |parsed item|.
 
-4.  Return |policy|.
+6.  Let |parameters| be the second component of |parsed item|.
+
+7.  If |policy| is neither "`require-corp`" nor "`unsafe-none`",
+    then return "`unsafe-none`" and `null`.
+
+8.  Let |endpoint| be `null`.
+
+9.  For each |name| with a value of |value| in |parameters:
+
+    1. If |name| is "`report-to`", then set |endpoint| to |value|.
+
+10. Return |policy| and |endpoint|.
 
 <div class="note">
 Note: This fails open (by defaulting to "`unsafe-none`") in the presence of a header that cannot be
@@ -242,28 +235,6 @@ multiple instances of the `Cross-Origin-Embedder-Policy` header present in a giv
 
 </div>
 
-<div algorithm="parsing the report-to header">
-To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy reporting
-endpoint</dfn> given a [=response=] (|response|):
-
-1.  Let |endpoint| be `null`.
-
-2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy-Report-To`
-    from |response|'s [=response/header list=].
-
-3.  If |header| is not `null`:
-
-    1.  Set |header| to the result of [=isomorphic decoding=] |header|.
-
-    2.  Set |endpoint| to the result of executing the [$Structured Header parsing algorithm$]
-        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
-        to "`item`".
-
-        If parsing fails, set |endpoint| to `null`.
-
-4.  Return |endpoint|.
-</div>
-
 Integrations {#integrations}
 ============================
 
@@ -297,7 +268,7 @@ so, HTML is patched as follows:
         :   For {{WorkerGlobalScope}} objects:
         ::  Return <var ignore>worker global scope</var>'s [=WorkerGlobalScope/embedder policy=].
 
-3. An <dfn>embeedder policy reporting endpoint</dfn> is a nullable string.
+3. An <dfn>embedder policy reporting endpoint</dfn> is a nullable string.
 
 4. The [=/embedder policy reporting endpoint=] is persisted on a number of objects:
 
@@ -332,8 +303,9 @@ so, HTML is patched as follows:
     {{Document}}s to which a [=browsing context=] is navigated by adding a new step directly after
     Referrer Policy is initialized in step 6:
 
-    > 7.  Let <var ignore>document</var>'s [=document/embedder policy=] be the result of
-    >     [$parse header|obtaining an embedder policy$] from |response|.
+    > 7.  Let <var ignore>document</var>'s [=document/embedder policy=] and
+    >     <var ignore>document</var>'s [=document/embedder policy reporting endpoint=] be
+    >     the result of [$parse header|obtaining an embedder policy$] from |response|.
 
 7.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
     {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
@@ -359,10 +331,12 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 
 1.  Let |policy| be "`unsafe-none`".
 
-2.  Let |response policy| be the result of [$parse header|obtaining an embedder policy$] from
-    |response|.
+2.  Let |endpoint| be `null`.
 
-3.  Run the steps corresponding to the first matching statement:
+3.  Let |response policy| and |response endpoint| be the result of
+    [$parse header|obtaining an embedder policy$] from |response|.
+
+4.  Run the steps corresponding to the first matching statement:
 
     :   |response|'s [=response/url=]'s [=url/scheme=] is a [=local scheme=]
     :   |global| is a {{DedicatedWorkerGlobalScope}}:
@@ -371,39 +345,19 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
             1.  If the item's [=/embedder policy=] is "`require-corp`", set |policy| to
                 "`require-corp`".
 
+            1.  If |endpoint| is `null` and the item's [=/embedder policy reporting endpoint=] is
+                non-null, then set |endpoint| to the value.
+
     :   |global| is a {{SharedWorkerGlobalScope}}:
     :   |global| is a {{ServiceWorkerGlobalScope}}:
     ::  1.   Set |policy| to |response policy|.
-
-4.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
-
-</div>
-
-### Initializing a global object's Embedder policy reporting endpoint ### {#initialize-embedder-policy-reporting-endpoint-for-global}
-
-<div algorithm="to initialize a global object's embedder policy reporting endpoint from a response">
-To <dfn abstract-op>initialize a global object's embedder policy reporting endpoint from a
-response</dfn>, given a [=global object=] (|global|) and a [=response=] (|response|):
-
-1.  Let |endpoint| be `null`.
-
-2.  Let |response endpoint| be the result of [$parse header|obtaining an embedder policy reporting
-    endpoint$] from |response|.
-
-3.  Run the steps corresponding to the first matching statement:
-
-    :   |response|'s [=response/url=]'s [=url/scheme=] is a [=local scheme=]
-    :   |global| is a {{DedicatedWorkerGlobalScope}}:
-    ::  1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
-
-            1.  If the item's [=/embedder policy reporting endpoint=] is non-null, then
-                set |endpoint| to the value and break this loop.
-
-    :   |global| is a {{SharedWorkerGlobalScope}}:
-    :   |global| is a {{ServiceWorkerGlobalScope}}:
     ::  1.   Set |endpoint| to |response endpoint|.
 
-4.  Set |global|'s [=WorkerGlobalScope/embedder policy reporting endpoint=] to |endpoint|.
+
+5.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
+
+6.  Set |global|'s [=WorkerGlobalScope/embedder policy reporting endpoint=] to |endpoint|.
+
 </div>
 
 ### Process a navigation response ### {#process-navigation-response}
@@ -422,8 +376,8 @@ appropriate:
 
     *   |target| is not a [=child browsing context=].
     *   |target|'s [=container document=]'s [=document/embedder policy=] is "`unsafe-none`".
-    *   The result of [$parse header|obtaining an embedder policy$] from |response| is
-        "`require-corp`".
+    *   The first component of the result of [$parse header|obtaining an embedder policy$] from
+        |response| is "`require-corp`".
 
 2.  Return "`Blocked`".
 
