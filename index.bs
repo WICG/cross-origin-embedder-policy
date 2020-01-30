@@ -177,8 +177,8 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 
 6.  Let |parameters| be the second component of |parsed item|.
 
-7.  If |value| is neither "`require-corp`" nor "`unsafe-none`",
-    then return a new [=/embedder policy=].
+7.  If |value| is neither "`require-corp`" nor "`unsafe-none`", then return a new
+    [=/embedder policy=].
 
 8.  Let |endpoint| be `null`.
 
@@ -236,6 +236,7 @@ multiple instances of the `Cross-Origin-Embedder-Policy` header present in a giv
 
 </div>
 
+
 Integrations {#integrations}
 ============================
 
@@ -285,9 +286,8 @@ so, HTML is patched as follows:
     {{Document}}s to which a [=browsing context=] is navigated by adding a new step directly after
     Referrer Policy is initialized in step 6:
 
-    > 7.  Let <var ignore>document</var>'s [=document/embedder policy=] and
-    >     <var ignore>document</var>'s [=document/embedder policy reporting endpoint=] be
-    >     the result of [$parse header|obtaining an embedder policy$] from |response|.
+    > 7.  Let <var ignore>document</var>'s [=document/embedder policy=] be the result of
+    >     [$parse header|obtaining an embedder policy$] from |response|.
 
 5.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
     {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
@@ -327,7 +327,8 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 
             1.  If |policy|'s [=embedder policy/reporting endpoint] is `null` and the item's
                 [=embedder policy/reporting endpoint=] is non-null, then |policy|'s
-                [=embedder policy/reporting endpoint=] to the value.
+                [=embedder policy/reporting endpoint=] to the item's
+                [=embedder policy/reporting endpoint=].
 
     :   |global| is a {{SharedWorkerGlobalScope}}:
     :   |global| is a {{ServiceWorkerGlobalScope}}:
