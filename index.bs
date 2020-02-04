@@ -138,7 +138,7 @@ server to declare an embedder policy for a given document. It is a [=Structured 
 value MUST be a [=structured header/token=]. [[!I-D.ietf-httpbis-header-structure]] Its ABNF is:
 
 ```
-Cross-Origin-Embedder-Policy = sh-token [parameter]
+Cross-Origin-Embedder-Policy = sh-item
 ```
 
 The `Cross-Origin-Embedder-Policy` value consists of one token (either "`require-corp`" or
