@@ -156,38 +156,21 @@ Parsing {#parsing}
 To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy</dfn> given a
 [=response=] (|response|):
 
-1.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy` from
-    |response|'s [=response/header list=].
+1.  Let |parsed item| be the result of [=header list/getting a structured header=] with
+    "`Cross-Origin-Embedder-Policy`" and "`item`".
 
-2.  If |header| is `null`, then return a new [=/embedder policy=].
+2.  If |parsed item| is `failure` or `null`, then return a new [=/embedder policy=].
 
-3.  Set |header| to the result of [=isomorphic decoding=] |header|.
-
-4.  Let |parsed item| be the result of executing the [$Structured Header parsing algorithm$]
-    with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
-    to "`item`".
-
-    If parsing fails, then return a new [=/embedder policy=].
-
-    ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
-    somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
-    passing it into the parsing algorithm?
-
-5.  Let |value| be the first component of |parsed item|.
-
-6.  Let |parameters| be the second component of |parsed item|.
-
-7.  If |value| is neither "`require-corp`" nor "`unsafe-none`", then return a new
+3.  If |parsed item|'s bare item is neither "`require-corp`" nor "`unsafe-none`", then return a new
     [=/embedder policy=].
 
-8.  Let |endpoint| be `null`.
+4.  Let |endpoint| be `null`.
 
-9.  For each |name| with a value of |value| in |parameters:
+5.  If |parsed item|'s parameters["report-to"] [=map/exists=], then set |endpoint| to
+    |parsed item|'s parameters["report-to"].
 
-    1. If |name| is "`report-to`", then set |endpoint| to |value|.
-
-10. Return a new [=/embedder policy=] whose [=embedder policy/value] is |value| and whose
-    [=embedder/reporting endpoint=] is |endpoint|.
+6.  Return a new [=/embedder policy=] whose [=embedder policy/value] is |parsed item|'s
+    bare item and whose [=embedder/reporting endpoint=] is |endpoint|.
 
 <div class="note">
 Note: This fails open (by defaulting to "`unsafe-none`") in the presence of a header that cannot be
