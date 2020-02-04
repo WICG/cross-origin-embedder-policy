@@ -237,7 +237,7 @@ so, HTML is patched as follows:
     1.  A string (<dfn for="embedder policy">value</dfn>) with one of the following values:
         "`unsafe-none`", "`require-corp`", initially "`unsafe-none`".
 
-    1.  A nullable string (<dfn for="embedder plicy">reporting endpoint</dfn>), initially null.
+    1.  A string or `null` (<dfn for="embedder plicy">reporting endpoint</dfn>), initially `null`.
 
 2.  The [=/embedder policy=] is persisted on a number of objects:
 
