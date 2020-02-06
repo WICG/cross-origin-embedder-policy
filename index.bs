@@ -142,7 +142,8 @@ Cross-Origin-Embedder-Policy = sh-item
 ```
 
 The `Cross-Origin-Embedder-Policy` value consists of one token (either "`require-corp`" or
-"`unsafe-none`") which may have a parameter specifying an endpoint for violation reporting.
+"`unsafe-none`") which may have a parameter specifying a [=structured-header/string=] which
+represents the endpoint for violation reporting.
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
