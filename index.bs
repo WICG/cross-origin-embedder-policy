@@ -167,8 +167,8 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 
 4.  Let |endpoint| be `null`.
 
-5.  If |parsed item|'s parameters["report-to"] [=map/exists=], then set |endpoint| to
-    |parsed item|'s parameters["report-to"].
+5.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
+    |endpoint| to |parsed item|'s parameters["report-to"].
 
 6.  Return a new [=/embedder policy=] whose [=embedder policy/value] is |parsed item|'s
     bare item and whose [=embedder/reporting endpoint=] is |endpoint|.
