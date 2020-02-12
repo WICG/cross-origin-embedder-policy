@@ -141,14 +141,36 @@ value MUST be a [=structured header/token=]. [[!I-D.ietf-httpbis-header-structur
 Cross-Origin-Embedder-Policy = sh-item
 ```
 
-The `Cross-Origin-Embedder-Policy` value consists of one token (either "`require-corp`" or
-"`unsafe-none`") which may have a parameter specifying a [=structured-header/string=] which
+The `Cross-Origin-Embedder-Policy` value consists of one token ("`require-corp`") which
+may have a parameter specifying a [=structured-header/string=] which
 represents the endpoint for violation reporting.
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
 value cannot be parsed as a <a grammar>`sh-token`</a>.
 
+The `Cross-Origin-Embedder-Policy-Report-Only` HTTP Response Header {#COEP}
+----------------------------------------------------------------
+
+The <dfn http-header>`Cross-Origin-Embedder-Policy-Report-Only`</dfn> HTTP response header field
+allows a server to declare an embedder policy for a given document. It is a [=Structured Header=]
+whose value MUST be a [=structured header/token=]. [[!I-D.ietf-httpbis-header-structure]] Its ABNF
+is:
+
+```
+Cross-Origin-Embedder-Policy-Report-Only = sh-item
+```
+
+The `Cross-Origin-Embedder-Policy-Report-Policy` value consists of one token ("`require-corp`") which
+may have a parameter specifying a [=structured-header/string=] which
+represents the endpoint for violation reporting.
+
+The `Cross-Origin-Embedder-Policy-Report-Policy` value is used only when there is no
+`Cross-Origin-Embedder-Policy` header present.
+
+In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
+this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
+value cannot be parsed as a <a grammar>`sh-token`</a>.
 
 Parsing {#parsing}
 ------------------
@@ -160,18 +182,28 @@ To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy<
 1.  Let |parsed item| be the result of [=header list/getting a structured header=] with
     "`Cross-Origin-Embedder-Policy`" and "`item`".
 
-2.  If |parsed item| is `failure` or `null`, then return a new [=/embedder policy=].
+2.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
+    "`require-corp`":
 
-3.  If |parsed item|'s bare item is neither "`require-corp`" nor "`unsafe-none`", then return a new
-    [=/embedder policy=].
+    1.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
+        |endpoint| to |parsed item|'s parameters["report-to"].
 
-4.  Let |endpoint| be `null`.
+    2.  Return a new [=/embedder policy=] whose [=embedder policy/value] is |parsed item|'s
+        bare item and whose [=embedder/reporting endpoint=] is |endpoint|.
 
-5.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
-    |endpoint| to |parsed item|'s parameters["report-to"].
+3.  Set |parsed item| to the result of [=header list/getting a structured header=] with
+    "`Cross-Origin-Embedder-Policy-Report-Only`" and "`item`".
 
-6.  Return a new [=/embedder policy=] whose [=embedder policy/value] is |parsed item|'s
-    bare item and whose [=embedder/reporting endpoint=] is |endpoint|.
+4.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
+    "`require-corp`":
+
+    1.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
+        |endpoint| to |parsed item|'s parameters["report-to"].
+
+    2.  Return a new [=/embedder policy=] whose [=embedder policy/value] is "`unsafe-none`"
+        bare item and whose [=embedder/reporting endpoint=] is |endpoint|.
+
+5.  Return a new [=/embedder policy=].
 
 <div class="note">
 Note: This fails open (by defaulting to "`unsafe-none`") in the presence of a header that cannot be
