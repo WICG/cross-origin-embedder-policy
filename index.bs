@@ -179,31 +179,34 @@ Parsing {#parsing}
 To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy</dfn> given a
 [=response=] (|response|):
 
-1.  Let |parsed item| be the result of [=header list/getting a structured header=] with
+1.  Let |policy| be a new [=/embedder policy=].
+
+2.  Let |parsed item| be the result of [=header list/getting a structured header=] with
     "`Cross-Origin-Embedder-Policy`" and "`item`".
 
-2.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
+3.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
     "`require-corp`":
 
-    1.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
-        |endpoint| to |parsed item|'s parameters["report-to"].
+    1.  Set |policy|'s [=embedder policy/value=] to "`require-corp`".
 
-    2.  Return a new [=/embedder policy=] whose [=embedder policy/value] is |parsed item|'s
-        bare item and whose [=embedder/reporting endpoint=] is |endpoint|.
+    2.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
+        |policy|'s [=embedder policy/reporting endpoint=] to |parsed item|'s
+        parameters["report-to"].
 
-3.  Set |parsed item| to the result of [=header list/getting a structured header=] with
+4.  Set |parsed item| to the result of [=header list/getting a structured header=] with
     "`Cross-Origin-Embedder-Policy-Report-Only`" and "`item`".
 
-4.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
+5.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
     "`require-corp`":
 
-    1.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
-        |endpoint| to |parsed item|'s parameters["report-to"].
+    1.  Set |policy|'s [=embedder policy/report only value=] to "`require-corp`".
 
-    2.  Return a new [=/embedder policy=] whose [=embedder policy/value] is "`unsafe-none`"
-        bare item and whose [=embedder/reporting endpoint=] is |endpoint|.
+    2.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
+        |policy|'s [=embedder policy/report only reporting endpoint=] to |parsed item|'s
+        parameters["report-to"].
 
-5.  Return a new [=/embedder policy=].
+
+6.  Return |policy|.
 
 <div class="note">
 Note: This fails open (by defaulting to "`unsafe-none`") in the presence of a header that cannot be
@@ -270,7 +273,13 @@ so, HTML is patched as follows:
     1.  A string (<dfn for="embedder policy">value</dfn>) with one of the following values:
         "`unsafe-none`", "`require-corp`", initially "`unsafe-none`".
 
-    1.  A string or `null` (<dfn for="embedder plicy">reporting endpoint</dfn>), initially `null`.
+    1.  A string or `null` (<dfn for="embedder policy">reporting endpoint</dfn>), initially `null`.
+
+    1.  A string (<dfn for="embedder policy">report only value</dfn>) with one of the following
+        values: "`unsafe-none`", "`require-corp`", initially "`unsafe-none`".
+
+    1.  A string or `null` (<dfn for="embedder policy">report only reporting endpoint</dfn>),
+        initially `null`.
 
 2.  The [=/embedder policy=] is persisted on a number of objects:
 
