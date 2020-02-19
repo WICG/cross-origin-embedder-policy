@@ -138,15 +138,39 @@ server to declare an embedder policy for a given document. It is a [=Structured 
 value MUST be a [=structured header/token=]. [[!I-D.ietf-httpbis-header-structure]] Its ABNF is:
 
 ```
-Cross-Origin-Embedder-Policy = sh-token
+Cross-Origin-Embedder-Policy = sh-item
 ```
 
-The only currently valid `Cross-Origin-Embedder-Policy` value is "`require-corp`".
+The `Cross-Origin-Embedder-Policy` value consists of one token ("`require-corp`") which
+may have a parameter specifying a [=structured-header/string=] which
+represents the endpoint for violation reporting.
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
 value cannot be parsed as a <a grammar>`sh-token`</a>.
 
+The `Cross-Origin-Embedder-Policy-Report-Only` HTTP Response Header {#COEP}
+----------------------------------------------------------------
+
+The <dfn http-header>`Cross-Origin-Embedder-Policy-Report-Only`</dfn> HTTP response header field
+allows a server to declare an embedder policy for a given document. It is a [=Structured Header=]
+whose value MUST be a [=structured header/token=]. [[!I-D.ietf-httpbis-header-structure]] Its ABNF
+is:
+
+```
+Cross-Origin-Embedder-Policy-Report-Only = sh-item
+```
+
+The `Cross-Origin-Embedder-Policy-Report-Policy` value consists of one token ("`require-corp`") which
+may have a parameter specifying a [=structured-header/string=] which
+represents the endpoint for violation reporting.
+
+The `Cross-Origin-Embedder-Policy-Report-Policy` value is used only when there is no
+`Cross-Origin-Embedder-Policy` header present.
+
+In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
+this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
+value cannot be parsed as a <a grammar>`sh-token`</a>.
 
 Parsing {#parsing}
 ------------------
@@ -155,28 +179,34 @@ Parsing {#parsing}
 To <dfn abstract-op local-lt="parse header">obtain a response's embedder policy</dfn> given a
 [=response=] (|response|):
 
-1.  Let |policy| be "`unsafe-none`".
+1.  Let |policy| be a new [=/embedder policy=].
 
-2.  Let |header| be the result of [=header list/getting=] `Cross-Origin-Embedder-Policy` from
-    |response|'s [=response/header list=].
+2.  Let |parsed item| be the result of [=header list/getting a structured header=] with
+    "`Cross-Origin-Embedder-Policy`" and "`item`".
 
-3.  If |header| is not `null`:
+3.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
+    "`require-corp`":
 
-    1.  Set |header| to the result of [=isomorphic decoding=] |header|.
+    1.  Set |policy|'s [=embedder policy/value=] to "`require-corp`".
 
-    2.  Let |parsed policy| be the result of executing the [$Structured Header parsing algorithm$]
-        with <var ignore>input_string</var> set to |header|, and <var ignore>header_type</var> set
-        to "`item`".
+    2.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
+        |policy|'s [=embedder policy/reporting endpoint=] to |parsed item|'s
+        parameters["report-to"].
 
-        If parsing fails, set |parsed policy| to "`unsafe-none`".
+4.  Set |parsed item| to the result of [=header list/getting a structured header=] with
+    "`Cross-Origin-Embedder-Policy-Report-Only`" and "`item`".
 
-        ISSUE(httpwg/http-extensions#662): The ASCII requirements of Structured Headers are
-        somewhat unclear to me. Do we need to check whether |header| is an [=ASCII string=] before
-        passing it into the parsing algorithm?
+5.  If |parsed item| is neither `failure` nor `null` and |parsed item|'s bare item is
+    "`require-corp`":
 
-    3.  If |parsed policy| is "`require-corp`", set |policy| to "`require-corp`".
+    1.  Set |policy|'s [=embedder policy/report only value=] to "`require-corp`".
 
-4.  Return |policy|.
+    2.  If |parsed item|'s parameters["report-to"] [=map/exists=] and it is a string, then set
+        |policy|'s [=embedder policy/report only reporting endpoint=] to |parsed item|'s
+        parameters["report-to"].
+
+
+6.  Return |policy|.
 
 <div class="note">
 Note: This fails open (by defaulting to "`unsafe-none`") in the presence of a header that cannot be
@@ -238,16 +268,26 @@ restrictions it asserts. Likewise, user agents MUST also take into account the e
 asserted by the document's opener or embedder, ensuring that they're properly imposed as well. To do
 so, HTML is patched as follows:
 
-1.  An <dfn>embedder policy</dfn> is a string with one of the following values: "`unsafe-none`",
-    "`require-corp`".
+1.  An <dfn>embedder policy</dfn> consists of:
+
+    1.  A string (<dfn for="embedder policy">value</dfn>) with one of the following values:
+        "`unsafe-none`", "`require-corp`", initially "`unsafe-none`".
+
+    1.  A string or `null` (<dfn for="embedder policy">reporting endpoint</dfn>), initially `null`.
+
+    1.  A string (<dfn for="embedder policy">report only value</dfn>) with one of the following
+        values: "`unsafe-none`", "`require-corp`", initially "`unsafe-none`".
+
+    1.  A string or `null` (<dfn for="embedder policy">report only reporting endpoint</dfn>),
+        initially `null`.
 
 2.  The [=/embedder policy=] is persisted on a number of objects:
 
     1.  {{Document}} objects are given an <dfn for="document">embedder policy</dfn> property, whose
-        value is an [=/embedder policy=] defaulting to "`unsafe-none`".
+        value is an [=/embedder policy=].
 
     2.  {{WorkerGlobalScope}} objects are given a <dfn for="WorkerGlobalScope">embedder
-        policy</dfn> property, whose value is an [=/embedder policy=] defaulting to "`unsafe-none`".
+        policy</dfn> property, whose value is an [=/embedder policy=].
 
     3.  [=Environment settings objects=] are given a <dfn for="environment settings object">embedder
         policy</dfn> accessor, which has the following implementations:
@@ -296,7 +336,7 @@ so, HTML is patched as follows:
 To <dfn abstract-op>initialize a global object's embedder policy from a response</dfn>, given a
 [=global object=] (|global|) and a [=response=] (|response|):
 
-1.  Let |policy| be "`unsafe-none`".
+1.  Let |policy| be a new [=/embedder policy=].
 
 2.  Let |response policy| be the result of [$parse header|obtaining an embedder policy$] from
     |response|.
@@ -307,8 +347,21 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
     :   |global| is a {{DedicatedWorkerGlobalScope}}:
     ::  1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
 
-            1.  If the item's [=/embedder policy=] is "`require-corp`", set |policy| to
-                "`require-corp`".
+            1.  If the item's [=/embedder policy=]'s [=embedder policy/value] is "`require-corp`",
+                then set |policy|'s [=embedder policy/value] to "`require-corp`".
+
+            2.  If |policy|'s [=embedder policy/reporting endpoint] is `null` and the item's
+                [=embedder policy/reporting endpoint=] is non-null, then |policy|'s
+                [=embedder policy/reporting endpoint=] to the item's
+                [=embedder policy/reporting endpoint=].
+
+            3.  If the item's [=/embedder policy=]'s [=embedder policy/report only value] is
+                "`require-corp`", then set |policy|'s [=embedder policy/value] to "`require-corp`".
+
+            4.  If |policy|'s [=embedder policy/report only reporting endpoint] is `null` and the
+                item's [=embedder policy/report only reporting endpoint=] is non-null, then
+                |policy|'s [=embedder policy/report only reporting endpoint=] to the item's
+                [=embedder policy/report only reporting endpoint=].
 
     :   |global| is a {{SharedWorkerGlobalScope}}:
     :   |global| is a {{ServiceWorkerGlobalScope}}:
@@ -330,14 +383,16 @@ embedder's policy</dfn> given a [=response=] (|response|), and a target [=browsi
 (|target|), execute the following steps, which will return "`Allowed`" or "`Blocked`" as
 appropriate:
 
-1.  Return "`Allowed`" if any of the following statements are true:
+1.  Let |response policy| be the result of [$parse header|obtaining an embedder policy$] from
+    |response|.
+
+2.  Return "`Allowed`" if any of the following statements are true:
 
     *   |target| is not a [=child browsing context=].
     *   |target|'s [=container document=]'s [=document/embedder policy=] is "`unsafe-none`".
-    *   The result of [$parse header|obtaining an embedder policy$] from |response| is
-        "`require-corp`".
+    *   |response policy|'s [=embedder policy/value=] is "`require-corp`".
 
-2.  Return "`Blocked`".
+3.  Return "`Blocked`".
 
 </div>
 
@@ -362,8 +417,8 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
 
 2.  Set |embedder policy| to "`unsafe-none`" if both of the following statements are true:
 
-    *    |request|'s [=request/client=]'s [=environment settings object/embedder policy=] is
-         "`unsafe-none`".
+    *    |request|'s [=request/client=]'s [=environment settings object/embedder policy=]'s
+         [=embedder policy/value=] is "`unsafe-none`".
     *    |request|'s [=request/reserved client=] is not `null`, and its
          [=environment settings object/embedder policy=] is "`unsafe-none`".
 
