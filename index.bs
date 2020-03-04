@@ -418,7 +418,9 @@ steps:
 
 2.  If |request|'s mode is "`navigate`":
 
-    1.  ASSERT: |request|'s [=request/destination=] is not "`document`".
+    1.  ASSERT: This algorithm will only be called when |request| targets a nested
+        browsing context; therefore, its [=request/destination=] is either `frame`,
+        `iframe`, `embed`, or `object`.
 
         Note: This relies on [whatwg/fetch/#948](https://github.com/whatwg/fetch/pull/948).
 
