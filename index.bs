@@ -410,34 +410,29 @@ to incoming responses. To do so, Fetch is patched as follows:
 
 ### Cross-Origin Resource Policy Checks ### {#corp-check}
 
-To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [=request=]
-(|request|) and a [=response=] (|response|), run these steps:
+To perform a <dfn abstract-op>cross-origin resource policy internal check</dfn> given a string
+(|embedder policy value|), a [=request=] (|request|) and a [=response=] (|response|), run these
+steps:
 
-1.  Let |embedder policy| be "`require-corp`".
+1.  Return `allowed` if |request|'s [=request/mode=] is "`same-origin`", "`cors`", or "`websocket`".
 
-2.  Set |embedder policy| to "`unsafe-none`" if both of the following statements are true:
+2.  If |request|'s mode is "`navigate`":
 
-    *    |request|'s [=request/client=]'s [=environment settings object/embedder policy=]'s
-         [=embedder policy/value=] is "`unsafe-none`".
-    *    |request|'s [=request/reserved client=] is not `null`, and its
-         [=environment settings object/embedder policy=] is "`unsafe-none`".
+    1.  ASSERT: This algorithm will only be called when |request| targets a nested
+        browsing context; therefore, its [=request/destination=] is either "`frame`",
+        "`iframe`", "`embed`", or "`object`".
 
+        Note: This relies on [whatwg/fetch/#948](https://github.com/whatwg/fetch/pull/948).
 
-3.  Return `allowed` if any of the following statements are true:
+    2.  If |embedder policy value| is "`unsafe-none`", then return `allowed`.
 
-    *    |request|'s [=request/mode=] is "`same-origin`", "`cors`", or "`websocket`".
-    *    |request|'s [=request/mode=] is "`navigate`", and |embedder policy| is "`unsafe-none`".
-
-4.  ASSERT: |request|'s [=request/mode=] is "`no-cors`" or "`navigate`". If |request|'s
-    [=request/mode=] is "`navigate`", |embedder policy| is "`require-corp`".
-
-5.  Let |policy| be the result of [=header list/getting=] `Cross-Origin-Resource-Policy` from
+3.  Let |policy| be the result of [=header list/getting=] `Cross-Origin-Resource-Policy` from
     |response|'s [=response/header list=].
 
-6.  If |policy| is `null`, and |embedder policy| is "`require-corp`", set |policy| to
-    "`same-origin`".
+4.  If |policy| is `null` and |embedder policy value| is "`require-corp`",
+    then set |policy| to "`same-origin`".
 
-7.  Switch on |policy| and run the associated steps:
+5.  Switch on |policy| and run the associated steps:
 
     :   `null`
     :   `cross-origin`
@@ -473,6 +468,65 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
         [whatwg/fetch#760](https://github.com/whatwg/fetch/issues/760), as they seem like useful
         extensions, and I think it'll be more difficult to ship them after inverting the
         error-handling behavior.
+
+To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [=request=]
+(|request|) and a [=response=] (|response|), run these steps:
+
+1.  Let |embedder policy| be |request|'s [=request/client=]'s
+    [=environment settings object/embedder policy=].
+
+2.  If |request|'s [=request/reserved client=] is not `null`, then set |embedder policy|
+    to a new [=/embedder policy=].
+
+3.  If |embedder policy|'s [=embedder policy/report only reporting endpoint=] is not `null` and the
+    result of running [$cross-origin resource policy internal check] with
+    [=embedder policy/report only value=], |request| and |response| is `blocked`, then run these
+    steps:
+
+    1.  Let |blocked url| be |request|'s [=request/URL=].
+
+    2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to
+        `null`.
+
+    3.  Set |serialized blocked url| be the result of executing the
+        [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer) on |blocked url| with
+        the |exclude fragment flag| set.
+
+    4.  Let |body| be a new object containing the following properties with keys:
+
+        * key: "`type`", value: "`CORP`".
+
+        * key: "`blocked-url`", value: |serialized blocked url|.
+
+    5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep`" for
+        |embedder policy|'s [=embedder policy/report only reporting endpoint=] on |request|'s
+        [=request/client=].
+
+4.  Let |result| be the result of running [$cross-origin resource policy internal check$] with
+    [=embedder policy/value=], |request| and |response|.
+
+5.  If |embedder policy|'s [=embedder policy/reporting endpoint=] is not `null` and |result| is
+    `blocked`, then run these steps:
+
+    1.  Let |blocked url| be |request|'s [=request/URL=].
+
+    2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to `null`.
+
+    3.  Set |serialized blocked url| be the result of executing the
+        [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer) on |blocked url| with
+        the |exclude fragment flag| set.
+
+    4.  Let |body| be a new object containing the following properties with keys:
+
+        * key: "`type`", value: "`CORP`".
+
+        * key: "`blocked-url`", value: |serialized blocked url|.
+
+    5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep`" for
+        |embedder policy|'s [=embedder policy/reporting endpoint=] on |request|'s
+        [=request/client=].
+
+6.  Return |result|.
 
 Integration with Service Worker {#integration-sw}
 -------------------------------------------------
