@@ -1222,7 +1222,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
-  <meta content="43451ffcd01d30e2575b348c8357c622804d76b9" name="document-revision">
+  <meta content="bb2a63586bbfa8547a0ca66c7c5f8c0d97f4a1c5" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1422,7 +1422,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-03-03">3 March 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-03-04">4 March 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1797,7 +1797,9 @@ steps:</p>
      <p>If <var>request</var>’s mode is "<code>navigate</code>":</p>
      <ol>
       <li data-md>
-       <p class="assertion">ASSERT: <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-destination" id="ref-for-concept-request-destination">destination</a> is not "<code>document</code>".</p>
+       <p class="assertion">ASSERT: This algorithm will only be called when <var>request</var> targets a nested
+browsing context; therefore, its <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-destination" id="ref-for-concept-request-destination">destination</a> is either "<code>frame</code>",
+"<code>iframe</code>", "<code>embed</code>", or "<code>object</code>".</p>
        <p class="note" role="note"><span>Note:</span> This relies on <a href="https://github.com/whatwg/fetch/pull/948">whatwg/fetch/#948</a>.</p>
       <li data-md>
        <p>If <var>embedder policy value</var> is "<code>unsafe-none</code>", then return <code>allowed</code>.</p>
@@ -1865,7 +1867,9 @@ the <var>exclude fragment flag</var> set.</p>
         <li data-md>
          <p>key: "<code>type</code>", value: "<code>CORP</code>".</p>
         <li data-md>
-         <p>key: "<code>blocked</code>", value: <var>serialized blocked url</var>.</p>
+         <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
+        <li data-md>
+         <p>key: "<code>destination</code>", value: <var>request</var>s <a data-link-type="dfn">destionation</a>.</p>
        </ul>
       <li data-md>
        <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep</code>" for <var>embedder policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> on <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client②">client</a>.</p>
@@ -1888,7 +1892,9 @@ the <var>exclude fragment flag</var> set.</p>
         <li data-md>
          <p>key: "<code>type</code>", value: "<code>CORP</code>".</p>
         <li data-md>
-         <p>key: "<code>blocked</code>", value: <var>serialized blocked url</var>.</p>
+         <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
+        <li data-md>
+         <p>key: "<code>destination</code>", value: <var>request</var>s <a data-link-type="dfn">destionation</a>.</p>
        </ul>
       <li data-md>
        <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep</code>" for <var>embedder policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> on <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client③">client</a>.</p>

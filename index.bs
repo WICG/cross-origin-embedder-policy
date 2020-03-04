@@ -419,8 +419,8 @@ steps:
 2.  If |request|'s mode is "`navigate`":
 
     1.  ASSERT: This algorithm will only be called when |request| targets a nested
-        browsing context; therefore, its [=request/destination=] is either `frame`,
-        `iframe`, `embed`, or `object`.
+        browsing context; therefore, its [=request/destination=] is either "`frame`",
+        "`iframe`", "`embed`", or "`object`".
 
         Note: This relies on [whatwg/fetch/#948](https://github.com/whatwg/fetch/pull/948).
 
@@ -496,7 +496,9 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
 
         * key: "`type`", value: "`CORP`".
 
-        * key: "`blocked`", value: |serialized blocked url|.
+        * key: "`blocked-url`", value: |serialized blocked url|.
+
+        * key: "`destination`", value: |request|s [=request/destionation=].
 
     5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep`" for
         |embedder policy|'s [=embedder policy/report only reporting endpoint=] on |request|'s
@@ -520,7 +522,9 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
 
         * key: "`type`", value: "`CORP`".
 
-        * key: "`blocked`", value: |serialized blocked url|.
+        * key: "`blocked-url`", value: |serialized blocked url|.
+
+        * key: "`destination`", value: |request|s [=request/destionation=].
 
     5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep`" for
         |embedder policy|'s [=embedder policy/reporting endpoint=] on |request|'s
