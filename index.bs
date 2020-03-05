@@ -611,7 +611,7 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
 
     4.  Let |body| be a new object containing the following properties with keys:
 
-        * key: "`type`", value: "`CORP`".
+        * key: "`type`", value: "`corp`".
 
         * key: "`blocked-url`", value: |serialized blocked url|.
 
@@ -635,7 +635,7 @@ To perform a <dfn abstract-op>cross-origin resource policy check</dfn> given a [
 
     4.  Let |body| be a new object containing the following properties with keys:
 
-        * key: "`type`", value: "`CORP`".
+        * key: "`type`", value: "`corp`".
 
         * key: "`blocked-url`", value: |serialized blocked url|.
 
