@@ -66,12 +66,14 @@ urlPrefix: https://html.spec.whatwg.org/
         text: initialize the Document object; url: multipage/browsing-the-web.html#initialise-the-document-object
         text: create a new browsing context; url: multipage/browsers.html#creating-a-new-browsing-context
         text: run a worker; url: multipage/workers.html#run-a-worker
+        text: process a navigate fetch; url: multipage/browsing-the-web.html#process-a-navigate-fetch
         text: process a navigate response; url: multipage/browsing-the-web.html#process-a-navigate-response
 </pre>
 
 <pre class="link-defaults">
 spec:fetch; type:dfn; for:/; text:request
 spec:fetch; type:dfn; text: cors check
+spec:fetch; type:dfn; for:/; text:network error
 spec:url; type:dfn; for:/; text:url
 spec:html; type:dfn; for:/; text:browsing context
 spec:html; type:dfn; text:environment
@@ -80,6 +82,7 @@ spec:fetch; type:dfn; for:/; text:response
 spec:fetch; type:dfn; for:/; text:cross-origin resource policy check
 spec:html; type:dfn; for:/; text:global object
 spec:html; type:dfn; for:/; text:container document
+spec:html; type:dfn; for:/; text:parent browsing context
 </pre>
 
 Introduction {#intro}
@@ -321,7 +324,28 @@ so, HTML is patched as follows:
     > 6.  Call [$initialize a global object's embedder policy from a response$] given
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
 
-6.  The [$process a navigate response$] algorthm checks that documents nested in a `require-corp`
+6.  The [$process a navigate fetch$] algorithm runs the [$cross-origin resource policy check$] for
+    navigation for nested browsing contexts by adding the following step before step 6:
+
+    > 6.  If |browsingContext| is a [=child browsing context=]:
+    >
+    >     1.  Let |parent| be |browsingContext|'s [=parent browsing context=].
+    >
+    >     2.  Let |requestForCORPCheck| be a copy of |request|.
+    >
+    >     3.  Set |requestForCORPCheck|'s origin to |parent|'s origin.
+    >
+    >     4.  Set |requestForCORPCheck|'s client to |parent|'s [=active document=].
+    >
+    >     5.  If the result of [$cross-origin resource policy check$] with |requestForCORPCheck| and
+    >         |response| is `blocked`, then set |response| to a [=network error=].
+    >
+    >         Note: Here we're running the [$cross-origin resource policy check$] against the
+    >         [=parent browsing context=] rather than |sourceBrowsingContext|. This is because we do
+    >         care about the same-originness of the embedded content against the parent context, not
+    >         the navigation source.
+
+7.  The [$process a navigate response$] algorthm checks that documents nested in a `require-corp`
     context themselves positively assert `require-corp` by adding a new condition to the list in
     step 1:
 
@@ -532,9 +556,10 @@ Integration with Service Worker {#integration-sw}
 -------------------------------------------------
 
 In https://w3c.github.io/ServiceWorker/#dom-fetchevent-respondwith, replace 10.1 with the following
-item.
+items.
 
-1.  If |response| is not a `Response` object, or the result of performing a
+1.  If |response| is not a `Response` object, or _event_'s request's associated request's
+    [=request/mode=] is "`no-cors`" and the result of performing a
     [$cross-origin resource policy check$] with _event_'s request's associated request and
     _response_'s associated response is `blocked`, then set the respond-with-error flag.
 

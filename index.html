@@ -1222,7 +1222,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
-  <meta content="bb2a63586bbfa8547a0ca66c7c5f8c0d97f4a1c5" name="document-revision">
+  <meta content="8fe7a55c874811bb3a4fb0989c51d8905ddd4e08" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1431,7 +1431,7 @@ pre .property::before, pre .property::after {
      <dt class="editor">Editor:
      <dd class="editor p-author h-card vcard" data-editor-id="56384"><a class="p-name fn u-email email" href="mailto:mkwst@google.com">Mike West</a> (<span class="p-org org">Google Inc.</span>)
      <dt>Version History:
-     <dd><a href="https://github.com/yutakahirano/corpp">yutakahirano/corpp</a>
+     <dd><a href="https://github.com/mikewest/corpp">mikewest/corpp</a>
     </dl>
    </div>
    <div data-fill-with="warning"></div>
@@ -1700,6 +1700,30 @@ in step 12.5:</p>
       </ol>
      </blockquote>
     <li data-md>
+     <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#process-a-navigate-fetch" id="ref-for-process-a-navigate-fetch">process a navigate fetch</a> algorithm runs the <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a> for
+navigation for nested browsing contexts by adding the following step before step 6:</p>
+     <blockquote>
+      <ol start="6">
+       <li data-md>
+        <p>If <var>browsingContext</var> is a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context" id="ref-for-child-browsing-context">child browsing context</a>:</p>
+        <ol>
+         <li data-md>
+          <p>Let <var>parent</var> be <var>browsingContext</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#parent-browsing-context" id="ref-for-parent-browsing-context">parent browsing context</a>.</p>
+         <li data-md>
+          <p>Let <var>requestForCORPCheck</var> be a copy of <var>request</var>.</p>
+         <li data-md>
+          <p>Set <var>requestForCORPCheck</var>’s origin to <var>parent</var>’s origin.</p>
+         <li data-md>
+          <p>Set <var>requestForCORPCheck</var>’s client to <var>parent</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#active-document" id="ref-for-active-document">active document</a>.</p>
+         <li data-md>
+          <p>If the result of <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check①">cross-origin resource policy check</a> with <var>requestForCORPCheck</var> and <var>response</var> is <code>blocked</code>, then set <var>response</var> to a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error">network error</a>.</p>
+          <p class="note" role="note"><span>Note:</span> Here we’re running the <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check②">cross-origin resource policy check</a> against the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#parent-browsing-context" id="ref-for-parent-browsing-context①">parent browsing context</a> rather than <var>sourceBrowsingContext</var>. This is because we do
+care about the same-originness of the embedded content against the parent context, not
+the navigation source.</p>
+        </ol>
+      </ol>
+     </blockquote>
+    <li data-md>
      <p>The <a data-link-type="abstract-op" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#process-a-navigate-response" id="ref-for-process-a-navigate-response">process a navigate response</a> algorthm checks that documents nested in a <code>require-corp</code> context themselves positively assert <code>require-corp</code> by adding a new condition to the list in
 step 1:</p>
      <blockquote>
@@ -1766,7 +1790,7 @@ appropriate:</p>
       <p>Return "<code>Allowed</code>" if any of the following statements are true:</p>
       <ul>
        <li data-md>
-        <p><var>target</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context" id="ref-for-child-browsing-context">child browsing context</a>.</p>
+        <p><var>target</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context" id="ref-for-child-browsing-context①">child browsing context</a>.</p>
        <li data-md>
         <p><var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document">container document</a>'s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a> is "<code>unsafe-none</code>".</p>
        <li data-md>
@@ -1783,7 +1807,7 @@ to incoming responses. To do so, Fetch is patched as follows:</p>
     <li data-md>
      <p>The <code>Cross-Origin-Resource-Policy</code> grammar is extended to include a "<code>cross-origin</code>" value.</p>
     <li data-md>
-     <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</a> is rewritten to take the <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑨">embedder policy</a> into
+     <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check③">cross-origin resource policy check</a> is rewritten to take the <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑨">embedder policy</a> into
 account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#navigation-request" id="ref-for-navigation-request①">navigation requests</a> in addition to <code>no-cors</code> requests.</p>
    </ol>
    <h4 class="heading settled" data-level="3.2.1" id="corp-check"><span class="secno">3.2.1. </span><span class="content">Cross-Origin Resource Policy Checks</span><a class="self-link" href="#corp-check"></a></h4>
@@ -1868,8 +1892,6 @@ the <var>exclude fragment flag</var> set.</p>
          <p>key: "<code>type</code>", value: "<code>CORP</code>".</p>
         <li data-md>
          <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
-        <li data-md>
-         <p>key: "<code>destination</code>", value: <var>request</var>s <a data-link-type="dfn">destionation</a>.</p>
        </ul>
       <li data-md>
        <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep</code>" for <var>embedder policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> on <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client②">client</a>.</p>
@@ -1893,8 +1915,6 @@ the <var>exclude fragment flag</var> set.</p>
          <p>key: "<code>type</code>", value: "<code>CORP</code>".</p>
         <li data-md>
          <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
-        <li data-md>
-         <p>key: "<code>destination</code>", value: <var>request</var>s <a data-link-type="dfn">destionation</a>.</p>
        </ul>
       <li data-md>
        <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep</code>" for <var>embedder policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> on <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client③">client</a>.</p>
@@ -1904,14 +1924,14 @@ the <var>exclude fragment flag</var> set.</p>
    </ol>
    <h3 class="heading settled" data-level="3.3" id="integration-sw"><span class="secno">3.3. </span><span class="content">Integration with Service Worker</span><a class="self-link" href="#integration-sw"></a></h3>
    <p>In https://w3c.github.io/ServiceWorker/#dom-fetchevent-respondwith, replace 10.1 with the following
-item.</p>
+items.</p>
    <ol>
     <li data-md>
-     <p>If <var>response</var> is not a <code>Response</code> object, or the result of performing a <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check①">cross-origin resource policy check</a> with _event_’s request’s associated request and
+     <p>If <var>response</var> is not a <code>Response</code> object, or _event_’s request’s associated request’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode①">mode</a> is "<code>no-cors</code>" and the result of performing a <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check④">cross-origin resource policy check</a> with _event_’s request’s associated request and
 _response_’s associated response is <code>blocked</code>, then set the respond-with-error flag.</p>
    </ol>
    <p>Also add the following note.</p>
-   <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check②">cross-origin resource policy check</a> performed here ensures that a Service Worker
+   <p>The <a data-link-type="abstract-op" href="#abstract-opdef-cross-origin-resource-policy-check" id="ref-for-abstract-opdef-cross-origin-resource-policy-check⑤">cross-origin resource policy check</a> performed here ensures that a Service Worker
 cannot respond to a client that requires CORP with an opaque response that doesn’t assert CORP.</p>
    <h2 class="heading settled" data-level="4" id="impl-considerations"><span class="secno">4. </span><span class="content">Implementation Considerations</span><a class="self-link" href="#impl-considerations"></a></h2>
    <h3 class="heading settled" data-level="4.1" id="why-not-cors"><span class="secno">4.1. </span><span class="content">Why not require CORS instead?</span><a class="self-link" href="#why-not-cors"></a></h3>
@@ -2194,6 +2214,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://fetch.spec.whatwg.org/#concept-request-mode">https://fetch.spec.whatwg.org/#concept-request-mode</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-request-mode">3.2.1. Cross-Origin Resource Policy Checks</a>
+    <li><a href="#ref-for-concept-request-mode①">3.3. Integration with Service Worker</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-navigation-request">
@@ -2201,6 +2222,12 @@ is significantly simpler than imposing new constraints in the future.</p>
    <ul>
     <li><a href="#ref-for-navigation-request">1. Introduction</a>
     <li><a href="#ref-for-navigation-request①">3.2. Integration with Fetch</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-network-error">
+   <a href="https://fetch.spec.whatwg.org/#concept-network-error">https://fetch.spec.whatwg.org/#concept-network-error</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-network-error">3.1. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-origin">
@@ -2262,6 +2289,12 @@ is significantly simpler than imposing new constraints in the future.</p>
     <li><a href="#ref-for-workerglobalscope">3.1. Integration with HTML</a> <a href="#ref-for-workerglobalscope①">(2)</a> <a href="#ref-for-workerglobalscope②">(3)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-active-document">
+   <a href="https://html.spec.whatwg.org/multipage/browsers.html#active-document">https://html.spec.whatwg.org/multipage/browsers.html#active-document</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-active-document">3.1. Integration with HTML</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-concept-document-window">
    <a href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window">https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window</a><b>Referenced in:</b>
    <ul>
@@ -2278,7 +2311,8 @@ is significantly simpler than imposing new constraints in the future.</p>
   <aside class="dfn-panel" data-for="term-for-child-browsing-context">
    <a href="https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#child-browsing-context</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-child-browsing-context">3.1.2. Process a navigation response</a>
+    <li><a href="#ref-for-child-browsing-context">3.1. Integration with HTML</a>
+    <li><a href="#ref-for-child-browsing-context①">3.1.2. Process a navigation response</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-bc-container-document">
@@ -2327,6 +2361,12 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set">https://html.spec.whatwg.org/multipage/workers.html#concept-WorkerGlobalScope-owner-set</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-WorkerGlobalScope-owner-set">3.1.1. Initializing a global object’s Embedder policy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-parent-browsing-context">
+   <a href="https://html.spec.whatwg.org/multipage/browsers.html#parent-browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#parent-browsing-context</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-parent-browsing-context">3.1. Integration with HTML</a> <a href="#ref-for-parent-browsing-context①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-same-origin">
@@ -2438,6 +2478,7 @@ is significantly simpler than imposing new constraints in the future.</p>
      <li><span class="dfn-paneled" id="term-for-local-scheme" style="color:initial">local scheme</span>
      <li><span class="dfn-paneled" id="term-for-concept-request-mode" style="color:initial">mode</span>
      <li><span class="dfn-paneled" id="term-for-navigation-request" style="color:initial">navigation request</span>
+     <li><span class="dfn-paneled" id="term-for-concept-network-error" style="color:initial">network error</span>
      <li><span class="dfn-paneled" id="term-for-concept-request-origin" style="color:initial">origin</span>
      <li><span class="dfn-paneled" id="term-for-concept-request" style="color:initial">request</span>
      <li><span class="dfn-paneled" id="term-for-concept-request-reserved-client" style="color:initial">reserved client</span>
@@ -2451,6 +2492,7 @@ is significantly simpler than imposing new constraints in the future.</p>
      <li><span class="dfn-paneled" id="term-for-sharedworkerglobalscope" style="color:initial">SharedWorkerGlobalScope</span>
      <li><span class="dfn-paneled" id="term-for-window" style="color:initial">Window</span>
      <li><span class="dfn-paneled" id="term-for-workerglobalscope" style="color:initial">WorkerGlobalScope</span>
+     <li><span class="dfn-paneled" id="term-for-active-document" style="color:initial">active document</span>
      <li><span class="dfn-paneled" id="term-for-concept-document-window" style="color:initial">associated document</span>
      <li><span class="dfn-paneled" id="term-for-browsing-context" style="color:initial">browsing context</span>
      <li><span class="dfn-paneled" id="term-for-child-browsing-context" style="color:initial">child browsing context</span>
@@ -2462,6 +2504,7 @@ is significantly simpler than imposing new constraints in the future.</p>
      <li><span class="dfn-paneled" id="term-for-nested-browsing-context" style="color:initial">nested browsing context</span>
      <li><span class="dfn-paneled" id="term-for-dom-open" style="color:initial">open()</span>
      <li><span class="dfn-paneled" id="term-for-concept-WorkerGlobalScope-owner-set" style="color:initial">owner set</span>
+     <li><span class="dfn-paneled" id="term-for-parent-browsing-context" style="color:initial">parent browsing context</span>
      <li><span class="dfn-paneled" id="term-for-same-origin" style="color:initial">same origin</span>
      <li><span class="dfn-paneled" id="term-for-same-site" style="color:initial">same site</span>
      <li><span class="dfn-paneled" id="term-for-concept-origin-scheme" style="color:initial">scheme</span>
@@ -2629,8 +2672,9 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
   <aside class="dfn-panel" data-for="abstract-opdef-cross-origin-resource-policy-check">
    <b><a href="#abstract-opdef-cross-origin-resource-policy-check">#abstract-opdef-cross-origin-resource-policy-check</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check">3.2. Integration with Fetch</a>
-    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check①">3.3. Integration with Service Worker</a> <a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check②">(2)</a>
+    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check">3.1. Integration with HTML</a> <a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check①">(2)</a> <a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check②">(3)</a>
+    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check③">3.2. Integration with Fetch</a>
+    <li><a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check④">3.3. Integration with Service Worker</a> <a href="#ref-for-abstract-opdef-cross-origin-resource-policy-check⑤">(2)</a>
    </ul>
   </aside>
 <script>/* script-var-click-highlighting */
