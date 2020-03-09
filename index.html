@@ -1222,7 +1222,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
-  <meta content="d4562974b99c4455514b839fefaad18c30aab981" name="document-revision">
+  <meta content="32b63ce1207d03c19aa592ca0821e0bf27865436" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1795,8 +1795,8 @@ embedder’s policy</dfn> given a <a data-link-type="dfn" href="https://fetch.sp
       <ol>
        <li data-md>
         <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a>.</p>
-        <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a> in order to avoid leaking redirect
-information.</p>
+        <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a> in order to avoid redirect
+information leak.</p>
        <li data-md>
         <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password">password</a> to <code>null</code>.</p>
        <li data-md>
@@ -1821,8 +1821,8 @@ information.</p>
          <li data-md>
           <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url①">URL</a>.</p>
         </ol>
-        <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a> in order to avoid leaking redirect
-information.</p>
+        <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a> in order to avoid redirect
+information leak.</p>
         <ol start="2">
          <li data-md>
           <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username①">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password①">password</a> to <code>null</code>.</p>
