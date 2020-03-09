@@ -420,6 +420,9 @@ embedder's policy</dfn> given a [=request=] (|request|), a [=response=] (|respon
 
     1.  Let |blocked url| be |request|'s [=request/URL=].
 
+        Note: This is not |request|'s [=request/current URL=] in order to avoid leaking redirect
+        information.
+
     2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to `null`.
 
     3.  Set |serialized blocked url| be the result of executing the
@@ -441,6 +444,9 @@ embedder's policy</dfn> given a [=request=] (|request|), a [=response=] (|respon
     1.  If |parent policy|'s [=embedder policy/reporting endpoint=] is not null:
 
         1.  Let |blocked url| be |request|'s [=request/URL=].
+
+        Note: This is not |request|'s [=request/current URL=] in order to avoid leaking redirect
+        information.
 
         2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to
             `null`.
