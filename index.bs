@@ -403,7 +403,7 @@ If a document's [=document/embedder policy=] is "`require-corp`", then any docum
 [[#cascade-vs-require]]).
 
 To <dfn abstract-op lt="queue coep navigation violation">Queue a Cross-Origin Embedder Policy
-violation on navigation, given a [=request=] (|request|), a string (|endpoint|) and an
+violation on navigation</dfn> given a [=request=] (|request|), a string (|endpoint|) and an
 [=environment settings object=] (|settings|), run the following steps:
 
 1.  Let |blocked url| be |request|'s [=request/URL=].
@@ -439,16 +439,16 @@ embedder's policy</dfn> given a [=request=] (|request|), a [=response=] (|respon
 
 4.  If |parent policy|'s [=embedder policy/report only value=] is "`require-corp`" and
     |parent policy|'s [=embedder policy/report only reporting endpoint=] is not null and
-    |response policy|'s [=embedder policy/value=] is "`unsafe-none`", then
-    [$queue coep navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation]
-    with |request|, |parent policy|'s [=embedder policy/report only reporting endpoint=] and
-    |target|'s [=container document=].
+    |response policy|'s [=embedder policy/value=] is "`unsafe-none`", then [$queue coep navigation
+    violation|queue a Cross-Origin Embedder Policy vioalation on navigation$] with |request|,
+    |parent policy|'s [=embedder policy/report only reporting endpoint=] and |target|'s
+    [=container document=].
 
 5.  If |parent policy|'s [=embedder policy/value=] is "`require-corp`" and |child policy|'s
        [=embedder policy/value=] is "`unsafe-none`":
 
     1.  If |parent policy|'s [=embedder policy/reporting endpoint=] is not null, then [$queue coep
-        navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation] with
+        navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation$] with
         |request|, |parent policy|'s [=embedder policy/reporting endpoint=] and |target|'s
         [=container document=].
 

@@ -1222,7 +1222,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
-  <meta content="92a5dad74b162677d89507d120cd496d0821b7de" name="document-revision">
+  <meta content="9b6a66a83f434becedcb3eeac31eb98a7a09f89e" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1780,8 +1780,8 @@ item’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-en
    <h4 class="heading settled" data-level="3.1.2" id="process-navigation-response"><span class="secno">3.1.2. </span><span class="content">Process a navigation response</span><a class="self-link" href="#process-navigation-response"></a></h4>
    <div class="algorithm" data-algorithm="process a navigation response">
      If a document’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑥">embedder policy</a> is "<code>require-corp</code>", then any document it embeds in a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context" id="ref-for-nested-browsing-context">nested browsing context</a> must positively assert a "<code>require-corp</code>" <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑦">embedder policy</a> (see <a href="#cascade-vs-require">§ 4.3 Cascading vs. requiring embedder policies</a>). 
-    <p>To <dfn data-dfn-type="abstract-op" data-export data-lt="queue coep navigation violation" id="abstract-opdef-queue-coep-navigation-violation">Queue a Cross-Origin Embedder Policy
-violation on navigation, given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> (<var>request</var>), a string (<var>endpoint</var>) and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object①">environment settings object</a> (<var>settings</var>), run the following steps:<a class="self-link" href="#abstract-opdef-queue-coep-navigation-violation"></a></dfn></p>
+    <p>To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-lt="queue coep navigation violation" id="abstract-opdef-queue-coep-navigation-violation">Queue a Cross-Origin Embedder Policy
+violation on navigation</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> (<var>request</var>), a string (<var>endpoint</var>) and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object①">environment settings object</a> (<var>settings</var>), run the following steps:</p>
     <ol>
      <li data-md>
       <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a>.</p>
@@ -1813,15 +1813,12 @@ embedder’s policy</dfn> given a <a data-link-type="dfn" href="https://fetch.sp
      <li data-md>
       <p>Let <var>parent policy</var> be <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document">container document</a>'s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a>.</p>
      <li data-md>
-      <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-value" id="ref-for-embedder-policy-report-only-value①">report only value</a> is "<code>require-corp</code>" and <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint④">report only reporting endpoint</a> is not null and <var>response policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value①">value</a> is "<code>unsafe-none</code>", then
-[$queue coep navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation]
-with <var>request</var>, <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> and <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document①">container document</a>.</p>
+      <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-value" id="ref-for-embedder-policy-report-only-value①">report only value</a> is "<code>require-corp</code>" and <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint④">report only reporting endpoint</a> is not null and <var>response policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value①">value</a> is "<code>unsafe-none</code>", then <a data-link-type="abstract-op" href="#abstract-opdef-queue-coep-navigation-violation" id="ref-for-abstract-opdef-queue-coep-navigation-violation">queue a Cross-Origin Embedder Policy vioalation on navigation</a> with <var>request</var>, <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> and <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document①">container document</a>.</p>
      <li data-md>
       <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value②">value</a> is "<code>require-corp</code>" and <var>child policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value③">value</a> is "<code>unsafe-none</code>":</p>
       <ol>
        <li data-md>
-        <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint④">reporting endpoint</a> is not null, then [$queue coep
-navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation] with <var>request</var>, <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> and <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document②">container document</a>.</p>
+        <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint④">reporting endpoint</a> is not null, then <a data-link-type="abstract-op" href="#abstract-opdef-queue-coep-navigation-violation" id="ref-for-abstract-opdef-queue-coep-navigation-violation①">queue a Cross-Origin Embedder Policy vioalation on navigation</a> with <var>request</var>, <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> and <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document②">container document</a>.</p>
        <li data-md>
         <p>Return "<code>Blocked</code>".</p>
       </ol>
@@ -2693,6 +2690,12 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
    <b><a href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">3.1. Integration with HTML</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="abstract-opdef-queue-coep-navigation-violation">
+   <b><a href="#abstract-opdef-queue-coep-navigation-violation">#abstract-opdef-queue-coep-navigation-violation</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-abstract-opdef-queue-coep-navigation-violation">3.1.2. Process a navigation response</a> <a href="#ref-for-abstract-opdef-queue-coep-navigation-violation①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="abstract-opdef-process-navigation-response">
