@@ -1222,7 +1222,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
-  <meta content="32b63ce1207d03c19aa592ca0821e0bf27865436" name="document-revision">
+  <meta content="92a5dad74b162677d89507d120cd496d0821b7de" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1422,7 +1422,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-03-09">9 March 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-03-11">11 March 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1780,8 +1780,30 @@ item’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-en
    <h4 class="heading settled" data-level="3.1.2" id="process-navigation-response"><span class="secno">3.1.2. </span><span class="content">Process a navigation response</span><a class="self-link" href="#process-navigation-response"></a></h4>
    <div class="algorithm" data-algorithm="process a navigation response">
      If a document’s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑥">embedder policy</a> is "<code>require-corp</code>", then any document it embeds in a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#nested-browsing-context" id="ref-for-nested-browsing-context">nested browsing context</a> must positively assert a "<code>require-corp</code>" <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑦">embedder policy</a> (see <a href="#cascade-vs-require">§ 4.3 Cascading vs. requiring embedder policies</a>). 
+    <p>To <dfn data-dfn-type="abstract-op" data-export data-lt="queue coep navigation violation" id="abstract-opdef-queue-coep-navigation-violation">Queue a Cross-Origin Embedder Policy
+violation on navigation, given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> (<var>request</var>), a string (<var>endpoint</var>) and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object①">environment settings object</a> (<var>settings</var>), run the following steps:<a class="self-link" href="#abstract-opdef-queue-coep-navigation-violation"></a></dfn></p>
+    <ol>
+     <li data-md>
+      <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a>.</p>
+      <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a> in order to avoid redirect
+information leak.</p>
+     <li data-md>
+      <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password">password</a> to <code>null</code>.</p>
+     <li data-md>
+      <p>Set <var>serialized blocked url</var> be the result of executing the <a href="https://url.spec.whatwg.org/#concept-url-serializer">URL serializer</a> on <var>blocked url</var> with the <var>exclude fragment flag</var> set.</p>
+     <li data-md>
+      <p>Let <var>body</var> be a new object containing the following properties with keys:</p>
+      <ul>
+       <li data-md>
+        <p>key: "<code>type</code>", "<code>navigation</code>".</p>
+       <li data-md>
+        <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
+      </ul>
+     <li data-md>
+      <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep-navigation</code>" for <var>endpoint</var> on <var>settings</var>.</p>
+    </ol>
     <p>To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-lt="process navigation response" id="abstract-opdef-process-navigation-response">check a navigation response’s adherence to its
-embedder’s policy</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> (<var>request</var>), a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response②">response</a> (<var>response</var>), and a target <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context①">browsing context</a> (<var>target</var>), execute the following steps, which will return "<code>Allowed</code>" or
+embedder’s policy</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a> (<var>request</var>), a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response②">response</a> (<var>response</var>), and a target <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context①">browsing context</a> (<var>target</var>), execute the following steps, which will return "<code>Allowed</code>" or
 "<code>Blocked</code>" as appropriate:</p>
     <ol>
      <li data-md>
@@ -1791,54 +1813,15 @@ embedder’s policy</dfn> given a <a data-link-type="dfn" href="https://fetch.sp
      <li data-md>
       <p>Let <var>parent policy</var> be <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document">container document</a>'s <a data-link-type="dfn" href="#document-embedder-policy" id="ref-for-document-embedder-policy⑦">embedder policy</a>.</p>
      <li data-md>
-      <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-value" id="ref-for-embedder-policy-report-only-value①">report only value</a> is "<code>require-corp</code>" and <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint④">report only reporting endpoint</a> is not null and <var>response policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value①">value</a> is "<code>unsafe-none</code>":</p>
-      <ol>
-       <li data-md>
-        <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a>.</p>
-        <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a> in order to avoid redirect
-information leak.</p>
-       <li data-md>
-        <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password">password</a> to <code>null</code>.</p>
-       <li data-md>
-        <p>Set <var>serialized blocked url</var> be the result of executing the <a href="https://url.spec.whatwg.org/#concept-url-serializer">URL serializer</a> on <var>blocked url</var> with the <var>exclude fragment flag</var> set.</p>
-       <li data-md>
-        <p>Let <var>body</var> be a new object containing the following properties with keys:</p>
-        <ul>
-         <li data-md>
-          <p>key: "<code>type</code>", "<code>navigation</code>".</p>
-         <li data-md>
-          <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
-        </ul>
-       <li data-md>
-        <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep-navigation</code>" for <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> on <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document①">container document</a>.</p>
-      </ol>
+      <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-value" id="ref-for-embedder-policy-report-only-value①">report only value</a> is "<code>require-corp</code>" and <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint④">report only reporting endpoint</a> is not null and <var>response policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value①">value</a> is "<code>unsafe-none</code>", then
+[$queue coep navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation]
+with <var>request</var>, <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> and <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document①">container document</a>.</p>
      <li data-md>
       <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value②">value</a> is "<code>require-corp</code>" and <var>child policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value③">value</a> is "<code>unsafe-none</code>":</p>
       <ol>
        <li data-md>
-        <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint④">reporting endpoint</a> is not null:</p>
-        <ol>
-         <li data-md>
-          <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url①">URL</a>.</p>
-        </ol>
-        <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a> in order to avoid redirect
-information leak.</p>
-        <ol start="2">
-         <li data-md>
-          <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username①">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password①">password</a> to <code>null</code>.</p>
-         <li data-md>
-          <p>Set <var>serialized blocked url</var> be the result of executing the <a href="https://url.spec.whatwg.org/#concept-url-serializer">URL serializer</a> on <var>blocked url</var> with the <var>exclude fragment flag</var> set.</p>
-         <li data-md>
-          <p>Let <var>body</var> be a new object containing the following properties with keys:</p>
-          <ul>
-           <li data-md>
-            <p>key: "<code>type</code>", "<code>navigation</code>".</p>
-           <li data-md>
-            <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
-          </ul>
-         <li data-md>
-          <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep-navigation</code>" for <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> on <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document②">container document</a>.</p>
-        </ol>
+        <p>If <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint④">reporting endpoint</a> is not null, then [$queue coep
+navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation] with <var>request</var>, <var>parent policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> and <var>target</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#bc-container-document" id="ref-for-bc-container-document②">container document</a>.</p>
        <li data-md>
         <p>Return "<code>Blocked</code>".</p>
       </ol>
@@ -1847,7 +1830,7 @@ information leak.</p>
     </ol>
    </div>
    <h3 class="heading settled" data-level="3.2" id="integration-fetch"><span class="secno">3.2. </span><span class="content">Integration with Fetch</span><a class="self-link" href="#integration-fetch"></a></h3>
-   <p>When fetching resources, user agents should examine both the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client">reserved client</a> to determine the applicable <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑧">embedder policy</a>, and apply any constraints that policy expresses
+   <p>When fetching resources, user agents should examine both the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request②">request</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-reserved-client" id="ref-for-concept-request-reserved-client">reserved client</a> to determine the applicable <a data-link-type="dfn" href="#embedder-policy" id="ref-for-embedder-policy⑧">embedder policy</a>, and apply any constraints that policy expresses
 to incoming responses. To do so, Fetch is patched as follows:</p>
    <ol>
     <li data-md>
@@ -1858,7 +1841,7 @@ account, and to cover some <a data-link-type="dfn" href="https://fetch.spec.what
    </ol>
    <h4 class="heading settled" data-level="3.2.1" id="corp-check"><span class="secno">3.2.1. </span><span class="content">Cross-Origin Resource Policy Checks</span><a class="self-link" href="#corp-check"></a></h4>
    <p>To perform a <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-cross-origin-resource-policy-internal-check">cross-origin resource policy internal check</dfn> given a string
-(<var>embedder policy value</var>), a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request②">request</a> (<var>request</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response③">response</a> (<var>response</var>), run these
+(<var>embedder policy value</var>), a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request③">request</a> (<var>request</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response③">response</a> (<var>response</var>), run these
 steps:</p>
    <ol>
     <li data-md>
@@ -1888,14 +1871,14 @@ then set <var>policy</var> to "<code>same-origin</code>".</p>
        <p>Return <code>allowed</code>.</p>
       <dt data-md><code>same-origin</code>
       <dd data-md>
-       <p>If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin">origin</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-origin" id="ref-for-same-origin">same origin</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url②">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin">origin</a>, then return <code>allowed</code>.</p>
+       <p>If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin">origin</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-origin" id="ref-for-same-origin">same origin</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url①">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin">origin</a>, then return <code>allowed</code>.</p>
        <p>Otherwise, return <code>blocked</code>.</p>
       <dt data-md><code>same-site</code>
       <dd data-md>
        <p>If both of the following statements are true, then return <code>allowed</code>:</p>
        <ul>
         <li data-md>
-         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host">host</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-site" id="ref-for-same-site">same site</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url③">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host①">host</a>.</p>
+         <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host">host</a> is <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#same-site" id="ref-for-same-site">same site</a> with <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url②">current URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-host" id="ref-for-concept-origin-host①">host</a>.</p>
         <li data-md>
          <p><var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-origin" id="ref-for-concept-request-origin②">origin</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin-scheme" id="ref-for-concept-origin-scheme">scheme</a> is "<code>https</code>", or <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-https-state" id="ref-for-concept-response-https-state">HTTPS state</a> is "<code>none</code>".</p>
        </ul>
@@ -1913,7 +1896,7 @@ extensions, and I think it’ll be more difficult to ship them after inverting t
 error-handling behavior.</p>
      </dl>
    </ol>
-   <p>To perform a <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request③">request</a> (<var>request</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response④">response</a> (<var>response</var>), run these steps:</p>
+   <p>To perform a <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-cross-origin-resource-policy-check">cross-origin resource policy check</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request④">request</a> (<var>request</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response④">response</a> (<var>response</var>), run these steps:</p>
    <ol>
     <li data-md>
      <p>Let <var>embedder policy</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a>'s <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy">embedder policy</a>.</p>
@@ -1925,9 +1908,9 @@ result of running [$cross-origin resource policy internal check] with <a data-li
 steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url②">URL</a>.</p>
+       <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url①">URL</a>.</p>
       <li data-md>
-       <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username②">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password②">password</a> to <code>null</code>.</p>
+       <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username①">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password①">password</a> to <code>null</code>.</p>
       <li data-md>
        <p>Set <var>serialized blocked url</var> be the result of executing the <a href="https://url.spec.whatwg.org/#concept-url-serializer">URL serializer</a> on <var>blocked url</var> with
 the <var>exclude fragment flag</var> set.</p>
@@ -1948,9 +1931,9 @@ the <var>exclude fragment flag</var> set.</p>
      <p>If <var>embedder policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑥">reporting endpoint</a> is not <code>null</code> and <var>result</var> is <code>blocked</code>, then run these steps:</p>
      <ol>
       <li data-md>
-       <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url③">URL</a>.</p>
+       <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url②">URL</a>.</p>
       <li data-md>
-       <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username③">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password③">password</a> to <code>null</code>.</p>
+       <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username②">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password②">password</a> to <code>null</code>.</p>
       <li data-md>
        <p>Set <var>serialized blocked url</var> be the result of executing the <a href="https://url.spec.whatwg.org/#concept-url-serializer">URL serializer</a> on <var>blocked url</var> with
 the <var>exclude fragment flag</var> set.</p>
@@ -2184,6 +2167,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <li><a href="#abstract-opdef-obtain-a-responses-embedder-policy">obtain a response’s embedder policy</a><span>, in §2.3</span>
    <li><a href="#abstract-opdef-obtain-a-responses-embedder-policy">parse header</a><span>, in §2.3</span>
    <li><a href="#abstract-opdef-process-navigation-response">process navigation response</a><span>, in §3.1.2</span>
+   <li><a href="#abstract-opdef-queue-coep-navigation-violation">queue coep navigation violation</a><span>, in §3.1.2</span>
    <li><a href="#embedder-policy-reporting-endpoint">reporting endpoint</a><span>, in §3.1</span>
    <li><a href="#embedder-policy-report-only-reporting-endpoint">report only reporting endpoint</a><span>, in §3.1</span>
    <li><a href="#embedder-policy-report-only-value">report only value</a><span>, in §3.1</span>
@@ -2223,8 +2207,8 @@ is significantly simpler than imposing new constraints in the future.</p>
   <aside class="dfn-panel" data-for="term-for-concept-request-current-url">
    <a href="https://fetch.spec.whatwg.org/#concept-request-current-url">https://fetch.spec.whatwg.org/#concept-request-current-url</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-request-current-url">3.1.2. Process a navigation response</a> <a href="#ref-for-concept-request-current-url①">(2)</a>
-    <li><a href="#ref-for-concept-request-current-url②">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-request-current-url③">(2)</a>
+    <li><a href="#ref-for-concept-request-current-url">3.1.2. Process a navigation response</a>
+    <li><a href="#ref-for-concept-request-current-url①">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-request-current-url②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-destination">
@@ -2286,9 +2270,9 @@ is significantly simpler than imposing new constraints in the future.</p>
   <aside class="dfn-panel" data-for="term-for-concept-request">
    <a href="https://fetch.spec.whatwg.org/#concept-request">https://fetch.spec.whatwg.org/#concept-request</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-request">3.1.2. Process a navigation response</a>
-    <li><a href="#ref-for-concept-request①">3.2. Integration with Fetch</a>
-    <li><a href="#ref-for-concept-request②">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-request③">(2)</a>
+    <li><a href="#ref-for-concept-request">3.1.2. Process a navigation response</a> <a href="#ref-for-concept-request①">(2)</a>
+    <li><a href="#ref-for-concept-request②">3.2. Integration with Fetch</a>
+    <li><a href="#ref-for-concept-request③">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-request④">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-reserved-client">
@@ -2373,6 +2357,7 @@ is significantly simpler than imposing new constraints in the future.</p>
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-environment-settings-object">3.1. Integration with HTML</a>
+    <li><a href="#ref-for-environment-settings-object①">3.1.2. Process a navigation response</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-global-object">
@@ -2485,8 +2470,8 @@ is significantly simpler than imposing new constraints in the future.</p>
   <aside class="dfn-panel" data-for="term-for-concept-url-password">
    <a href="https://url.spec.whatwg.org/#concept-url-password">https://url.spec.whatwg.org/#concept-url-password</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-url-password">3.1.2. Process a navigation response</a> <a href="#ref-for-concept-url-password①">(2)</a>
-    <li><a href="#ref-for-concept-url-password②">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-url-password③">(2)</a>
+    <li><a href="#ref-for-concept-url-password">3.1.2. Process a navigation response</a>
+    <li><a href="#ref-for-concept-url-password①">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-url-password②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-url-scheme">
@@ -2498,8 +2483,8 @@ is significantly simpler than imposing new constraints in the future.</p>
   <aside class="dfn-panel" data-for="term-for-concept-url-username">
    <a href="https://url.spec.whatwg.org/#concept-url-username">https://url.spec.whatwg.org/#concept-url-username</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-url-username">3.1.2. Process a navigation response</a> <a href="#ref-for-concept-url-username①">(2)</a>
-    <li><a href="#ref-for-concept-url-username②">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-url-username③">(2)</a>
+    <li><a href="#ref-for-concept-url-username">3.1.2. Process a navigation response</a>
+    <li><a href="#ref-for-concept-url-username①">3.2.1. Cross-Origin Resource Policy Checks</a> <a href="#ref-for-concept-url-username②">(2)</a>
    </ul>
   </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>

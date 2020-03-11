@@ -402,6 +402,29 @@ If a document's [=document/embedder policy=] is "`require-corp`", then any docum
 [=nested browsing context=] must positively assert a "`require-corp`" [=/embedder policy=] (see
 [[#cascade-vs-require]]).
 
+To <dfn abstract-op lt="queue coep navigation violation">Queue a Cross-Origin Embedder Policy
+violation on navigation, given a [=request=] (|request|), a string (|endpoint|) and an
+[=environment settings object=] (|settings|), run the following steps:
+
+1.  Let |blocked url| be |request|'s [=request/URL=].
+
+    Note: This is not |request|'s [=request/current URL=] in order to avoid redirect
+    information leak.
+
+2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to `null`.
+
+3.  Set |serialized blocked url| be the result of executing the
+    [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer) on |blocked url|
+    with the |exclude fragment flag| set.
+
+4.  Let |body| be a new object containing the following properties with keys:
+
+    * key: "`type`", "`navigation`".
+    * key: "`blocked-url`", value: |serialized blocked url|.
+
+5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep-navigation`" for
+    |endpoint| on |settings|.
+
 To <dfn abstract-op lt="process navigation response">check a navigation response's adherence to its
 embedder's policy</dfn> given a [=request=] (|request|), a [=response=] (|response|), and a target
 [=browsing context=] (|target|), execute the following steps, which will return "`Allowed`" or
@@ -415,54 +438,19 @@ embedder's policy</dfn> given a [=request=] (|request|), a [=response=] (|respon
 3.  Let |parent policy| be |target|'s [=container document=]'s [=document/embedder policy=].
 
 4.  If |parent policy|'s [=embedder policy/report only value=] is "`require-corp`" and
-       |parent policy|'s [=embedder policy/report only reporting endpoint=] is not null and
-       |response policy|'s [=embedder policy/value=] is "`unsafe-none`":
-
-    1.  Let |blocked url| be |request|'s [=request/URL=].
-
-        Note: This is not |request|'s [=request/current URL=] in order to avoid redirect
-        information leak.
-
-    2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to `null`.
-
-    3.  Set |serialized blocked url| be the result of executing the
-        [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer) on |blocked url|
-        with the |exclude fragment flag| set.
-
-    4.  Let |body| be a new object containing the following properties with keys:
-
-        * key: "`type`", "`navigation`".
-        * key: "`blocked-url`", value: |serialized blocked url|.
-
-    5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep-navigation`" for
-        |parent policy|'s [=embedder policy/report only reporting endpoint=] on |target|'s
-        [=container document=].
+    |parent policy|'s [=embedder policy/report only reporting endpoint=] is not null and
+    |response policy|'s [=embedder policy/value=] is "`unsafe-none`", then
+    [$queue coep navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation]
+    with |request|, |parent policy|'s [=embedder policy/report only reporting endpoint=] and
+    |target|'s [=container document=].
 
 5.  If |parent policy|'s [=embedder policy/value=] is "`require-corp`" and |child policy|'s
        [=embedder policy/value=] is "`unsafe-none`":
 
-    1.  If |parent policy|'s [=embedder policy/reporting endpoint=] is not null:
-
-        1.  Let |blocked url| be |request|'s [=request/URL=].
-
-        Note: This is not |request|'s [=request/current URL=] in order to avoid redirect
-        information leak.
-
-        2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to
-            `null`.
-
-        3.  Set |serialized blocked url| be the result of executing the
-            [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer) on |blocked url|
-            with the |exclude fragment flag| set.
-
-        4.  Let |body| be a new object containing the following properties with keys:
-
-            * key: "`type`", "`navigation`".
-            * key: "`blocked-url`", value: |serialized blocked url|.
-
-        5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep-navigation`" for
-            |parent policy|'s [=embedder policy/reporting endpoint=] on |target|'s
-            [=container document=].
+    1.  If |parent policy|'s [=embedder policy/reporting endpoint=] is not null, then [$queue coep
+        navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation] with
+        |request|, |parent policy|'s [=embedder policy/reporting endpoint=] and |target|'s
+        [=container document=].
 
     2.  Return "`Blocked`".
 
