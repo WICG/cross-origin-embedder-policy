@@ -325,8 +325,8 @@ so, HTML is patched as follows:
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
     >
     > 7.  If the result of [$check a global object's embedder policy$] given
-    >     <var ignore>request</var>, <var ignore>worker global scope</var> and
-    >     <var ignore>owner</var> is "`blocked`", then set |response| to a [=network error=].
+    >     <var ignore>worker global scope</var>, <var ignore>owner</var> and
+    >     <var ignore>request</var> is "`blocked`", then set |response| to a [=network error=].
 
 6.  The [$process a navigate fetch$] algorithm runs the [$cross-origin resource policy check$] for
     navigation for nested browsing contexts by adding the following step before step 6:
