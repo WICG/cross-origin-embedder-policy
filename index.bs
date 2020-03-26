@@ -318,11 +318,15 @@ so, HTML is patched as follows:
     >     [$parse header|obtaining an embedder policy$] from |response|.
 
 5.  The [$run a worker$] algorithm sets the [=WorkerGlobalScope/embedder policy=] for
-    {{WorkerGlobalScope}} objects by adding a new step directly after Referrer Policy is initialized
+    {{WorkerGlobalScope}} objects by adding new steps directly after Referrer Policy is initialized
     in step 12.5:
 
     > 6.  Call [$initialize a global object's embedder policy from a response$] given
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
+    >
+    > 7.  If the result of [$cheking a global object's embedder policy$] given
+    >     <var ignore>worker global scope</var> and <var ignore>response</var> is "`blocked`", then
+    >     set |response| to a [=network error=].
 
 6.  The [$process a navigate fetch$] algorithm runs the [$cross-origin resource policy check$] for
     navigation for nested browsing contexts by adding the following step before step 6:
@@ -365,11 +369,9 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 2.  Let |response policy| be the result of [$parse header|obtaining an embedder policy$] from
     |response|.
 
-3.  Run the steps corresponding to the first matching statement:
+3.  If |response|'s [=response/url=]'s [=url/scheme=] is a [=local scheme=]:
 
-    :   |response|'s [=response/url=]'s [=url/scheme=] is a [=local scheme=]
-    :   |global| is a {{DedicatedWorkerGlobalScope}}:
-    ::  1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
+    1.  For each of the items in |global|'s [=WorkerGlobalScope/owner set=]:
 
             1.  If the item's [=/embedder policy=]'s [=embedder policy/value] is "`require-corp`",
                 then set |policy|'s [=embedder policy/value] to "`require-corp`".
@@ -386,12 +388,61 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
                 item's [=embedder policy/report only reporting endpoint=] is non-null, then
                 |policy|'s [=embedder policy/report only reporting endpoint=] to the item's
                 [=embedder policy/report only reporting endpoint=].
+4.  Otherwise:
 
-    :   |global| is a {{SharedWorkerGlobalScope}}:
-    :   |global| is a {{ServiceWorkerGlobalScope}}:
-    ::  1.   Set |policy| to |response policy|.
+    1.   Set |policy| to |response policy|.
 
-4.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
+5.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
+
+### Checking a global object's Embedder policy ### {#check-embedder-policy-for-global}
+<div algorithm="to check a global object's embedder policy">
+To <dfn abstract-op lt="queue coep worker violation">Queue a Cross-Origin Embedder Policy
+violation on worker initialization</dfn> given a [=request=] (|request|), a string (|endpoint|) and an
+[=environment settings object=] (|settings|), run the following steps:
+
+1.  Let |blocked url| be |request|'s [=request/URL=].
+
+    Note: This is not |request|'s [=request/current URL=] in order to avoid redirect
+    information leak.
+
+2.  Set |blocked url|'s [=url/username=] to the empty string, and its [=url/password=] to `null`.
+
+3.  Set |serialized blocked url| be the result of executing the
+    [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer) on |blocked url|
+    with the |exclude fragment flag| set.
+
+4.  Let |body| be a new object containing the following properties with keys:
+
+    * key: "`type`", "`worker initializatoin`".
+    * key: "`blocked-url`", value: |serialized blocked url|.
+
+5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep`" for
+    |endpoint| on |settings|.
+
+To <dfn abstract-op>check a global object's embedder policy</dfn>, given a [=global object=]
+(|global|), a [=environment settings object=] (|owner|) and a [=request=] (|request|), then
+
+1.  If |global| is a {{SharedWorkerGlobalScope}} or |global| is a {{ServiceWorkerGlobalScope}}, then
+    return "`allowed`".
+
+2.  Let |owner policy| be |owner|'s [=environment settings object/embedder policy=].
+
+3.  If |owner policy|'s [=embedder policy/report only value=] is "`require-corp`" and
+    |owner policy|'s [=embedder policy/report only reporting endpoint=] is not null and
+    |response policy|'s [=embedder policy/value=] is "`unsafe-none`", then [$queue coep worker
+    violation|queue a Cross-Origin Embedder Policy vioalation on worker initialization$] with
+    |request|, |owner policy|'s [=embedder policy/report only reporting endpoint=] and |global|.
+
+4.  If |owner policy|'s [=embedder policy/value=] is "`require-corp`" and |child policy|'s
+       [=embedder policy/value=] is "`unsafe-none`":
+
+    1.  If |owner policy|'s [=embedder policy/reporting endpoint=] is not null, then [$queue coep
+        worker violation|queue a Cross-Origin Embedder Policy vioalation on worker initialization$]
+        with |request|, |owner policy|'s [=embedder policy/reporting endpoint=] and |global|.
+
+    2.  Return "`blocked`".
+
+5.  Return "`allowed`".
 
 </div>
 
