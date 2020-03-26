@@ -324,9 +324,9 @@ so, HTML is patched as follows:
     > 6.  Call [$initialize a global object's embedder policy from a response$] given
     >     <var ignore>worker global scope</var> and <var ignore>response</var>.
     >
-    > 7.  If the result of [$cheking a global object's embedder policy$] given
-    >     <var ignore>worker global scope</var> and <var ignore>response</var> is "`blocked`", then
-    >     set |response| to a [=network error=].
+    > 7.  If the result of [$check a global object's embedder policy$] given
+    >     <var ignore>request</var>, <var ignore>worker global scope</var> and
+    >     <var ignore>owner</var> is "`blocked`", then set |response| to a [=network error=].
 
 6.  The [$process a navigate fetch$] algorithm runs the [$cross-origin resource policy check$] for
     navigation for nested browsing contexts by adding the following step before step 6:
@@ -431,14 +431,14 @@ To <dfn abstract-op>check a global object's embedder policy</dfn>, given a [=glo
     |owner policy|'s [=embedder policy/report only reporting endpoint=] is not null and
     |response policy|'s [=embedder policy/value=] is "`unsafe-none`", then [$queue coep worker
     violation|queue a Cross-Origin Embedder Policy vioalation on worker initialization$] with
-    |request|, |owner policy|'s [=embedder policy/report only reporting endpoint=] and |global|.
+    |request|, |owner policy|'s [=embedder policy/report only reporting endpoint=] and |owner|.
 
 4.  If |owner policy|'s [=embedder policy/value=] is "`require-corp`" and |child policy|'s
        [=embedder policy/value=] is "`unsafe-none`":
 
     1.  If |owner policy|'s [=embedder policy/reporting endpoint=] is not null, then [$queue coep
         worker violation|queue a Cross-Origin Embedder Policy vioalation on worker initialization$]
-        with |request|, |owner policy|'s [=embedder policy/reporting endpoint=] and |global|.
+        with |request|, |owner policy|'s [=embedder policy/reporting endpoint=] and |owner|.
 
     2.  Return "`blocked`".
 

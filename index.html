@@ -1222,7 +1222,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
-  <meta content="74b057c89085ca152a846edefd76197621d49308" name="document-revision">
+  <meta content="131306e40134c11cc3637c14f2f5a0dc8929b06e" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1699,8 +1699,7 @@ in step 12.5:</p>
        <li data-md>
         <p>Call <a data-link-type="abstract-op" href="#abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response" id="ref-for-abstract-opdef-initialize-a-global-objects-embedder-policy-from-a-response">initialize a global object’s embedder policy from a response</a> given <var>worker global scope</var> and <var>response</var>.</p>
        <li data-md>
-        <p>If the result of <a data-link-type="abstract-op">cheking a global object’s embedder policy</a> given <var>worker global scope</var> and <var>response</var> is "<code>blocked</code>", then
-set <var>response</var> to a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error">network error</a>.</p>
+        <p>If the result of <a data-link-type="abstract-op" href="#abstract-opdef-check-a-global-objects-embedder-policy" id="ref-for-abstract-opdef-check-a-global-objects-embedder-policy">check a global object’s embedder policy</a> given <var>request</var>, <var>worker global scope</var> and <var>owner</var> is "<code>blocked</code>", then set <var>response</var> to a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error">network error</a>.</p>
       </ol>
      </blockquote>
     <li data-md>
@@ -1798,7 +1797,7 @@ information leak.</p>
       <li data-md>
        <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep</code>" for <var>endpoint</var> on <var>settings</var>.</p>
      </ol>
-     <p>To <dfn data-dfn-type="abstract-op" data-export id="abstract-opdef-check-a-global-objects-embedder-policy">check a global object’s embedder policy<a class="self-link" href="#abstract-opdef-check-a-global-objects-embedder-policy"></a></dfn>, given a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object①">global object</a> (<var>global</var>), a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object②">environment settings object</a> (<var>owner</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a> (<var>request</var>), then</p>
+     <p>To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-check-a-global-objects-embedder-policy">check a global object’s embedder policy</dfn>, given a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object①">global object</a> (<var>global</var>), a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object②">environment settings object</a> (<var>owner</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a> (<var>request</var>), then</p>
      <ol>
       <li data-md>
        <p>If <var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworkerglobalscope" id="ref-for-sharedworkerglobalscope">SharedWorkerGlobalScope</a></code> or <var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope" id="ref-for-serviceworkerglobalscope">ServiceWorkerGlobalScope</a></code>, then
@@ -1806,12 +1805,12 @@ return "<code>allowed</code>".</p>
       <li data-md>
        <p>Let <var>owner policy</var> be <var>owner</var>’s <a data-link-type="dfn" href="#environment-settings-object-embedder-policy" id="ref-for-environment-settings-object-embedder-policy">embedder policy</a>.</p>
       <li data-md>
-       <p>If <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-value" id="ref-for-embedder-policy-report-only-value①">report only value</a> is "<code>require-corp</code>" and <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint④">report only reporting endpoint</a> is not null and <var>response policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value①">value</a> is "<code>unsafe-none</code>", then <a data-link-type="abstract-op" href="#abstract-opdef-queue-coep-worker-violation" id="ref-for-abstract-opdef-queue-coep-worker-violation">queue a Cross-Origin Embedder Policy vioalation on worker initialization</a> with <var>request</var>, <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> and <var>global</var>.</p>
+       <p>If <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-value" id="ref-for-embedder-policy-report-only-value①">report only value</a> is "<code>require-corp</code>" and <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint④">report only reporting endpoint</a> is not null and <var>response policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value①">value</a> is "<code>unsafe-none</code>", then <a data-link-type="abstract-op" href="#abstract-opdef-queue-coep-worker-violation" id="ref-for-abstract-opdef-queue-coep-worker-violation">queue a Cross-Origin Embedder Policy vioalation on worker initialization</a> with <var>request</var>, <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-endpoint" id="ref-for-embedder-policy-report-only-reporting-endpoint⑤">report only reporting endpoint</a> and <var>owner</var>.</p>
       <li data-md>
        <p>If <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value②">value</a> is "<code>require-corp</code>" and <var>child policy</var>’s <a data-link-type="dfn" href="#embedder-policy-value" id="ref-for-embedder-policy-value③">value</a> is "<code>unsafe-none</code>":</p>
        <ol>
         <li data-md>
-         <p>If <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint④">reporting endpoint</a> is not null, then <a data-link-type="abstract-op" href="#abstract-opdef-queue-coep-worker-violation" id="ref-for-abstract-opdef-queue-coep-worker-violation①">queue a Cross-Origin Embedder Policy vioalation on worker initialization</a> with <var>request</var>, <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> and <var>global</var>.</p>
+         <p>If <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint④">reporting endpoint</a> is not null, then <a data-link-type="abstract-op" href="#abstract-opdef-queue-coep-worker-violation" id="ref-for-abstract-opdef-queue-coep-worker-violation①">queue a Cross-Origin Embedder Policy vioalation on worker initialization</a> with <var>request</var>, <var>owner policy</var>’s <a data-link-type="dfn" href="#embedder-policy-reporting-endpoint" id="ref-for-embedder-policy-reporting-endpoint⑤">reporting endpoint</a> and <var>owner</var>.</p>
         <li data-md>
          <p>Return "<code>blocked</code>".</p>
        </ol>
@@ -2745,6 +2744,12 @@ error-handling behavior.<a href="#issue-4328816a"> ↵ </a></div>
    <b><a href="#abstract-opdef-queue-coep-worker-violation">#abstract-opdef-queue-coep-worker-violation</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-abstract-opdef-queue-coep-worker-violation">3.1.2. Checking a global object’s Embedder policy</a> <a href="#ref-for-abstract-opdef-queue-coep-worker-violation①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="abstract-opdef-check-a-global-objects-embedder-policy">
+   <b><a href="#abstract-opdef-check-a-global-objects-embedder-policy">#abstract-opdef-check-a-global-objects-embedder-policy</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-abstract-opdef-check-a-global-objects-embedder-policy">3.1. Integration with HTML</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="abstract-opdef-queue-coep-navigation-violation">
