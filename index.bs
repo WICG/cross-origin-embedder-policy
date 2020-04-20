@@ -395,7 +395,8 @@ To <dfn abstract-op>initialize a global object's embedder policy from a response
 5.  Set |global|'s [=WorkerGlobalScope/embedder policy=] to |policy|.
 
 ### Checking a global object's Embedder policy ### {#check-embedder-policy-for-global}
-<div algorithm="to check a global object's embedder policy">
+
+<div algorithm="to queu a coep worker violation">
 To <dfn abstract-op lt="queue coep worker violation">Queue a Cross-Origin Embedder Policy
 violation on worker initialization</dfn> given a [=request=] (|request|), a string (|endpoint|) and an
 [=environment settings object=] (|settings|), run the following steps:
@@ -419,6 +420,9 @@ violation on worker initialization</dfn> given a [=request=] (|request|), a stri
 5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep`" for
     |endpoint| on |settings|.
 
+</div>
+
+<div algorithm="to check a global object's embedder policy">
 To <dfn abstract-op>check a global object's embedder policy</dfn>, given a [=global object=]
 (|global|), a [=environment settings object=] (|owner|) and a [=request=] (|request|), then
 
