@@ -413,7 +413,7 @@ violation on worker initialization</dfn> given a [=request=] (|request|), a stri
 
 4.  Let |body| be a new object containing the following properties with keys:
 
-    * key: "`type`", "`worker initializatoin`".
+    * key: "`type`", "`worker initialization`".
     * key: "`blocked-url`", value: |serialized blocked url|.
 
 5.  [Queue](https://w3c.github.io/reporting/#queue-report) |body| as "`coep`" for
