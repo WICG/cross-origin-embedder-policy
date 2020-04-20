@@ -152,7 +152,7 @@ In order to support forward-compatibility with as-yet-unknown request types, use
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
 value cannot be parsed as a <a grammar>`sh-token`</a>.
 
-The `Cross-Origin-Embedder-Policy-Report-Only` HTTP Response Header {#COEP}
+The `Cross-Origin-Embedder-Policy-Report-Only` HTTP Response Header {#COEP-RO}
 ----------------------------------------------------------------
 
 The <dfn http-header>`Cross-Origin-Embedder-Policy-Report-Only`</dfn> HTTP response header field

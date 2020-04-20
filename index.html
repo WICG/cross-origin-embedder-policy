@@ -1222,7 +1222,7 @@ Possible extra rowspan handling
 	}
 </style>
   <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
-  <meta content="1038b545b4389184c188d6a73c96da3bd226c642" name="document-revision">
+  <meta content="e59fbaa66de7380dd89f0275eaa3cee25ec65b5e" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1422,7 +1422,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Cross-Origin Embedder Policy</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-03-26">26 March 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">A Collection of Interesting Ideas, <time class="dt-updated" datetime="2020-04-20">20 April 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>Issue Tracking:
@@ -1456,7 +1456,7 @@ pre .property::before, pre .property::after {
      <a href="#framework"><span class="secno">2</span> <span class="content">Framework</span></a>
      <ol class="toc">
       <li><a href="#COEP"><span class="secno">2.1</span> <span class="content">The <code>Cross-Origin-Embedder-Policy</code> HTTP Response Header</span></a>
-      <li><a href="#COEP①"><span class="secno">2.2</span> <span class="content">The <code>Cross-Origin-Embedder-Policy-Report-Only</code> HTTP Response Header</span></a>
+      <li><a href="#COEP-RO"><span class="secno">2.2</span> <span class="content">The <code>Cross-Origin-Embedder-Policy-Report-Only</code> HTTP Response Header</span></a>
       <li><a href="#parsing"><span class="secno">2.3</span> <span class="content">Parsing</span></a>
      </ol>
     <li>
@@ -1547,7 +1547,7 @@ represents the endpoint for violation reporting.</p>
    <p>In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
 this header if it contains an invalid value. Likewise, user agents MUST ignore this header if the
 value cannot be parsed as a <a data-link-type="grammar" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9①"><code>sh-token</code></a>.</p>
-   <h3 class="heading settled" data-level="2.2" id="COEP①"><span class="secno">2.2. </span><span class="content">The <code>Cross-Origin-Embedder-Policy-Report-Only</code> HTTP Response Header</span><a class="self-link" href="#COEP①"></a></h3>
+   <h3 class="heading settled" data-level="2.2" id="COEP-RO"><span class="secno">2.2. </span><span class="content">The <code>Cross-Origin-Embedder-Policy-Report-Only</code> HTTP Response Header</span><a class="self-link" href="#COEP-RO"></a></h3>
    <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-cross-origin-embedder-policy-report-only"><code>Cross-Origin-Embedder-Policy-Report-Only</code><a class="self-link" href="#http-headerdef-cross-origin-embedder-policy-report-only"></a></dfn> HTTP response header field
 allows a server to declare an embedder policy for a given document. It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#" id="termref-for-①">Structured Header</a> whose value MUST be a <a data-link-type="dfn" href="https://tools.ietf.org/html/draft-ietf-httpbis-header-structure#section-3.9" id="ref-for-section-3.9②">token</a>. <a data-link-type="biblio" href="#biblio-i-dietf-httpbis-header-structure">[I-D.ietf-httpbis-header-structure]</a> Its ABNF
 is:</p>
@@ -1774,14 +1774,14 @@ item’s <a data-link-type="dfn" href="#embedder-policy-report-only-reporting-en
       <p>Set <var>global</var>’s <a data-link-type="dfn" href="#workerglobalscope-embedder-policy" id="ref-for-workerglobalscope-embedder-policy②">embedder policy</a> to <var>policy</var>.</p>
     </ol>
     <h4 class="heading settled" data-level="3.1.2" id="check-embedder-policy-for-global"><span class="secno">3.1.2. </span><span class="content">Checking a global object’s Embedder policy</span><a class="self-link" href="#check-embedder-policy-for-global"></a></h4>
-    <div class="algorithm" data-algorithm="to check a global object’s embedder policy">
+    <div class="algorithm" data-algorithm="to queu a coep worker violation">
       To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-lt="queue coep worker violation" id="abstract-opdef-queue-coep-worker-violation">Queue a Cross-Origin Embedder Policy
 violation on worker initialization</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> (<var>request</var>), a string (<var>endpoint</var>) and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object①">environment settings object</a> (<var>settings</var>), run the following steps: 
      <ol>
       <li data-md>
        <p>Let <var>blocked url</var> be <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a>.</p>
-       <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a> in order to avoid redirect
-information leak.</p>
+       <p class="note" role="note"><span>Note:</span> This is not <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-current-url" id="ref-for-concept-request-current-url">current URL</a> in order to avoid leaking information
+about redirect targets (see https://w3c.github.io/webappsec-csp/#security-violation-reports).</p>
       <li data-md>
        <p>Set <var>blocked url</var>’s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-username" id="ref-for-concept-url-username">username</a> to the empty string, and its <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-password" id="ref-for-concept-url-password">password</a> to <code>null</code>.</p>
       <li data-md>
@@ -1790,14 +1790,16 @@ information leak.</p>
        <p>Let <var>body</var> be a new object containing the following properties with keys:</p>
        <ul>
         <li data-md>
-         <p>key: "<code>type</code>", "<code>worker initializatoin</code>".</p>
+         <p>key: "<code>type</code>", "<code>worker initialization</code>".</p>
         <li data-md>
          <p>key: "<code>blocked-url</code>", value: <var>serialized blocked url</var>.</p>
        </ul>
       <li data-md>
        <p><a href="https://w3c.github.io/reporting/#queue-report">Queue</a> <var>body</var> as "<code>coep</code>" for <var>endpoint</var> on <var>settings</var>.</p>
      </ol>
-     <p>To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-check-a-global-objects-embedder-policy">check a global object’s embedder policy</dfn>, given a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object①">global object</a> (<var>global</var>), a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object②">environment settings object</a> (<var>owner</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a> (<var>request</var>), then</p>
+    </div>
+    <div class="algorithm" data-algorithm="to check a global object’s embedder policy">
+      To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-check-a-global-objects-embedder-policy">check a global object’s embedder policy</dfn>, given a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object①">global object</a> (<var>global</var>), a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object②">environment settings object</a> (<var>owner</var>) and a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a> (<var>request</var>), then 
      <ol>
       <li data-md>
        <p>If <var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/workers.html#sharedworkerglobalscope" id="ref-for-sharedworkerglobalscope">SharedWorkerGlobalScope</a></code> or <var>global</var> is a <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope" id="ref-for-serviceworkerglobalscope">ServiceWorkerGlobalScope</a></code>, then
