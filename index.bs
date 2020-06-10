@@ -164,11 +164,11 @@ is:
 Cross-Origin-Embedder-Policy-Report-Only = sh-item
 ```
 
-The `Cross-Origin-Embedder-Policy-Report-Policy` value consists of one token ("`require-corp`") which
+The `Cross-Origin-Embedder-Policy-Report-Only` value consists of one token ("`require-corp`") which
 may have a parameter specifying a [=structured-header/string=] which
 represents the endpoint for violation reporting.
 
-The `Cross-Origin-Embedder-Policy-Report-Policy` value is used only when there is no
+The `Cross-Origin-Embedder-Policy-Report-Only` value is used only when there is no
 `Cross-Origin-Embedder-Policy` header present.
 
 In order to support forward-compatibility with as-yet-unknown request types, user agents MUST ignore
