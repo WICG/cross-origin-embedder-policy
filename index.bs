@@ -434,14 +434,14 @@ To <dfn abstract-op>check a global object's embedder policy</dfn>, given a [=glo
 3.  If |owner policy|'s [=embedder policy/report only value=] is "`require-corp`" and
     |owner policy|'s [=embedder policy/report only reporting endpoint=] is not null and
     |response policy|'s [=embedder policy/value=] is "`unsafe-none`", then [$queue coep worker
-    violation|queue a Cross-Origin Embedder Policy vioalation on worker initialization$] with
+    violation|queue a Cross-Origin Embedder Policy violation on worker initialization$] with
     |request|, |owner policy|'s [=embedder policy/report only reporting endpoint=] and |owner|.
 
 4.  If |owner policy|'s [=embedder policy/value=] is "`require-corp`" and |child policy|'s
        [=embedder policy/value=] is "`unsafe-none`":
 
     1.  If |owner policy|'s [=embedder policy/reporting endpoint=] is not null, then [$queue coep
-        worker violation|queue a Cross-Origin Embedder Policy vioalation on worker initialization$]
+        worker violation|queue a Cross-Origin Embedder Policy violation on worker initialization$]
         with |request|, |owner policy|'s [=embedder policy/reporting endpoint=] and |owner|.
 
     2.  Return "`blocked`".
@@ -495,7 +495,7 @@ embedder's policy</dfn> given a [=request=] (|request|), a [=response=] (|respon
 4.  If |parent policy|'s [=embedder policy/report only value=] is "`require-corp`" and
     |parent policy|'s [=embedder policy/report only reporting endpoint=] is not null and
     |response policy|'s [=embedder policy/value=] is "`unsafe-none`", then [$queue coep navigation
-    violation|queue a Cross-Origin Embedder Policy vioalation on navigation$] with |request|,
+    violation|queue a Cross-Origin Embedder Policy violation on navigation$] with |request|,
     |parent policy|'s [=embedder policy/report only reporting endpoint=] and |target|'s
     [=container document=].
 
@@ -503,7 +503,7 @@ embedder's policy</dfn> given a [=request=] (|request|), a [=response=] (|respon
        [=embedder policy/value=] is "`unsafe-none`":
 
     1.  If |parent policy|'s [=embedder policy/reporting endpoint=] is not null, then [$queue coep
-        navigation violation|queue a Cross-Origin Embedder Policy vioalation on navigation$] with
+        navigation violation|queue a Cross-Origin Embedder Policy violation on navigation$] with
         |request|, |parent policy|'s [=embedder policy/reporting endpoint=] and |target|'s
         [=container document=].
 
